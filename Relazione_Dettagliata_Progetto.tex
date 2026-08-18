@@ -1,0 +1,94 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[italic]{mathastext}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\geometry{a4paper, margin=20mm}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{enumitem}
+
+\definecolor{primary}{RGB}{15, 23, 42}
+\definecolor{accent}{RGB}{217, 119, 6}
+\definecolor{codebg}{RGB}{15, 23, 42}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=accent
+}
+
+\lstset{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small\color{white},
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{accent},
+    language=SQL
+}
+
+\title{\textbf{\Large RELAZIONE TECNICA DETTAGLIATA DI PROGETTO}\\ \large Corso: Web and Multimedia Technologies — UNIPV}
+\author{\textbf{Marco Santoro}}
+\date{Anno Accademico 2025/2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduzione, Vision e Contesto Applicativo}
+La presente relazione descrive in dettaglio la progettazione, l'architettura tecnica e le scelte metodologiche alla base dello sviluppo del sito web e della piattaforma di gestione per \textbf{Algora Studio}. Algora Studio è una software house specializzata nella realizzazione di soluzioni verticali per il dominio del patrimonio culturale e della memoria storica documentale italiana.
+
+Il prodotto di punta è \textbf{Foliarium}, un software gestionale sviluppato per l'Archivio di Stato di Savona per la digitalizzazione e consultazione \textit{fuzzy} degli archivi catastali storici (dal 1830 ad oggi).
+
+\section{Architettura dell'Informazione e Mappatura delle Pagine}
+L'applicazione si articola su 5 pagine HTML5 statiche integrate da 1 script dinamico PHP:
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Risorsa File} & \textbf{Stack} & \textbf{Ruolo nell'Architettura} \\
+\midrule
+\texttt{index.html} & HTML5, CSS3, JS & Home Page Istituzionale con manifesto e metriche. \\
+\texttt{chi-siamo.html} & HTML5, CSS3 & Profilo aziendale e filosofia dello sviluppo verticale. \\
+\texttt{foliarium.html} & HTML5, CSS3 & Scheda prodotto dettagliata e prezzi licenze PA. \\
+\texttt{caso-studio.html} & HTML5, CSS3 & Caso studio reale Archivio di Stato di Savona. \\
+\texttt{contatti.html} & HTML5, CSS3, JS & Interfaccia di contatto, FAQ accordion e form. \\
+\texttt{invia-contatto.php} & PHP 8, MySQLi & Backend server-side per la persistenza dei dati. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Tecniche Frontend: HTML5, CSS3 e Layout Non Lineare}
+Il codice è stato sviluppato interamente a mano. Il layout "non lineare" è garantito dall'uso di \texttt{position: fixed} per la navigazione e da griglie asimmetriche in \textbf{CSS Grid} e \textbf{Flexbox}.
+
+\section{Tecniche Client-Side: JavaScript Vanilla}
+Realizzato in JS Vanilla per la gestione del menu responsive (\texttt{toggleNav}), dello scroll listener e del sistema FAQ accordion.
+
+\section{Tecniche Server-Side e Persistenza Dati: PHP \& MySQL}
+Schema DDL della tabella \texttt{contatti}:
+
+\begin{lstlisting}
+CREATE DATABASE IF NOT EXISTS algora_db;
+USE algora_db;
+
+CREATE TABLE IF NOT EXISTS contatti (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    ente VARCHAR(100),
+    email VARCHAR(100) NOT NULL,
+    tipo VARCHAR(50),
+    messaggio TEXT NOT NULL,
+    data_invio DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+\end{lstlisting}
+
+Sicurezza garantita da Prepared Statements (\texttt{mysqli}) e sanitizzazione degli input (\texttt{trim()}, \texttt{htmlspecialchars()}).
+
+\section{Conclusioni e Collaudo Locale}
+Per il collaudo locale: avviare Apache e MySQL su XAMPP, copiare la cartella in \texttt{htdocs}, importare il database e accedere a \texttt{http://localhost/algora_site/contatti.html}.
+
+\end{document}
