@@ -129,5 +129,12 @@ Per eseguire il collaudo completo della piattaforma e verificare l'interazione d
 2. Copiare l'intera cartella `algora_site` all'interno della directory root del server (es. `C:\xampp\htdocs\algora_site` oppure nella cartella  `C:\wamp64\www\algora_site` nel caso di WAMP).
 3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire le query DDL di creazione del database `algora_db` e della tabella `contatti` riportate al punto 5.2.
 4. Aprire il browser e digitare l'URL locale per la home: http://localhost/algora_site/index.html`
-5. Per testare le funzionalità server basta andare su `http://localhost/algora_site/contatti.html`, compilare il form e inviare i dati. Verificare che venga mostrata la schermata di conferma dinamica generata da `invia-contatto.php` e che la nuova riga sia presente nella tabella MySQL.
-6. In alternativa la versione online è disponibile per la consultazione al sito www.algorastudio.it .
+5. Per testare le funzionalità server basta andare su `http://localhost/algora_site/contatti.html`, compilare il form e inviare i dati. Verificare che venga mostrata la schermata di conferma dinamica generata da `invia-contatto.php` e che la nuova riga sia presente nella tabella MySQL
+
+## 8. ISTRUZIONI PER L'UTILIZZO ONLINE
+
+1. In alternativa la versione online è disponibile per la consultazione al sito www.algorastudio.it .
+2. Nel caso di utilizzo su hosting e dominio web, bisogna configurare nel file .php i parametri di connessione del database e del relativo user con i privilegi associati, impostati sul gestore del dominio.
+3. Qui una schermata di  **phpMyAdmin** che dimostra la corretta creazione del record relativa alla richiesta di contatto.
+
+![image-20260819185633301](C:\Users\saintgold\AppData\Roaming\Typora\typora-user-images\image-20260819185633301.png)
