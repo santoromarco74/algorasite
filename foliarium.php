@@ -133,6 +133,52 @@
   </div>
 </section>
 
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCHERMATE DEL PRODOTTO
+
+     Blocco pronto all'uso, disattivato finche' non ci sono le immagini.
+     Per attivarlo: metti i tre PNG in img/ (vedi img/LEGGIMI.md), togli
+     le due righe di commento qui sotto e sopra </section>, e aggiorna
+     width/height con le dimensioni reali dei file.
+
+     Gli attributi width e height servono a riservare lo spazio prima che
+     l'immagine arrivi: senza, il testo sotto slitta a caricamento finito.
+     loading="lazy" rimanda il caricamento a quando l'immagine si avvicina
+     allo schermo; decoding="async" evita che blocchi il disegno di pagina.
+
+<section class="schermate">
+  <div class="feat-intro">
+    <p class="label mb-16">Schermate</p>
+    <h2>Foliarium<br><em>in funzione.</em></h2>
+  </div>
+
+  <div class="shot-grid">
+    <figure class="shot">
+      <img src="img/foliarium-ricerca.png"
+           alt="Ricerca del possessore Ferrari: il sistema propone anche Ferrero e Ferraro, con l'indicazione di quanto ciascun risultato si discosta dal testo cercato."
+           width="1600" height="1000" loading="lazy" decoding="async">
+      <figcaption>La ricerca fuzzy tollera le varianti di grafia con cui lo stesso cognome compare nei registri di epoche diverse.</figcaption>
+    </figure>
+
+    <figure class="shot">
+      <img src="img/foliarium-albero.png"
+           alt="Albero delle proprieta' di un possessore: dalla partita catastale si diramano i singoli terreni, ognuno con foglio, mappale e destinazione d'uso."
+           width="1600" height="1000" loading="lazy" decoding="async">
+      <figcaption>L'albero delle proprieta' ricostruisce in una sola vista che cosa apparteneva a un possessore e in quale comune.</figcaption>
+    </figure>
+
+    <figure class="shot">
+      <img src="img/foliarium-report.png"
+           alt="Anteprima di un report in PDF con l'intestazione dell'Archivio di Stato, l'elenco delle partite selezionate e la data di estrazione."
+           width="1600" height="1000" loading="lazy" decoding="async">
+      <figcaption>Ogni ricerca puo' diventare un report firmato e datato, utile per le richieste di consultazione.</figcaption>
+    </figure>
+  </div>
+</section>
+
+═══════════════════════════════════════════════════════════════════ -->
+
 <!-- LICENZE -->
 <section class="licenze">
   <p class="label mb-16">Licenze software</p>

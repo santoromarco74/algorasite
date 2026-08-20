@@ -34,10 +34,19 @@ $messaggio = trim($_POST['messaggio'] ?? '');
 
 $email = filter_var($emailRaw, FILTER_VALIDATE_EMAIL);
 
+// Il consenso al trattamento e' la base giuridica su cui poggia tutto il
+// trattamento: senza, il dato non va scritto. La casella e' marcata
+// required nel modulo, ma il controllo lato client si aggira banalmente,
+// quindi la verifica che conta e' questa.
+$consenso = isset($_POST['consenso']) && $_POST['consenso'] === '1';
+
 if ($nome === '' || $messaggio === '') {
     $errore = 'Per favore compila tutti i campi obbligatori: nome, email e messaggio.';
 } elseif ($email === false) {
     $errore = 'L\'indirizzo email inserito non sembra valido. Controllalo e riprova.';
+} elseif (!$consenso) {
+    $errore = 'Per poterti rispondere dobbiamo registrare i tuoi dati: '
+            . 'serve il consenso al trattamento indicato nell\'informativa privacy.';
 } else {
     // ── Inserimento con istruzione preparata ──────────────────────────
     // I segnaposto "?" tengono separati comandi SQL e dati utente:
@@ -53,8 +62,12 @@ if ($nome === '' || $messaggio === '') {
         $conn = new mysqli($cfg['host'], $cfg['user'], $cfg['password'], $cfg['dbname']);
         $conn->set_charset($cfg['charset']);
 
+        // Il consenso viene registrato con il momento in cui e' stato
+        // prestato: l'art. 7 del GDPR richiede di poterlo dimostrare.
         $stmt = $conn->prepare(
-            'INSERT INTO contatti (nome, ente, email, tipo, messaggio) VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO contatti (nome, ente, email, tipo, messaggio,
+                                   consenso_privacy, data_consenso)
+             VALUES (?, ?, ?, ?, ?, 1, NOW())'
         );
         $stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
         $stmt->execute();
