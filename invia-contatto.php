@@ -53,25 +53,25 @@ $conn->close();
 <body>
 
 <nav id="nav">
-  <a href="index.html" class="nav-logo">
+  <a href="index.php" class="nav-logo">
     <span class="brand">ALGORA</span>
     <span class="sub">STUDIO</span>
   </a>
 </nav>
 
-<section style="padding-top: 140px; min-height: 80vh;">
-  <div style="max-width: 600px; margin: 0 auto; background: var(--parchment-2); padding: 40px; border: 1px solid var(--border);">
+<section class="esito-section">
+  <div class="esito-card">
     <?php if ($successo): ?>
-        <p class="label" style="color: var(--green);">Messaggio Ricevuto</p>
-        <h2 style="margin-top: 10px;">Grazie, <?= htmlspecialchars($nome) ?>!</h2>
-        <p style="margin-top: 15px; color: var(--mid);">La tua richiesta per l'ente <strong><?= htmlspecialchars($ente ?: 'Non specificato') ?></strong> è stata salvata con successo nel nostro sistema.</p>
-        <p style="margin-top: 10px; color: var(--mid);">Ti risponderemo all'indirizzo <em><?= htmlspecialchars($email) ?></em> entro 24 ore lavorative.</p>
-        <a href="index.html" class="btn btn-dark" style="margin-top: 25px;">Torna alla Home</a>
+        <p class="label msg-success">Messaggio Ricevuto</p>
+        <h2 class="mt-10">Grazie, <?= htmlspecialchars($nome) ?>!</h2>
+        <p class="mt-15 text-mid">La tua richiesta per l'ente <strong><?= htmlspecialchars($ente ?: 'Non specificato') ?></strong> è stata salvata con successo nel nostro sistema.</p>
+        <p class="mt-10 text-mid">Ti risponderemo all'indirizzo <em><?= htmlspecialchars($email) ?></em> entro 24 ore lavorative.</p>
+        <a href="index.php" class="btn btn-dark mt-25">Torna alla Home</a>
     <?php else: ?>
-        <p class="label" style="color: #a00;">Errore</p>
-        <h2 style="margin-top: 10px;">Si è verificato un problema</h2>
-        <p style="margin-top: 15px; color: var(--mid);"><?= htmlspecialchars($errore) ?></p>
-        <a href="contatti.html" class="btn btn-outline" style="margin-top: 25px;">Torna al modulo</a>
+        <p class="label msg-error">Errore</p>
+        <h2 class="mt-10">Si è verificato un problema</h2>
+        <p class="mt-15 text-mid"><?= htmlspecialchars($errore) ?></p>
+        <a href="contatti.php" class="btn btn-outline mt-25">Torna al modulo</a>
     <?php endif; ?>
   </div>
 </section>

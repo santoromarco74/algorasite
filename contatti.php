@@ -1,3 +1,4 @@
+<?php $active = 'contatti'; ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -5,161 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contatti — Algora Studio</title>
 <link rel="stylesheet" href="style.css">
-<style>
-.contact-hero {
-  background: var(--ink);
-  padding: 130px clamp(24px,5vw,72px) 80px;
-  display: grid; grid-template-columns: 1fr 420px; gap: 0;
-  align-items: start;
-}
-
-.ch-text { padding: 0 64px 0 0; }
-.ch-text .label { color: var(--gold); margin-bottom: 24px; }
-.ch-text h1 { color: var(--ivory); margin-bottom: 0; }
-.ch-text h1 em { color: var(--gold); }
-
-.contact-info-card {
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.1);
-  padding: 40px;
-}
-
-.ci-title {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 10px; letter-spacing: 4px; color: var(--gold);
-  text-transform: uppercase; margin-bottom: 28px;
-}
-
-.ci-item { padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
-.ci-item:last-child { border-bottom: none; }
-.ci-item label {
-  display: block; font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 10px; letter-spacing: 3px; color: var(--gold);
-  text-transform: uppercase; margin-bottom: 6px;
-}
-.ci-item a, .ci-item span {
-  font-size: 16px; color: rgba(249,246,239,.85); text-decoration: none;
-}
-.ci-item a:hover { color: var(--gold); }
-
-/* ── FORM ────────────────────────── */
-.contact-form-section { background: var(--cream); border-bottom: 1px solid var(--border); }
-
-.form-grid { gap: clamp(40px,6vw,88px); align-items: start; }
-
-.form-intro h2 { margin-bottom: 16px; }
-.form-intro p { font-size: 16px; color: var(--mid); margin-bottom: 20px; line-height: 1.8; }
-
-.demo-steps { list-style: none; margin-top: 32px; }
-.demo-steps li {
-  display: flex; gap: 20px; padding: 16px 0;
-  border-bottom: 1px solid var(--border);
-}
-.demo-steps li:last-child { border-bottom: none; }
-.ds-n {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 11px; letter-spacing: 3px; color: var(--gold);
-  flex-shrink: 0; margin-top: 3px;
-}
-.ds-t strong { display: block; font-size: 16px; color: var(--ink); margin-bottom: 4px; }
-.ds-t p { font-size: 14px; color: var(--muted); margin: 0; }
-
-.form-group { margin-bottom: 24px; }
-
-.form-group label {
-  display: block; font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 10px; letter-spacing: 3px; color: var(--gold);
-  text-transform: uppercase; margin-bottom: 8px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%; padding: 14px 16px;
-  background: var(--parchment); border: 1px solid var(--border);
-  font-family: 'Libre Baskerville', serif; font-size: 15px; color: var(--ink);
-  outline: none; transition: border-color .2s;
-  appearance: none;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: var(--gold);
-  background: var(--ivory);
-}
-
-.form-group textarea { min-height: 140px; resize: vertical; }
-
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-.form-submit {
-  background: var(--ink); color: var(--ivory);
-  width: 100%; padding: 16px;
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
-  border: none; cursor: pointer; transition: background .2s;
-}
-.form-submit:hover { background: var(--green); }
-
-.form-note {
-  font-size: 13px; color: var(--muted); margin-top: 12px;
-  font-style: italic;
-}
-
-/* ── PERCHÉ NOI ─────────────────── */
-.perche { background: var(--parchment); }
-
-.perche-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; background: var(--border); }
-.pc-card { background: var(--parchment); padding: 40px 32px; }
-.pc-n { font-family: 'Trebuchet MS', Calibri, sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
-.pc-card h3 { font-size: 22px; color: var(--ink); margin-bottom: 12px; }
-.pc-card p { font-size: 15px; color: var(--mid); line-height: 1.7; }
-
-/* ── FAQ ────────────────────────── */
-.faq { background: var(--parchment-2); border-top: 1px solid var(--border); }
-.faq-list { max-width: 760px; }
-.faq-item {
-  border-bottom: 1px solid var(--border); padding: 24px 0;
-  cursor: pointer;
-}
-.faq-item:last-child { border-bottom: none; }
-.faq-q {
-  display: flex; justify-content: space-between; align-items: start; gap: 16px;
-}
-.faq-q span {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; color: var(--ink); line-height: 1.3;
-}
-.faq-toggle {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 20px; color: var(--gold); flex-shrink: 0; line-height: 1.3;
-  transition: transform .3s;
-}
-.faq-a {
-  font-size: 15px; color: var(--mid); line-height: 1.8;
-  max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s;
-}
-.faq-item.open .faq-toggle { transform: rotate(45deg); }
-.faq-item.open .faq-a { max-height: 300px; padding-top: 16px; }
-</style>
 </head>
 <body>
 
-<nav id="nav">
-  <a href="index.html" class="nav-logo">
-    <span class="brand">ALGORA</span>
-    <span class="sub">STUDIO</span>
-  </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="chi-siamo.html">Chi siamo</a></li>
-    <li><a href="foliarium.html">Foliarium</a></li>
-    <li><a href="caso-studio.html">Caso Studio</a></li>
-    <li><a href="contatti.html" class="nav-cta active">Contatti</a></li>
-  </ul>
-  <div class="nav-burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
-</nav>
+<?php include 'nav.php'; ?>
 
 <!-- HERO -->
 <header class="contact-hero">
@@ -180,7 +30,7 @@
       </div>
       <div class="ci-item">
         <label>Sito prodotto</label>
-        <a href="https://foliarium.it" target="_blank">foliarium.it</a>
+        <a href="https://foliarium.it" target="_blank" rel="noopener">foliarium.it</a>
       </div>
       <div class="ci-item">
         <label>Sede</label>
@@ -204,7 +54,7 @@
 <section class="contact-form-section" id="demo">
   <div class="grid-2 form-grid">
     <div class="form-intro">
-      <p class="label" style="margin-bottom:16px;">Richiedi una demo</p>
+      <p class="label mb-16">Richiedi una demo</p>
       <h2>Come funziona<br><em>la nostra demo.</em></h2>
       <p>Offriamo una dimostrazione gratuita di Foliarium della durata di 45 minuti. Utilizziamo un database demo precaricato con dati storici realistici della Provincia di Savona — così vedi il software in azione su un archivio catastale completo, non su dati di fantasia.</p>
       <p>La demo avviene in videochiamata, senza che tu debba installare nulla. Alla fine, se Foliarium fa per te, ti prepariamo un preventivo personalizzato.</p>
@@ -242,7 +92,7 @@
     </div>
 
     <div class="contact-form">
-      <p class="label" style="margin-bottom:24px;">Modulo di contatto</p>
+      <p class="label mb-24">Modulo di contatto</p>
       <form action="invia-contatto.php" method="POST" id="contactForm">
         <div class="form-row">
           <div class="form-group">
@@ -278,9 +128,9 @@
         <button type="submit" class="form-submit">Invia richiesta →</button>
         <p class="form-note">Risponderemo entro 24 ore lavorative. Nessun impegno, nessun commerciale aggressivo.</p>
       </form>
-      <div id="form-success" style="display:none;background:var(--green-light);border:1px solid rgba(26,58,40,.2);padding:28px;margin-top:16px;">
-        <p style="font-family:'Trebuchet MS',sans-serif;font-size:12px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:8px;">Messaggio inviato</p>
-        <p style="font-size:15px;color:var(--mid);">Grazie per averci scritto. Ti risponderemo entro 24 ore lavorative.</p>
+      <div id="form-success" class="form-success">
+        <p>Messaggio inviato</p>
+        <p>Grazie per averci scritto. Ti risponderemo entro 24 ore lavorative.</p>
       </div>
     </div>
   </div>
@@ -288,8 +138,8 @@
 
 <!-- PERCHÉ SCEGLIERCI -->
 <section class="perche">
-  <div style="max-width:640px;margin-bottom:52px;">
-    <p class="label" style="margin-bottom:16px;">Perché Algora Studio</p>
+  <div class="section-intro">
+    <p class="label mb-16">Perché Algora Studio</p>
     <h2>Non vendiamo software<br><em>vendiamo soluzioni.</em></h2>
   </div>
   <div class="perche-grid">
@@ -313,8 +163,8 @@
 
 <!-- FAQ -->
 <section class="faq">
-  <div style="max-width:640px;margin-bottom:48px;">
-    <p class="label" style="margin-bottom:16px;">FAQ</p>
+  <div class="faq-intro">
+    <p class="label mb-16">FAQ</p>
     <h2>Domande frequenti.</h2>
   </div>
   <div class="faq-list">
@@ -363,52 +213,8 @@
   </div>
 </section>
 
-<footer>
-  <div class="footer-main">
-    <div class="footer-brand">
-      <span class="brand">ALGORA</span>
-      <span class="sub">STUDIO</span>
-      <p>Software verticale per domini specifici. Strumenti precisi, duraturi, costruiti per la complessità reale di chi li usa.</p>
-    </div>
-    <div class="footer-col">
-      <h3>Studio</h3>
-      <ul>
-        <li><a href="chi-siamo.html">Chi siamo</a></li>
-        <li><a href="chi-siamo.html#approccio">Approccio</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h3>Prodotti</h3>
-      <ul>
-        <li><a href="foliarium.html">Foliarium</a></li>
-        <li><a href="caso-studio.html">Caso Studio</a></li>
-        <li><a href="foliarium.html#prezzi">Prezzi</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h3>Contatti</h3>
-      <ul>
-        <li><a href="contatti.html">Scrivici</a></li>
-        <li><a href="mailto:info@algorastudio.it">info@algorastudio.it</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2025 Algora Studio — Marco Santoro — P.IVA [inserire] — Savona, Liguria</p>
-    <p><a href="#">Privacy</a> · <a href="#">Cookie</a></p>
-  </div>
-</footer>
+<?php include 'footer.php'; ?>
 
-<script>
-function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
-window.addEventListener('scroll', () => { document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20); });
-
-function toggleFaq(el) {
-  const isOpen = el.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-  if (!isOpen) el.classList.add('open');
-}
-
-</script>
+<script src="main.js"></script>
 </body>
 </html>

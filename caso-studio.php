@@ -1,3 +1,4 @@
+<?php $active = 'caso-studio'; ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -6,131 +7,10 @@
 <title>Caso Studio — Archivio di Stato di Savona | Algora Studio</title>
 <meta name="description" content="Come Foliarium ha digitalizzato 190 anni di storia catastale per l'Archivio di Stato di Savona. Il caso studio completo.">
 <link rel="stylesheet" href="style.css">
-<style>
-.cs-hero {
-  background: var(--ink);
-  padding: 130px clamp(24px,5vw,72px) 80px;
-}
-.cs-hero-inner { max-width: 800px; }
-.cs-hero .label { color: var(--gold); margin-bottom: 24px; }
-.cs-hero h1 { color: var(--ivory); margin-bottom: 28px; }
-.cs-hero h1 em { color: var(--gold); }
-.cs-hero p { font-size: 19px; color: rgba(249,246,239,.65); max-width: 560px; line-height: 1.9; }
-
-.cs-stat-band {
-  background: var(--green);
-  padding: 0 clamp(24px,5vw,72px);
-  display: grid; grid-template-columns: repeat(4,1fr);
-  gap: 1px; background-image: none;
-}
-.cs-stat-band { background: var(--green); }
-
-.cs-sband-inner {
-  display: grid; grid-template-columns: repeat(4,1fr);
-  gap: 1px; background: rgba(249,246,239,.1);
-}
-
-.cs-stat { background: var(--green); padding: 36px; text-align: center; }
-.cs-stat strong {
-  display: block; font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(32px,5vw,56px); font-weight: 300;
-  color: var(--ivory); line-height: 1; margin-bottom: 8px;
-}
-.cs-stat span {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 10px; letter-spacing: 3px;
-  color: rgba(249,246,239,.4); text-transform: uppercase;
-}
-
-/* ── SEZIONI ────────────────────── */
-.problema { background: var(--cream); border-bottom: 1px solid var(--border); }
-.soluzione { background: var(--parchment); }
-.risultati { background: var(--parchment-2); border-top: 1px solid var(--border); }
-.sviluppo { background: var(--cream); border-top: 1px solid var(--border); }
-
-.section-title { margin-bottom: clamp(40px,5vw,64px); max-width: 600px; }
-.section-title p { font-size: 17px; color: var(--mid); margin-top: 16px; line-height: 1.8; }
-
-/* ── PRIMA DOPO ─────────────────── */
-.before-after {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border);
-  margin-bottom: 60px;
-}
-.ba-col { padding: 40px; }
-.ba-col.before { background: var(--parchment-2); }
-.ba-col.after { background: var(--ink); }
-
-.ba-label {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px;
-}
-.ba-col.before .ba-label { color: var(--muted); }
-.ba-col.after .ba-label { color: var(--gold); }
-
-.ba-col h3 { margin-bottom: 20px; }
-.ba-col.before h3 { color: var(--ink); }
-.ba-col.after h3 { color: var(--ivory); }
-
-.ba-list { list-style: none; }
-.ba-list li {
-  padding: 12px 0; border-bottom: 1px solid;
-  font-size: 15px; display: flex; gap: 12px;
-}
-.ba-col.before .ba-list li { border-color: var(--ink-08); color: var(--mid); }
-.ba-col.after .ba-list li { border-color: rgba(249,246,239,.08); color: rgba(249,246,239,.7); }
-.ba-list li:last-child { border-bottom: none; }
-.ba-icon { flex-shrink: 0; font-style: normal; }
-
-/* ── SOLUZIONE GRID ─────────────── */
-.sol-grid { gap: clamp(40px,6vw,80px); align-items: start; }
-
-.sol-text h2 { margin-bottom: 16px; }
-.sol-text p { font-size: 16px; color: var(--mid); margin-bottom: 16px; line-height: 1.8; }
-
-.sol-features { margin-top: 32px; }
-
-/* ── SVILUPPO FASI ──────────────── */
-.fasi-grid {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; background: var(--border);
-}
-.fase-card { background: var(--cream); padding: 36px 32px; }
-.fase-n {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 10px; letter-spacing: 4px; color: var(--gold);
-  text-transform: uppercase; margin-bottom: 16px;
-}
-.fase-card h3 { font-size: 22px; margin-bottom: 12px; color: var(--ink); }
-.fase-card p { font-size: 15px; color: var(--mid); line-height: 1.7; }
-.fase-period {
-  font-family: 'Trebuchet MS', Calibri, sans-serif;
-  font-size: 11px; color: var(--faint); margin-top: 16px;
-  letter-spacing: 1px;
-}
-
-/* ── RISULTATI ──────────────────── */
-.ris-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; background: var(--border); margin-top: 48px; }
-.ris-card { background: var(--parchment-2); padding: 36px; }
-.ris-card .ris-n { font-family: 'Trebuchet MS', Calibri, sans-serif; font-size: 10px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
-.ris-card strong { display: block; font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 8px; }
-.ris-card p { font-size: 15px; color: var(--mid); }
-</style>
 </head>
 <body>
 
-<nav id="nav">
-  <a href="index.html" class="nav-logo">
-    <span class="brand">ALGORA</span>
-    <span class="sub">STUDIO</span>
-  </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="chi-siamo.html">Chi siamo</a></li>
-    <li><a href="foliarium.html">Foliarium</a></li>
-    <li><a href="caso-studio.html" class="active">Caso Studio</a></li>
-    <li><a href="contatti.html" class="nav-cta">Contatti</a></li>
-  </ul>
-  <div class="nav-burger" onclick="toggleNav()"><span></span><span></span><span></span></div>
-</nav>
+<?php include 'nav.php'; ?>
 
 <!-- HERO -->
 <header class="cs-hero">
@@ -141,8 +21,8 @@
   </div>
 </header>
 
-<div style="background:var(--green);padding:0 clamp(24px,5vw,72px);">
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(249,246,239,.1);">
+<div class="cs-stat-band">
+  <div class="cs-sband-inner">
     <div class="cs-stat"><strong>69</strong><span>Comuni gestiti</span></div>
     <div class="cs-stat"><strong>12.000+</strong><span>Partite catastali</span></div>
     <div class="cs-stat"><strong>8.500+</strong><span>Possessori</span></div>
@@ -201,7 +81,7 @@
 <section class="soluzione">
   <div class="grid-2 sol-grid">
     <div class="sol-text">
-      <p class="label" style="margin-bottom:16px;">La soluzione</p>
+      <p class="label mb-16">La soluzione</p>
       <h2>Foliarium: progettato<br><em>per il catasto storico.</em></h2>
       <p>Algora Studio ha affrontato il progetto partendo da un'analisi approfondita delle specificità del catasto storico italiano — non adattando uno strumento generico, ma progettando dall'inizio un sistema che rispecchiasse la struttura reale dell'archivio.</p>
       <p>Il modello dati gestisce le peculiarità del sistema catastale post-unitario: comuni con denominazioni storiche diverse, partite con suffissi e partite secondarie, possessori con paternità, variazioni di proprietà con atti notarili collegati, immobili con classificazioni d'epoca.</p>
@@ -316,9 +196,9 @@
 
 <!-- RISULTATI -->
 <section class="risultati">
-  <p class="label" style="margin-bottom:16px;">I risultati</p>
+  <p class="label mb-16">I risultati</p>
   <h2>L'archivio storico<br><em>è ora vivo.</em></h2>
-  <p style="font-size:17px;color:var(--mid);max-width:600px;margin-top:16px;line-height:1.8;">Foliarium ha trasformato un patrimonio documentale quasi inaccessibile in un sistema consultabile in tempo reale da tutto il personale autorizzato dell'Archivio.</p>
+  <p class="ris-lead">Foliarium ha trasformato un patrimonio documentale quasi inaccessibile in un sistema consultabile in tempo reale da tutto il personale autorizzato dell'Archivio.</p>
 
   <div class="ris-grid">
     <div class="ris-card">
@@ -340,51 +220,18 @@
 </section>
 
 <!-- CTA -->
-<section style="background:var(--ink);padding:clamp(56px,7vw,88px) clamp(24px,5vw,72px);">
-  <div style="max-width:680px;">
-    <p class="label" style="color:var(--gold);margin-bottom:20px;">Il tuo archivio</p>
-    <h2 style="color:var(--ivory);margin-bottom:20px;">Hai un archivio storico<br><em>da rendere consultabile?</em></h2>
-    <p style="font-size:18px;color:rgba(249,246,239,.6);margin-bottom:44px;line-height:1.8;">Il metodo che ha funzionato per Savona può funzionare per il tuo archivio. Il primo passo è una conversazione: raccontaci la tua situazione e capiamo insieme se Foliarium fa per te.</p>
-    <a href="contatti.html" class="btn btn-gold">Parliamo</a>
-    <a href="foliarium.html" class="btn btn-outline-light" style="margin-left:16px;">Scopri Foliarium</a>
+<section class="cta-final">
+  <div>
+    <p class="label">Il tuo archivio</p>
+    <h2>Hai un archivio storico<br><em>da rendere consultabile?</em></h2>
+    <p class="cta-lead">Il metodo che ha funzionato per Savona può funzionare per il tuo archivio. Il primo passo è una conversazione: raccontaci la tua situazione e capiamo insieme se Foliarium fa per te.</p>
+    <a href="contatti.php" class="btn btn-gold">Parliamo</a>
+    <a href="foliarium.php" class="btn btn-outline-light">Scopri Foliarium</a>
   </div>
 </section>
 
-<footer>
-  <div class="footer-main">
-    <div class="footer-brand">
-      <span class="brand">ALGORA</span>
-      <span class="sub">STUDIO</span>
-      <p>Software verticale per domini specifici. Strumenti precisi, duraturi, costruiti per la complessità reale di chi li usa.</p>
-    </div>
-    <div class="footer-col">
-      <h3>Studio</h3>
-      <ul><li><a href="chi-siamo.html">Chi siamo</a></li></ul>
-    </div>
-    <div class="footer-col">
-      <h3>Prodotti</h3>
-      <ul>
-        <li><a href="foliarium.html">Foliarium</a></li>
-        <li><a href="caso-studio.html">Caso Studio</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h3>Contatti</h3>
-      <ul>
-        <li><a href="contatti.html">Scrivici</a></li>
-        <li><a href="mailto:info@algorastudio.it">info@algorastudio.it</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2025 Algora Studio — Marco Santoro — P.IVA [inserire]</p>
-    <p><a href="#">Privacy</a></p>
-  </div>
-</footer>
+<?php include 'footer.php'; ?>
 
-<script>
-function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
-window.addEventListener('scroll', () => { document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20); });
-</script>
+<script src="main.js"></script>
 </body>
 </html>
