@@ -35,6 +35,18 @@
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body:    'Libre Baskerville', Georgia, serif;
   --font-label:   'Trebuchet MS', Calibri, sans-serif;
+
+  /* Passo orizzontale delle fasce a tutta larghezza.
+     Questo e' il valore per schermo stretto: la variante desktop e'
+     nel blocco @media (min-width: 961px) piu' sotto. Tenendolo in una
+     variabile, il margine di pagina si cambia in un punto solo. */
+  --pad-x:        20px;
+}
+
+/* Su schermo largo le fasce respirano: stesso token, valore maggiore.
+   Va dichiarato qui, prima delle regole che usano la variabile. */
+@media (min-width: 961px) {
+  :root { --pad-x: clamp(24px, 5vw, 72px); }
 }
 
 html { font-size: 16px; }
@@ -100,9 +112,15 @@ h1, h2, h3 {
   line-height: 1.1;
 }
 
-h1 { font-size: clamp(52px, 7vw, 88px); }
-h2 { font-size: clamp(36px, 5vw, 56px); }
+h1 { font-size: clamp(36px, 8vw, 48px); }
+h2 { font-size: clamp(28px, 6vw, 36px); }
 h3 { font-size: clamp(22px, 3vw, 32px); }
+
+/* Sopra il punto di rottura i titoli display prendono la scala piena */
+@media (min-width: 961px) {
+  h1 { font-size: clamp(52px, 7vw, 88px); }
+  h2 { font-size: clamp(36px, 5vw, 56px); }
+}
 
 .label {
   font-family: var(--font-label);
@@ -118,7 +136,7 @@ h3 { font-size: clamp(22px, 3vw, 32px); }
   background: var(--parchment);
   border-bottom: 2px solid var(--ink);
   display: flex; align-items: center;
-  padding: 0 clamp(24px, 5vw, 72px);
+  padding: 0 var(--pad-x);
   justify-content: space-between;
   transition: box-shadow .3s;
 }
@@ -137,9 +155,31 @@ h3 { font-size: clamp(22px, 3vw, 32px); }
   color: var(--gold-text); text-transform: uppercase;
 }
 
+/* Di base (schermo stretto) l'elenco e' nascosto e viene aperto dal
+   pulsante hamburger come pannello a tutta pagina. */
 .nav-links {
-  display: flex; gap: 8px; align-items: center; list-style: none;
+  display: none; gap: 8px; align-items: center; list-style: none;
 }
+.nav-links.open {
+  display: flex; flex-direction: column;
+  position: fixed; top: 62px; left: 0; right: 0; bottom: 0;
+  background: var(--parchment);
+  padding: 32px; gap: 12px; z-index: 199;
+}
+.nav-links.open a { font-size: 22px; padding: 12px 0; }
+
+.nav-burger {
+  display: flex; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 8px;
+}
+.nav-burger span {
+  display: block; width: 24px; height: 1.5px;
+  background: var(--ink); transition: all .3s;
+}
+/* Le tre barre diventano una croce quando il menu e' aperto */
+.nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
 .nav-links a {
   font-family: var(--font-body);
@@ -162,11 +202,30 @@ h3 { font-size: clamp(22px, 3vw, 32px); }
   font-family: var(--font-label);
   font-size: 11px; font-style: normal;
   letter-spacing: 2px; text-transform: uppercase;
-  background: var(--ink); color: var(--ivory) !important;
+  background: var(--ink); color: var(--ivory);
   padding: 8px 22px; margin-left: 8px;
 }
 .nav-links .nav-cta:hover { background: var(--green); }
+/* Sulla pagina Contatti il pulsante e' anche .active: senza questa regola
+   vincerebbe .nav-links a.active (piu' specifica) e il testo diventerebbe
+   scuro su fondo scuro. Serve specificita', non !important. */
+.nav-links .nav-cta.active { color: var(--ivory); }
 .nav-links .nav-cta.active::after { display: none; }
+
+/* Da 961px in su il menu torna una barra orizzontale e l'hamburger sparisce.
+   La regola cita anche .open perche' la classe puo' restare applicata se la
+   finestra viene allargata a menu aperto. */
+@media (min-width: 961px) {
+  .nav-links,
+  .nav-links.open {
+    display: flex; flex-direction: row;
+    position: static; padding: 0; gap: 8px;
+    background: none;
+  }
+  .nav-links.open a { font-size: 14px; padding: 6px 14px; }
+  .nav-links.open .nav-cta { font-size: 11px; padding: 8px 22px; }
+  .nav-burger { display: none; }
+}
 
 /* ── PULSANTI ─────────────────────────────────── */
 .btn {
@@ -194,17 +253,29 @@ h3 { font-size: clamp(22px, 3vw, 32px); }
 .cta-final .btn + .btn { margin-left: 16px; }
 
 /* ── LAYOUT ──────────────────────────────────── */
-section { padding: clamp(64px, 8vw, 112px) clamp(24px, 5vw, 72px); }
+section { padding: clamp(64px, 8vw, 112px) var(--pad-x); }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 88px); }
+/* Impianto a colonna singola: e' la disposizione di base, non un ripiego.
+   Le colonne multiple arrivano dal blocco @media in fondo alla sezione. */
+.grid-2 { display: grid; grid-template-columns: 1fr; gap: 24px; }
 /* Varianti di .grid-2 usate nell'HTML come "grid-2 <variante>" */
 .ch-grid, .approccio-grid, .form-grid, .app-grid, .sol-grid { align-items: start; }
-.app-grid, .sol-grid { gap: clamp(40px,6vw,80px); }
 
-/* Griglia di card a 3 colonne, separate da una linea di 2px */
+/* Griglia di card: impilate su schermo stretto, affiancate e separate da
+   una linea di 2px (il gap che lascia trasparire lo sfondo) su desktop. */
 .ph-grid, .val-grid, .pack-grid, .fasi-grid, .perche-grid {
-  display: grid; grid-template-columns: repeat(3,1fr);
-  gap: 2px; background: var(--border);
+  display: grid; grid-template-columns: 1fr;
+  gap: 24px; background: var(--border);
+}
+
+@media (min-width: 961px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 88px); }
+  .app-grid, .sol-grid { gap: clamp(40px,6vw,80px); }
+
+  .ph-grid, .val-grid, .pack-grid, .fasi-grid, .perche-grid {
+    grid-template-columns: repeat(3,1fr);
+    gap: 2px;
+  }
 }
 
 /* ── SFONDI DI SEZIONE ────────────────────────── */
@@ -217,7 +288,7 @@ section { padding: clamp(64px, 8vw, 112px) clamp(24px, 5vw, 72px); }
 .prod-home { background: var(--cream); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 
 /* ── COMPONENTI COMUNI ────────────────────────── */
-.cta-final { background: var(--ink); padding: clamp(56px, 7vw, 88px) clamp(24px, 5vw, 72px); }
+.cta-final { background: var(--ink); padding: clamp(56px, 7vw, 88px) var(--pad-x); }
 .cta-final > div { max-width: 680px; }
 .cta-final .label { color: var(--gold-on-dark); margin-bottom: 20px; }
 .cta-final h2 { color: var(--ivory); margin-bottom: 20px; }
@@ -302,7 +373,7 @@ section { padding: clamp(64px, 8vw, 112px) clamp(24px, 5vw, 72px); }
 /* ── STRIP ───────────────────────────────────── */
 .strip {
   background: var(--ink);
-  padding: 18px clamp(24px, 5vw, 72px);
+  padding: 18px var(--pad-x);
   display: flex; gap: 40px; flex-wrap: wrap; align-items: center;
 }
 
@@ -365,14 +436,18 @@ section { padding: clamp(64px, 8vw, 112px) clamp(24px, 5vw, 72px); }
 /* ── FOOTER ──────────────────────────────────── */
 footer {
   background: #0E0A04;
-  padding: clamp(20px, 3vw, 32px) clamp(24px, 5vw, 72px);
+  padding: clamp(20px, 3vw, 32px) var(--pad-x);
 }
 
 .footer-main {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px; padding-bottom: 40px;
+  display: grid; grid-template-columns: 1fr;
+  gap: 24px; padding-bottom: 40px;
   border-bottom: 1px solid rgba(249,246,239,.08);
   margin-bottom: 28px;
+}
+
+@media (min-width: 961px) {
+  .footer-main { grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
 }
 
 .footer-brand .brand {
@@ -411,7 +486,7 @@ footer {
 ═══════════════════════════════════════════════ */
 .hero {
   min-height: 100vh;
-  padding: 130px clamp(24px,5vw,72px) 0;
+  padding: 130px var(--pad-x) 0;
   display: flex; flex-direction: column; justify-content: center;
   border-bottom: 1px solid var(--border);
   position: relative; overflow: hidden;
@@ -432,13 +507,12 @@ footer {
 .hero h1 em { font-style: italic; display: block; }
 
 .hero-grid {
-  display: grid; grid-template-columns: 1fr 400px;
-  gap: 0; margin-top: 52px; align-items: start;
+  display: grid; grid-template-columns: 1fr;
+  gap: 24px; margin-top: 52px; align-items: start;
 }
 
 .hero-body {
-  padding: 0 64px 80px 0;
-  border-right: 1px solid var(--border);
+  padding: 0 0 80px;
 }
 
 .hero-body p {
@@ -447,7 +521,7 @@ footer {
   border-top: 2px solid var(--gold); padding-top: 28px;
 }
 
-.hero-aside { padding: 0 0 80px 52px; }
+.hero-aside { padding: 0 0 80px; }
 
 .manifesto {
   background: var(--ink); padding: 36px; margin-bottom: 20px;
@@ -514,7 +588,7 @@ footer {
 
 .ch-stat-band {
   background: var(--ink); padding: 28px 32px;
-  display: grid; grid-template-columns: repeat(2,1fr); gap: 1px;
+  display: grid; grid-template-columns: 1fr; gap: 24px;
   margin-top: 40px;
 }
 
@@ -554,7 +628,7 @@ footer {
   font-family: var(--font-display);
   font-size: 22px; font-weight: 400; color: var(--ivory); margin-bottom: 24px;
 }
-.stack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(249,246,239,.08); }
+.stack-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: rgba(249,246,239,.08); }
 .stack-item { background: var(--ink); padding: 18px; }
 .stack-item strong { display: block; font-family: var(--font-label); font-size: 13px; color: var(--gold-on-dark); margin-bottom: 4px; }
 .stack-item span { font-family: var(--font-label); font-size: 12px; color: rgba(249,246,239,.62); }
@@ -570,20 +644,31 @@ footer {
 
 .cta-wide { max-width: 700px; }
 
+/* Disposizione desktop della home */
+@media (min-width: 961px) {
+  .hero-grid { grid-template-columns: 1fr 400px; gap: 0; }
+  /* Affiancate, le due colonne sono divise da un filetto verticale */
+  .hero-body  { padding: 0 64px 80px 0; border-right: 1px solid var(--border); }
+  .hero-aside { padding: 0 0 80px 52px; }
+
+  .ch-stat-band { grid-template-columns: repeat(2,1fr); gap: 1px; }
+  .stack-grid   { grid-template-columns: 1fr 1fr; gap: 1px; }
+}
+
 /* ═══════════════════════════════════════════════
    PAGINA: chi-siamo.php
 ═══════════════════════════════════════════════ */
 .about-hero {
-  padding: 130px clamp(24px,5vw,72px) 80px;
+  padding: 130px var(--pad-x) 80px;
   border-bottom: 1px solid var(--border);
-  display: grid; grid-template-columns: 1fr 380px; gap: 0;
+  display: grid; grid-template-columns: 1fr; gap: 24px;
   align-items: end;
 }
-.ah-left { padding: 0 64px 0 0; border-right: 1px solid var(--border); }
+.ah-left { padding: 0; }
 .ah-left .label { margin-bottom: 24px; }
 .ah-left h1 { color: var(--ink); margin-bottom: 24px; }
 .ah-left p { font-size: 18px; color: var(--mid); max-width: 520px; line-height: 1.9; border-top: 2px solid var(--gold); padding-top: 24px; }
-.ah-right { padding: 0 0 0 52px; }
+.ah-right { padding: 0; }
 
 .founder-portrait {
   background: var(--ink); padding: 40px;
@@ -642,24 +727,33 @@ footer {
 
 .futuro-lead { font-size: 17px; color: var(--mid); max-width: 580px; margin-top: 16px; line-height: 1.8; }
 
-.futuro-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; background: var(--border); margin-top: 48px; }
+.futuro-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); margin-top: 48px; }
 .fut-card { background: var(--parchment-2); padding: 36px 32px; }
 .fut-status { font-family: var(--font-label); font-size: 11px; color: var(--muted); margin-top: 16px; letter-spacing: 1px; }
+
+/* Disposizione desktop di chi-siamo */
+@media (min-width: 961px) {
+  .about-hero { grid-template-columns: 1fr 380px; gap: 0; }
+  .ah-left    { padding: 0 64px 0 0; border-right: 1px solid var(--border); }
+  .ah-right   { padding: 0 0 0 52px; }
+
+  .futuro-grid { grid-template-columns: repeat(3,1fr); gap: 2px; }
+}
 
 /* ═══════════════════════════════════════════════
    PAGINA: foliarium.php
 ═══════════════════════════════════════════════ */
 .prod-hero {
-  padding: 130px clamp(24px,5vw,72px) 0;
+  padding: 130px var(--pad-x) 0;
   border-bottom: 1px solid var(--border);
 }
 
 .prod-hero-inner {
-  display: grid; grid-template-columns: 1fr 420px; gap: 0;
+  display: grid; grid-template-columns: 1fr; gap: 24px;
   align-items: start;
 }
 
-.ph-left { padding: 0 64px 80px 0; border-right: 1px solid var(--border); }
+.ph-left { padding: 0 0 80px; }
 
 .ph-badge {
   display: inline-flex; align-items: center; gap: 8px;
@@ -686,7 +780,7 @@ footer {
   border-top: 2px solid var(--gold); padding-top: 28px; margin-bottom: 40px;
 }
 
-.ph-right { padding: 0 0 80px 52px; }
+.ph-right { padding: 0 0 80px; }
 
 .pricing-card { background: var(--ink); padding: 40px; }
 
@@ -724,7 +818,7 @@ footer {
 .feat-intro { max-width: 640px; margin-bottom: 60px; }
 .feat-intro p { font-size: 17px; color: var(--mid); margin-top: 16px; line-height: 1.8; }
 
-.feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); }
+.feat-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); }
 
 .feat-card { background: var(--cream); padding: 40px 36px; }
 .feat-card h3 { margin-bottom: 14px; color: var(--ink); }
@@ -743,7 +837,7 @@ footer {
 
 .pricing-lead { font-size: 17px; color: var(--mid); max-width: 560px; margin-bottom: 56px; line-height: 1.8; }
 
-.lic-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; background: var(--border); max-width: 900px; }
+.lic-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); max-width: 900px; }
 
 .lic-card { padding: 36px 32px; background: var(--cream); }
 
@@ -805,7 +899,7 @@ footer {
 .pack-card.featured .pack-cta { background: var(--gold); color: var(--ink); }
 .pack-card.featured .pack-cta:hover { background: var(--gold-hi); }
 
-.req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); max-width: 800px; }
+.req-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); max-width: 800px; }
 .req-cell { background: var(--parchment-2); padding: 24px 28px; }
 .req-cell strong {
   display: block; font-family: var(--font-label);
@@ -815,12 +909,23 @@ footer {
 
 .req-note { margin-top: 28px; font-size: 15px; color: var(--muted); font-style: italic; }
 
+/* Disposizione desktop della scheda prodotto */
+@media (min-width: 961px) {
+  .prod-hero-inner { grid-template-columns: 1fr 420px; gap: 0; }
+  .ph-left  { padding: 0 64px 80px 0; border-right: 1px solid var(--border); }
+  .ph-right { padding: 0 0 80px 52px; }
+
+  .feat-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+  .lic-grid  { grid-template-columns: repeat(3,1fr); gap: 2px; }
+  .req-grid  { grid-template-columns: 1fr 1fr; gap: 2px; }
+}
+
 /* ═══════════════════════════════════════════════
    PAGINA: caso-studio.php
 ═══════════════════════════════════════════════ */
 .cs-hero {
   background: var(--ink);
-  padding: 130px clamp(24px,5vw,72px) 80px;
+  padding: 130px var(--pad-x) 80px;
 }
 .cs-hero-inner { max-width: 800px; }
 .cs-hero .label { color: var(--gold-on-dark); margin-bottom: 24px; }
@@ -828,11 +933,11 @@ footer {
 .cs-hero h1 em { color: var(--gold-on-dark); }
 .cs-hero p { font-size: 19px; color: rgba(249,246,239,.65); max-width: 560px; line-height: 1.9; }
 
-.cs-stat-band { background: var(--green); padding: 0 clamp(24px,5vw,72px); }
+.cs-stat-band { background: var(--green); padding: 0 var(--pad-x); }
 
 .cs-sband-inner {
-  display: grid; grid-template-columns: repeat(4,1fr);
-  gap: 1px; background: rgba(249,246,239,.1);
+  display: grid; grid-template-columns: 1fr;
+  gap: 24px; background: rgba(249,246,239,.1);
 }
 
 .cs-stat { background: var(--green); padding: 36px; text-align: center; }
@@ -851,7 +956,7 @@ footer {
 .section-title p { font-size: 17px; color: var(--mid); margin-top: 16px; line-height: 1.8; }
 
 .before-after {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border);
+  display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border);
   margin-bottom: 60px;
 }
 .ba-col { padding: 40px; }
@@ -885,22 +990,29 @@ footer {
 
 .ris-lead { font-size: 17px; color: var(--mid); max-width: 600px; margin-top: 16px; line-height: 1.8; }
 
-.ris-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; background: var(--border); margin-top: 48px; }
+.ris-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); margin-top: 48px; }
 .ris-card { background: var(--parchment-2); padding: 36px; }
 .ris-card strong { display: block; font-family: var(--font-display); font-size: 44px; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 8px; }
 .ris-card p { font-size: 15px; color: var(--mid); }
+
+/* Disposizione desktop del caso studio */
+@media (min-width: 961px) {
+  .cs-sband-inner { grid-template-columns: repeat(4,1fr); gap: 1px; }
+  .before-after   { grid-template-columns: 1fr 1fr; gap: 2px; }
+  .ris-grid       { grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
+}
 
 /* ═══════════════════════════════════════════════
    PAGINA: contatti.php
 ═══════════════════════════════════════════════ */
 .contact-hero {
   background: var(--ink);
-  padding: 130px clamp(24px,5vw,72px) 80px;
-  display: grid; grid-template-columns: 1fr 420px; gap: 0;
+  padding: 130px var(--pad-x) 80px;
+  display: grid; grid-template-columns: 1fr; gap: 24px;
   align-items: start;
 }
 
-.ch-text { padding: 0 64px 0 0; }
+.ch-text { padding: 0; }
 .ch-text .label { color: var(--gold-on-dark); margin-bottom: 24px; }
 .ch-text h1 { color: var(--ivory); margin-bottom: 0; }
 .ch-text h1 em { color: var(--gold-on-dark); }
@@ -973,7 +1085,7 @@ footer {
 
 .form-group textarea { min-height: 140px; resize: vertical; }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr; gap: 24px; }
 
 .form-submit {
   background: var(--ink); color: var(--ivory);
@@ -1025,6 +1137,14 @@ footer {
   transition: max-height .3s ease, padding .3s, visibility 0s 0s;
 }
 
+/* Disposizione desktop della pagina contatti */
+@media (min-width: 961px) {
+  .contact-hero { grid-template-columns: 1fr 420px; gap: 0; }
+  .ch-text      { padding: 0 64px 0 0; }
+
+  .form-row { grid-template-columns: 1fr 1fr; gap: 20px; }
+}
+
 /* ═══════════════════════════════════════════════
    PAGINA: invia-contatto.php
 ═══════════════════════════════════════════════ */
@@ -1048,86 +1168,12 @@ footer {
 .fade-up-2 { animation-delay: .2s; }
 .fade-up-3 { animation-delay: .3s; }
 
-/* ── RESPONSIVE ──────────────────────────────── */
-@media (max-width: 960px) {
-  /* 1. Riduzione dei padding laterali per recuperare spazio su mobile */
-  section, 
-  header, 
-  footer, 
-  .hero, 
-  .strip, 
-  #nav {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-  }
+/* ── PUNTO DI ROTTURA ─────────────────────────────
+   Il foglio e' scritto mobile-first: le regole di base descrivono lo
+   schermo stretto e ogni sezione porta il proprio blocco
+   @media (min-width: 961px) con la disposizione desktop, accanto ai
+   componenti che riguarda invece che in coda al file. Per questo qui
+   non c'e' nessun blocco correttivo finale, e nel foglio non serve
+   nessun !important per il layout.
+═══════════════════════════════════════════════ */
 
-  /* 2. Forzare TUTTE le griglie a colonna singola */
-  .grid-2,
-  .hero-grid,
-  .ph-grid,
-  .ch-stat-band,
-  .stack-grid,
-  .footer-main,
-  .about-hero,
-  .val-grid,
-  .futuro-grid,
-  .prod-hero-inner,
-  .feat-grid,
-  .pack-grid,
-  .req-grid,
-  .lic-grid,
-  .cs-sband-inner,
-  .before-after,
-  .fasi-grid,
-  .ris-grid,
-  .contact-hero,
-  .perche-grid,
-  .form-row {
-    grid-template-columns: 1fr !important;
-    gap: 24px !important;
-  }
-
-  /* 3. Sistemazione Hero Section (colonne fisse -> impilate) */
-  .hero-body,
-  .ah-left,
-  .ph-left,
-  .ch-text {
-    padding-right: 0 !important;
-    border-right: none !important;
-  }
-
-  .hero-aside,
-  .ah-right,
-  .ph-right {
-    padding-left: 0 !important;
-  }
-
-  /* 4. Menu mobile e burger */
-  .nav-links { display: none; }
-  .nav-links.open {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 62px; left: 0; right: 0; bottom: 0;
-    background: var(--parchment);
-    padding: 32px;
-    gap: 12px;
-    z-index: 199;
-  }
-  .nav-links.open a { font-size: 22px; padding: 12px 0; }
-  .nav-burger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
-  .nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-  .nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-  .nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-  .nav-burger span { display: block; width: 24px; height: 1.5px; background: var(--ink); transition: all .3s; }
-
-  /* 5. Ridimensionamento titoli per evitare sovrapposizioni */
-  h1 { font-size: clamp(36px, 8vw, 48px) !important; }
-  h2 { font-size: clamp(28px, 6vw, 36px) !important; }
-}
-@media (min-width: 961px) {
-  .nav-burger { display: none; }
-}
-
-/* Azzeramento degli stili nativi del <button> usato come burger */
-.nav-burger { background: none; border: none; }

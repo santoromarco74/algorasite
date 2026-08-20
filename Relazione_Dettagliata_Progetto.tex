@@ -230,8 +230,8 @@ restituisce la pagina di esito. \\
 dalla logica applicativa. \\
 \texttt{crea\_db.sql} & Script DDL di creazione di database e
 tabella. \\
-\texttt{style.css} & Foglio di stile unico dell'intero sito (1.133
-righe, \textasciitilde41 KB). \\
+\texttt{style.css} & Foglio di stile unico dell'intero sito (1.179
+righe, \textasciitilde44 KB). \\
 \texttt{main.js} & Comportamenti client-side (53 righe). \\
 \end{longtable}
 
@@ -359,19 +359,85 @@ A questi si aggiungono elementi in \texttt{position:\ absolute} usati
 come decorazione (la lettera ``A'' in filigrana nella hero, i punti
 della timeline).
 
-\hypertarget{comportamento-responsive}{%
-\subsubsection{3.4 Comportamento
-responsive}\label{comportamento-responsive}}
+\hypertarget{comportamento-responsive-impostazione-mobile-first}{%
+\subsubsection{3.4 Comportamento responsive: impostazione
+mobile-first}\label{comportamento-responsive-impostazione-mobile-first}}
 
-Il layout desktop è definito nel corpo principale del foglio di stile;
-un blocco \texttt{@media\ (max-width:\ 960px)} riporta le griglie a
-colonna singola, riduce i margini laterali e attiva il menu a scomparsa.
-Il blocco funziona, ma è organizzato come strato di correzione che
-riscrive a valle le regole precedenti (con ricorso a
-\texttt{!important}): una riscrittura \emph{mobile-first}, in cui il
-layout a colonna singola è la regola di base e le griglie vengono
-introdotte da \texttt{@media\ (min-width:\ …)}, sarebbe più pulita ed è
-il primo intervento previsto per un'eventuale evoluzione.
+Il foglio di stile è scritto \textbf{mobile-first}: le regole di base
+descrivono lo schermo stretto, e un unico punto di rottura a
+\texttt{961px} introduce la disposizione desktop tramite
+\texttt{@media\ (min-width:\ 961px)}.
+
+Concretamente, ogni griglia nasce a colonna singola:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{.feat{-}grid}\NormalTok{ \{}
+  \KeywordTok{display}\NormalTok{: }\DecValTok{grid}\OperatorTok{;} \KeywordTok{grid{-}template{-}columns}\NormalTok{: }\DecValTok{1}\DataTypeTok{fr}\OperatorTok{;}
+  \KeywordTok{gap}\NormalTok{: }\DecValTok{24}\DataTypeTok{px}\OperatorTok{;} \KeywordTok{background}\NormalTok{: }\FunctionTok{var(}\VariableTok{{-}{-}border}\FunctionTok{)}\OperatorTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+e le colonne multiple arrivano dal blocco desktop della sezione:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{@media}\NormalTok{ (}\KeywordTok{min{-}width}\NormalTok{: }\DecValTok{961}\DataTypeTok{px}\NormalTok{) \{}
+  \FunctionTok{.feat{-}grid}\NormalTok{ \{ }\KeywordTok{grid{-}template{-}columns}\NormalTok{: }\DecValTok{1}\DataTypeTok{fr} \DecValTok{1}\DataTypeTok{fr}\OperatorTok{;} \KeywordTok{gap}\NormalTok{: }\DecValTok{2}\DataTypeTok{px}\OperatorTok{;}\NormalTok{ \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+I blocchi \texttt{@media} non sono raccolti in coda al file ma collocati
+\textbf{al termine della sezione che riguardano} --- uno per le griglie
+comuni, uno per il piè di pagina, uno per ciascuna pagina --- così che
+la variante desktop di un componente si legga accanto alla sua
+definizione di base.
+
+Il passo orizzontale delle fasce a tutta larghezza è centralizzato in
+una variabile, ridichiarata una sola volta per il desktop:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\InformationTok{:root}\NormalTok{ \{ }\VariableTok{{-}{-}pad{-}x}\NormalTok{: }\DecValTok{20}\DataTypeTok{px}\OperatorTok{;}\NormalTok{ \}}
+\ImportTok{@media}\NormalTok{ (}\KeywordTok{min{-}width}\NormalTok{: }\DecValTok{961}\DataTypeTok{px}\NormalTok{) \{}
+  \InformationTok{:root}\NormalTok{ \{ }\VariableTok{{-}{-}pad{-}x}\NormalTok{: }\FunctionTok{clamp(}\DecValTok{24}\DataTypeTok{px}\OperatorTok{,} \DecValTok{5}\DataTypeTok{vw}\OperatorTok{,} \DecValTok{72}\DataTypeTok{px}\FunctionTok{)}\OperatorTok{;}\NormalTok{ \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Undici regole (barra di navigazione, sezioni, fasce, piè di pagina,
+intestazioni di pagina) usano \texttt{var(-\/-pad-x)}: il margine di
+pagina si modifica in un punto solo.
+
+\hypertarget{perchuxe9-non-uno-strato-correttivo-max-width}{%
+\paragraph{\texorpdfstring{Perché non uno strato correttivo
+\texttt{max-width}}{Perché non uno strato correttivo max-width}}\label{perchuxe9-non-uno-strato-correttivo-max-width}}
+
+L'impostazione precedente definiva il layout desktop nelle regole di
+base e lo correggeva a valle con un blocco
+\texttt{@media\ (max-width:\ 960px)} che riportava a colonna singola
+tutte le griglie. Quel blocco aveva bisogno di \textbf{nove
+dichiarazioni \texttt{!important}} per vincere sulle regole che stava
+annullando, ed è un difetto strutturale, non estetico:
+\texttt{!important} scavalca la specificità, quindi una regola mirata
+perde contro una regola generica dichiarata dopo di essa.
+
+Il caso concreto emerso in questo progetto: i titoli di colonna del piè
+di pagina sono governati da
+\texttt{.footer-col\ h2\ \{\ font-size:\ 10px\ \}}, ma lo strato
+correttivo conteneva
+\texttt{h2\ \{\ font-size:\ clamp(28px,\ 6vw,\ 36px)\ !important\ \}}.
+Su schermo stretto vinceva quest'ultima, e le etichette ``Studio'',
+``Prodotti'', ``Contatti'' venivano rese a 28px anziché a 10px ---
+visibile solo sotto i 960px. Rimosso lo strato, la regola specifica
+torna a valere e il difetto sparisce senza alcun intervento mirato.
+
+Nel foglio di stile non resta oggi nessun \texttt{!important} di layout:
+gli unici tre superstiti sono quelli, idiomatici, del blocco
+\texttt{prefers-reduced-motion}, dove servono proprio a scavalcare
+qualunque animazione dichiarata altrove.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -799,6 +865,32 @@ Database irraggiungibile & Messaggio generico all'utente, dettaglio nel
 log, nessun dato tecnico esposto & Superato \\
 \end{longtable}
 
+\hypertarget{verifica-del-passaggio-a-mobile-first}{%
+\subsubsection{7.2 Verifica del passaggio a
+mobile-first}\label{verifica-del-passaggio-a-mobile-first}}
+
+La riscrittura del foglio di stile non doveva cambiare il risultato a
+video. Per dimostrarlo sono state acquisite le schermate a pagina intera
+delle cinque pagine a \texttt{390}, \texttt{768}, \texttt{960},
+\texttt{961} e \texttt{1440} px prima e dopo l'intervento, e confrontate
+pixel per pixel:
+
+\begin{itemize}
+\tightlist
+\item
+  a \texttt{961} e \texttt{1440} px le immagini sono risultate
+  \textbf{identiche}, a conferma che la disposizione desktop è
+  invariata;
+\item
+  a \texttt{390}, \texttt{768} e \texttt{960} px l'unica differenza
+  misurata riguarda l'altezza del piè di pagina, cioè esattamente la
+  correzione descritta in §3.4; l'altezza di ogni altro elemento è
+  rimasta invariata.
+\end{itemize}
+
+È stata inoltre verificata l'assenza di scorrimento orizzontale da
+\texttt{320} a \texttt{1920} px.
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{pubblicazione-online}{%
@@ -843,11 +935,6 @@ dovrebbe affrontare:
   Alcune schermate di Foliarium (ricerca fuzzy, albero delle proprietà)
   renderebbero più concreta la scheda prodotto e permetterebbero di
   mostrare la gestione dei testi alternativi.
-\item
-  \textbf{Foglio di stile responsive.} Il blocco
-  \texttt{@media\ (max-width:\ 960px)} è uno strato di correzione; una
-  riscrittura mobile-first eliminerebbe il ricorso a \texttt{!important}
-  (§3.4).
 \item
   \textbf{Informativa privacy.} Il modulo raccoglie dati personali e li
   memorizza: i collegamenti ``Privacy'' e ``Cookie'' nel piè di pagina
