@@ -1,140 +1,288 @@
-# RELAZIONE TECNICA DETTAGLIATA DI PROGETTO
-**Corso:** Web and Multimedia Technologies (Laurea Magistrale)  
-**Docente:** Prof. Marco Porta — Università degli Studi di Pavia  
-**Studente:** Marco Santoro  
-**Progetto:** Algora Studio / Foliarium Web Platform  
-**Anno Accademico:** 2025/2026  
+# RELAZIONE TECNICA DI PROGETTO
+
+**Corso:** Web and Multimedia Technologies (Laurea Magistrale)
+**Docente:** Prof. Marco Porta — Università degli Studi di Pavia
+**Studente:** Marco Santoro
+**Progetto:** Algora Studio — sito istituzionale e piattaforma di contatto
+**Anno Accademico:** 2025/2026
 
 ---
 
-## 1. INTRODUZIONE, VISION E CONTESTO APPLICATIVO
+## 1. INTRODUZIONE E CONTESTO APPLICATIVO
 
-La presente relazione descrive in dettaglio la progettazione, l'architettura tecnica e le scelte metodologiche alla base dello sviluppo del sito web e della piattaforma di gestione per **Algora Studio**. 
+Questa relazione descrive la progettazione e le scelte tecniche del sito web di **Algora Studio**, uno studio di sviluppo software specializzato in soluzioni verticali per il patrimonio culturale e la memoria storica documentale italiana (Archivi di Stato, archivi storici comunali, studi notarili, fondazioni).
 
-**Algora Studio** è una software house, fondata da **Marco Santoro**, specializzata nella realizzazione di soluzioni verticali per il dominio del patrimonio culturale e della memoria storica documentale italiana (Archivi di Stato, archivi storici comunali, studi notarili e fondazioni).
+Il prodotto attorno a cui ruota la comunicazione del sito è **Foliarium**, un gestionale sviluppato per l'Archivio di Stato di Savona per la digitalizzazione, la modellazione relazionale e la consultazione *fuzzy* degli archivi catastali storici (dal 1830 a oggi).
 
-Il prodotto di punta attorno a cui ruota la comunicazione e l'interazione del sito è **Foliarium**, un software gestionale sviluppato per l'Archivio di Stato di Savona per la digitalizzazione, la modellazione relazionale e la consultazione *fuzzy* degli archivi catastali storici (dal 1830 ad oggi).
+### Motivazione della scelta
 
-### Motivazione della scelta del tema e dell'approccio
-La maggior parte dei siti web aziendali per software house si affida a template generici privi di identità semantica, oppure a CMS complessi che appesantiscono le prestazioni e frammentano il controllo sul codice. La scelta di creare un portale ad hoc per Algora Studio risponde alla necessità di dimostrare come la programmazione web nativa (**HTML5, CSS3, JavaScript Vanilla, PHP e MySQL**) consenta di realizzare un'applicazione web con:
-1. Un'estetica altamente caratterizzata ("Archivio Caldo") coerente con il dominio trattato.
-2. Prestazioni e tempi di caricamento ridotti al minimo (stylesheet unico di ~12 KB, zero dipendenze esterne).
-3. Piena accessibilità e aderenza totale ai vincoli d'esame e di validazione W3C.
+La maggior parte dei siti per software house si appoggia a template generici o a CMS che frammentano il controllo sul codice. Realizzare un portale ad hoc risponde all'obiettivo di dimostrare che la programmazione web nativa (**HTML5, CSS3, JavaScript Vanilla, PHP e MySQL/MariaDB**) permette di ottenere:
 
----
-
-## 2. ARCHITETTURA DELL'INFORMAZIONE E MAPPATURA DELLE PAGINE
-
-L'applicazione web si articola su **5 pagine HTML5 statiche principali** integrate da **1 script server-side dinamico PHP** per la gestione della persistenza dei dati:
-
-| Risorsa File | Stack Tecnologico | Metodologia, Contenuto e Ruolo nell'Architettura |
-| :--- | :--- | :--- |
-| `index.html` | HTML5, CSS3, JS | **Home Page Istituzionale:** Definisce la vision di Algora Studio, presenta il manifesto aziendale ("Strumenti digitali per chi custodisce la conoscenza"), evidenzia le metriche chiave e fornisce un teaser del caso studio reale. |
-| `chi-siamo.html` | HTML5, CSS3 | **Profilo Aziendale e Filosofia:** Illustra la filosofia dello "sviluppo verticale", i 3 valori guida (Specializzazione, Co-progettazione, Tecnologie durevoli) e presenta il profilo del fondatore e lo stack tecnologico adottato. |
-| `foliarium.html` | HTML5, CSS3 | **Scheda Prodotto Verticale:** Dettaglia le funzionalità del software *Foliarium* (ricerca fuzzy Levenshtein, albero delle proprietà, audit trail, esportazione report PDF/Excel), i requisiti di sistema e la struttura dei prezzi/licenze per la Pubblica Amministrazione. |
-| `caso-studio.html` | HTML5, CSS3 | **Caso Studio Archivio di Stato di Savona:** Documenta i risultati quantitativi (69 comuni, 12.000+ partite catastali, 8.500+ possessori) e confronta il processo di ricerca prima e dopo la digitalizzazione tramite un layout comparativo. |
-| `contatti.html` | HTML5, CSS3, JS | **Interfaccia di Contatto e Demo:** Combina una guida conoscitiva in 4 fasi, un sistema di FAQ interattivo ad accordion e il modulo per la prenotazione della demo gratuita. |
-| `invia-contatto.php` | PHP 8.x, MySQLi | **Backend Server-Side:** Riceve le richieste HTTP POST dal form di contatto, applica sanitizzazione/validazione, memorizza i dati nel database MySQL tramite Prepared Statements e genera un esito HTML dinamico. |
+1. un'estetica caratterizzata ("Archivio Caldo") coerente con il dominio trattato;
+2. un carico di rete ridotto, con un solo foglio di stile e un solo file JavaScript;
+3. conformità alla validazione W3C e alle regole di base di usabilità e accessibilità viste a lezione.
 
 ---
 
-## 3. TECNICHE FRONTEND: HTML5 SEMANTICO, CSS3 E DESIGN SYSTEM
+## 2. ARCHITETTURA DELL'INFORMAZIONE E MAPPATURA DEI FILE
 
-### 3.1 Scrittura Nativa e Struttura Semantica
-In linea con i requisiti del corso, il codice è stato scritto interamente a mano senza ricorrere a editor WYSIWYG o framework CSS pesanti (come Bootstrap o Tailwind). La scelta di non utilizzare framework garantisce il pieno controllo sull'albero DOM e sull'ingombro del codice stylesheet (ridotto a un singolo file `style.css` di ~12 KB).
+Il sito si articola su **5 pagine di contenuto**, servite da PHP, più **1 script server-side** per la persistenza dei dati. Le parti comuni sono estratte in due **include PHP** riusati da tutte le pagine.
 
-Ogni pagina utilizza tag semantici HTML5 per strutturare i contenuti: `<nav>` per la navigazione globale, `<header>` per le sezioni introduttive, `<main>` e `<section>` per i blocchi tematici principali, `<footer>` per la chiusura di pagina.
+| File | Ruolo |
+| :--- | :--- |
+| `index.php` | **Home.** Vision dello studio, manifesto, metriche di sintesi, anteprima del caso studio, sezione approccio, call to action finale. |
+| `chi-siamo.php` | **Profilo dello studio.** Filosofia dello sviluppo verticale, i tre valori guida, profilo del fondatore, stack tecnologico, prospettive future. |
+| `foliarium.php` | **Scheda prodotto.** Funzionalità di Foliarium (ricerca fuzzy, albero delle proprietà, audit trail, esportazione report), requisiti di sistema, licenze e pacchetti di assistenza. |
+| `caso-studio.php` | **Caso studio Archivio di Stato di Savona.** Risultati quantitativi (69 comuni, 12.000+ partite, 8.500+ possessori), confronto "prima e dopo", fasi del progetto. |
+| `contatti.php` | **Contatti e demo.** Guida in quattro fasi, modulo di contatto, FAQ a fisarmonica. |
+| `nav.php` | Include: barra di navigazione, generata da un array PHP che marca automaticamente la voce attiva. |
+| `footer.php` | Include: piè di pagina comune a tutte le pagine. |
+| `invia-contatto.php` | **Backend.** Riceve il POST del modulo, valida, inserisce nel database con istruzione preparata, restituisce la pagina di esito. |
+| `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
+| `crea_db.sql` | Script DDL di creazione di database e tabella. |
+| `style.css` | Foglio di stile unico dell'intero sito (1.133 righe, ~41 KB). |
+| `main.js` | Comportamenti client-side (53 righe). |
 
-### 3.2 Design System "Archivio Caldo" e Tipografia Modulare
-Per trasmettere il senso di storicità, autorevolezza e precisione archivistica, è stato definito un Design System basato su CSS Custom Properties (Variabili CSS):
-* **Palette Cromatica:** Sfondo pergamena tenue (`--parchment: #F4EFE4`, `--cream: #F9F6EF`), testo e contenitori inchiostro profondo (`--ink: #1E150A`), dettagli e accenti dorati (`--gold: #B8821A`) e verde archivio per le azioni confermative (`--green: #1A3A28`).
-* **Accoppiamento Tipografico:** Utilizzo dei font Google Fonts *Cormorant Garamond* (serif elegante per i titoli display `h1`, `h2`, `h3`) e *Libre Baskerville* (serif ad alta leggibilità per il corpo del testo). I micro-testi e le etichette tecniche utilizzano *Trebuchet MS / Calibri* in maiuscolo con spaziatura tracciata (`letter-spacing: 3px–5px`).
+### 2.1 Perché PHP anche sulle pagine di contenuto
 
-### 3.3 Layout Non Lineare: CSS Grid, Flexbox e Posizionamento Ancorato
-Il requisito del layout "non lineare" è stato soddisfatto integrando diverse tecniche di posizionamento al di fuori del normale flusso del documento:
-1. **Header Fisso (Fixed Positioning):** La barra di navigazione principale (`#nav`) ha un posizionamento ancorato `position: fixed; top: 0; left: 0; right: 0; z-index: 200;` che la mantiene costantemente visibile durante lo scroll della pagina.
-2. **Griglie Asimmetriche CSS Grid:** La hero section e la struttura del caso studio utilizzano griglie a colonne differenziate (es. `grid-template-columns: 1fr 400px;` o `repeat(3, 1fr)` con gap di 2px su sfondo contorno per creare l'effetto griglia "a caselle archivistiche").
-3. **Confronto "Prima e Dopo" (Before/After):** In `caso-studio.html` è stato realizzato un layout a due colonne asimmetriche con sfondi a contrasto (parchment vs ink) per evidenziare visivamente i vantaggi della digitalizzazione.
+Le cinque pagine non contengono logica applicativa, ma hanno estensione `.php` per poter usare `include`:
+
+```php
+<?php $active = 'home'; ?>
+...
+<?php include 'nav.php'; ?>
+```
+
+Barra di navigazione e piè di pagina esistono così in **un'unica copia**. La voce di menu corrispondente alla pagina corrente viene evidenziata confrontando la variabile `$active` con le chiavi dell'array che descrive il menu:
+
+```php
+$navItems = [
+  'home'      => ['href' => 'index.php',    'label' => 'Home'],
+  'chi-siamo' => ['href' => 'chi-siamo.php', 'label' => 'Chi siamo'],
+  /* ... */
+];
+foreach ($navItems as $key => $item) {
+  /* class="active" quando $active === $key */
+}
+```
+
+Senza include, una modifica al menu andrebbe replicata a mano su sei file, con il rischio concreto di disallineamenti.
 
 ---
 
-## 4. TECNICHE CLIENT-SIDE: JAVASCRIPT VANILLA E INTERATTIVITÀ
+## 3. FRONTEND: HTML5 SEMANTICO, CSS3 E DESIGN SYSTEM
 
-I moduli client-side sono stati implementati in JavaScript moderno (ES6+) Vanilla, con l'obiettivo è stato quello di arricchire l'esperienza utente mantenendo tempi di esecuzione immediati.
+### 3.1 Scrittura nativa e struttura semantica
 
-* **Menu Hamburger Responsive (`toggleNav`):** Permette l'apertura e la chiusura del menu di navigazione su schermi mobili. Al container `div.nav-burger` sono stati aggiunti gli attributi di accessibilità W3C validati `role="button"`, `tabindex="0"` e `aria-label="Menu"` per la navigazione via tastiera.
-* **Scroll Event Listener dinamico:** Un event listener ascolta lo scorrimento della finestra (`window.addEventListener('scroll', ...)`) e aggiunge la classe `.scrolled` al navigatore superati i 20px, attivando un'ombra sfumata che stacca la barra dal contenuto sottostante.
-* **FAQ Accordion Interattivo (`toggleFaq`):** In `contatti.html`, un sistema a fisarmonica gestisce la chiusura automatica delle altre risposte al click su una nuova domanda, calcolando dinamicamente la proprietà CSS `max-height` e la rotazione dell'icona `+`.
+Il codice è scritto interamente a mano, senza editor WYSIWYG e senza framework CSS (Bootstrap, Tailwind). Ogni pagina usa i tag strutturali di HTML5: `<nav>` per la navigazione, `<main>` per il contenuto principale, `<header>` per le sezioni di apertura, `<section>` per i blocchi tematici, `<footer>` per la chiusura.
+
+L'intero contenuto di ogni pagina è racchiuso in `<main id="contenuto">`: questo definisce il *landmark* principale e permette il funzionamento del collegamento di salto descritto in §6.
+
+### 3.2 Design system "Archivio Caldo"
+
+La palette e la tipografia sono definite con **variabili CSS** (custom properties) raccolte in `:root`, così che un cambio di tonalità si propaghi a tutto il sito modificando una riga sola:
+
+* **Colori:** fondo pergamena (`--parchment: #F4EFE4`, `--cream: #F9F6EF`), testo e contenitori inchiostro (`--ink: #1E150A`), accenti dorati (`--gold: #B8821A`), verde archivio per le conferme (`--green: #1A3A28`).
+* **Tipografia:** *Cormorant Garamond* per i titoli display e *Libre Baskerville* per il testo corrente, entrambi da Google Fonts; *Trebuchet MS / Calibri* in maiuscolo spaziato per etichette e micro-testi.
+
+I due caratteri sono l'unica dipendenza esterna del progetto, caricata via `@import` in testa a `style.css`. In un contesto di produzione converrebbe ospitarli localmente, sia per eliminare la richiesta a un dominio terzo sia per non far dipendere il rendering da un servizio esterno; per il perimetro di questo progetto la dipendenza è stata mantenuta e qui dichiarata esplicitamente.
+
+Come descritto in §6.2, l'oro di marca è usato per filetti, bordi e sfondi, mentre **come colore di testo** il foglio di stile ricorre a due varianti calibrate sul fondo, perché la tonalità originale non raggiungeva il contrasto minimo richiesto.
+
+### 3.3 Layout non lineare
+
+Il requisito di un layout non semplicemente lineare è soddisfatto da tre tecniche, tutte fuori dal flusso normale del documento:
+
+1. **Barra di navigazione ancorata:** `#nav` usa `position: fixed; top: 0; left: 0; right: 0; z-index: 200`, restando visibile durante lo scorrimento.
+2. **Griglie asimmetriche con CSS Grid:** la hero e il caso studio usano colonne di larghezza diversa (`grid-template-columns: 1fr 400px`) e griglie a `gap: 1px` su fondo colorato, che producono l'effetto di "caselle" archivistiche separate da un filetto. In tutto il foglio di stile sono presenti 18 contesti di griglia.
+3. **Confronto "prima e dopo":** in `caso-studio.php`, due colonne a contrasto invertito (pergamena contro inchiostro) affiancano il processo manuale e quello digitalizzato.
+
+A questi si aggiungono elementi in `position: absolute` usati come decorazione (la lettera "A" in filigrana nella hero, i punti della timeline).
+
+### 3.4 Comportamento responsive
+
+Il layout desktop è definito nel corpo principale del foglio di stile; un blocco `@media (max-width: 960px)` riporta le griglie a colonna singola, riduce i margini laterali e attiva il menu a scomparsa. Il blocco funziona, ma è organizzato come strato di correzione che riscrive a valle le regole precedenti (con ricorso a `!important`): una riscrittura *mobile-first*, in cui il layout a colonna singola è la regola di base e le griglie vengono introdotte da `@media (min-width: …)`, sarebbe più pulita ed è il primo intervento previsto per un'eventuale evoluzione.
 
 ---
 
-## 5. TECNICHE SERVER-SIDE E PERSISTENZA DATI: PHP & DBMS MYSQL
+## 4. CLIENT-SIDE: JAVASCRIPT VANILLA
 
-### 5.1 Motivazione dell'Architettura Server-Side
-Un semplice form HTML che invia un'email diretta via `mailto:` o che simula l'invio via JS non è sufficiente per garantire la persistenza dei dati, il tracciamento delle richieste e la sicurezza. Si è scelto pertanto di implementare un'architettura 3-Tier standard: **Client (HTML/CSS/JS) → Application Server (PHP 8) → Database Server (MySQL/MariaDB)**.
+`main.js` contiene tre comportamenti, scritti in JavaScript ES6+ senza librerie.
 
-### 5.2 Progettazione del Database (`algora_db`)
-Il database relazionale locale memorizza le richieste di contatto e prenotazione demo arrivate dal sito. Lo schema DDL è stato progettato con tipi di dato ottimizzati e vincoli di integrità:
+* **Menu di navigazione (mobile).** Il pulsante apre e chiude l'elenco dei collegamenti, aggiornando l'attributo `aria-expanded`; il tasto `Esc` chiude il menu e riporta il focus sul pulsante che lo aveva aperto.
+* **Ombra della barra allo scorrimento.** Un listener su `scroll` aggiunge la classe `.scrolled` a `#nav` oltre i 20 px, staccando visivamente la barra dal contenuto.
+* **FAQ a fisarmonica.** Al clic su una domanda le altre risposte si chiudono; l'apertura è animata sulla proprietà `max-height` e comunicata alle tecnologie assistive tramite `aria-expanded`.
+
+Entrambi i comandi interattivi sono elementi **`<button>` nativi**: la scelta è discussa in §6.1.
+
+---
+
+## 5. SERVER-SIDE E PERSISTENZA DATI
+
+### 5.1 Architettura
+
+Un modulo che invii una email via `mailto:` o simuli l'invio in JavaScript non garantisce né persistenza né tracciabilità. Il progetto adotta quindi l'architettura a tre livelli **Client (HTML/CSS/JS) → Application server (PHP 8) → Database server (MySQL/MariaDB)**.
+
+### 5.2 Base di dati (`algora_db`)
 
 ```sql
--- Creazione e selezione del Database
-CREATE DATABASE IF NOT EXISTS algora_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS algora_db
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE algora_db;
 
--- Creazione della tabella per i contatti dal form web
 CREATE TABLE IF NOT EXISTS contatti (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    ente VARCHAR(100),
-    email VARCHAR(100) NOT NULL,
-    tipo VARCHAR(50),
-    messaggio TEXT NOT NULL,
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    nome      VARCHAR(100) NOT NULL,
+    ente      VARCHAR(100),
+    email     VARCHAR(100) NOT NULL,
+    tipo      VARCHAR(50),
+    messaggio TEXT         NOT NULL,
     data_invio DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 ```
 
-### 5.3 Flusso di Elaborazione e Sicurezza Backend (`invia-contatto.php`)
-All'invio del modulo, il browser invia una richiesta HTTP `POST` a `invia-contatto.php`. Lo script esegue i seguenti passaggi in sequenza rigorosa:
-1. **Verifica del Metodo HTTP:** Controlla che la richiesta sia arrivata via `$_SERVER["REQUEST_METHOD"] === "POST"` per impedire l'accesso diretto via URL.
-2. **Sanitizzazione e Validazione Severa:**
-   - `trim()` e `htmlspecialchars()` per rimuovere spazi bianchi eccedenti e convertire i caratteri speciali HTML (es. `<`, `>`, `&`), neutralizzando attacchi di tipo *Cross-Site Scripting (XSS)*.
-   - `filter_var($email, FILTER_VALIDATE_EMAIL)` per verificare la correttezza formale dell'indirizzo di posta elettronica lato server.
-3. **Istruzioni Preparate (Anti-SQL Injection):** L'inserimento nel database avviene tramite Prepared Statements della libreria `mysqli`:
-   ```php
-   $stmt = $conn->prepare("INSERT INTO contatti (nome, ente, email, tipo, messaggio) VALUES (?, ?, ?, ?, ?)");
-   $stmt->bind_param("sssss", $nome, $ente, $email, $tipo, $messaggio);
-   $stmt->execute();
-   ```
-   L'uso dei segnaposto `?` e il binding separato dei parametri separano completamente le istruzioni SQL dai dati forniti dall'utente, rendendo impossibile qualsiasi attacco di *SQL Injection*.
-4. **Generazione dell'Output HTML Dinamico:** In base all'esito dell'operazione, lo script PHP renderizza direttamente una pagina di conferma personalizzata (con il nome dell'utente e l'email inserita) o una scheda d'errore stilizzata con lo stesso layout e foglio di stile `style.css` del sito.
+La codifica `utf8mb4` copre l'intero repertorio Unicode, inclusi i caratteri accentati e i segni tipografici usati nei nomi di enti e località.
+
+### 5.3 Flusso di elaborazione
+
+1. **Verifica del metodo HTTP.** Una richiesta che non sia `POST` (tipicamente l'apertura diretta dell'URL) non ha dati da elaborare: lo script risponde con un redirect `303 See Other` verso `contatti.php`, invece di mostrare una pagina di errore priva di significato.
+2. **Validazione.** `trim()` sui campi, controllo dei campi obbligatori, `filter_var($email, FILTER_VALIDATE_EMAIL)` per la correttezza formale dell'indirizzo. Messaggi di errore distinti per campi mancanti e per email non valida.
+3. **Inserimento con istruzione preparata.**
+
+```php
+$stmt = $conn->prepare(
+    'INSERT INTO contatti (nome, ente, email, tipo, messaggio)
+     VALUES (?, ?, ?, ?, ?)'
+);
+$stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
+$stmt->execute();
+```
+
+   I segnaposto `?` e il binding separato dei parametri tengono distinti comandi SQL e dati forniti dall'utente: il contenuto dei campi non può essere reinterpretato come istruzione. Un invio con `nome = "Rossi'); DROP TABLE contatti; --"` viene memorizzato come stringa letterale e la tabella resta intatta.
+4. **Pagina di esito.** In base all'esito lo script produce una pagina di conferma personalizzata o una scheda di errore, entrambe con la navigazione, il piè di pagina e il foglio di stile del resto del sito.
+
+### 5.4 Escaping: una sola volta, in uscita
+
+I dati vengono salvati nel database **così come l'utente li ha scritti**, e `htmlspecialchars()` viene applicato soltanto al momento di stamparli nella pagina.
+
+Applicare l'escaping anche in ingresso — errore frequente, perché sembra "più sicuro" — produce una doppia codifica: un cognome come `Sant'Angelo` verrebbe memorizzato come `Sant&#039;Angelo` e ristampato a video come `Sant&amp;#039;Angelo`. Il database si riempirebbe di entità HTML al posto dei caratteri reali, rendendo inutilizzabili i dati per qualsiasi uso diverso dalla pagina web (esportazioni, email, ricerche). La protezione dalle *SQL injection* è affidata all'istruzione preparata, non all'escaping HTML, che serve a un problema diverso (*Cross-Site Scripting*, in uscita).
+
+### 5.5 Gestione degli errori e credenziali
+
+I parametri di connessione stanno in `config-db.php`, separati dalla logica: il passaggio da ambiente locale a hosting richiede di modificare un solo file, e in un deployment reale il file va escluso dal versionamento.
+
+A partire da PHP 8.1 l'estensione `mysqli` segnala gli errori **sollevando eccezioni** anziché valorizzando `connect_error`. Un controllo scritto nella forma tradizionale `if ($conn->connect_error)` non verrebbe quindi mai eseguito, e un database irraggiungibile produrrebbe una traccia di stack contenente host, utente e percorso del file. La connessione è perciò racchiusa in un `try/catch`: all'utente arriva un messaggio generico, il dettaglio tecnico finisce nel log del server tramite `error_log()`.
 
 ---
 
-## 6. USABILITÀ, ACCESSIBILITÀ E RISOLUZIONE ERRORI W3C
+## 6. USABILITÀ E ACCESSIBILITÀ
 
-Durante la fase di collaudo, tutte le pagine sono state sottoposte alla verifica formale tramite il **W3C Markup Validation Service**. Sono state individuate e risolte le seguenti criticità:
+L'accessibilità è stata trattata come requisito di progetto e non come rifinitura finale. Le verifiche sono state condotte con il **W3C Nu Markup Validation Service** per la correttezza formale e con **axe-core** (motore di analisi automatica delle regole WCAG) per il comportamento, su tutte le pagine e su due larghezze di viewport (1440 px e 390 px).
 
-| Segnalazione W3C | Causa Tecnica | Soluzione Implementata |
+### 6.1 Comandi interattivi azionabili da tastiera
+
+Il menu a scomparsa e la fisarmonica delle FAQ erano inizialmente `<div>` con un gestore `onclick`. Un `<div>` non è raggiungibile con il tasto `Tab` e non risponde a `Invio` o `Barra spaziatrice`: entrambi i comandi funzionavano solo con il mouse. L'aggiunta di `role="button"` e `tabindex="0"` al solo elemento del menu peggiorava anzi la situazione, perché faceva annunciare l'elemento come pulsante a uno screen reader senza renderlo effettivamente azionabile.
+
+Entrambi sono stati riscritti come elementi **`<button type="button">` nativi**. Un pulsante nativo è già nell'ordine di tabulazione, risponde a `Invio` e `Barra spaziatrice` senza codice aggiuntivo, viene annunciato correttamente e riceve gli stili di focus del sistema. Lo stato di apertura è esposto con `aria-expanded`, e `aria-controls` collega il comando al blocco che governa:
+
+```html
+<button type="button" class="faq-trigger"
+        aria-expanded="false" aria-controls="faq-a1">
+  <span>Quanto tempo ci vuole per installare Foliarium?</span>
+  <span class="faq-toggle" aria-hidden="true">+</span>
+</button>
+```
+
+Il segno `+` che ruota in `×` è decorativo e duplicherebbe l'informazione già data da `aria-expanded`: è quindi marcato `aria-hidden="true"`. Ogni domanda è inoltre racchiusa in un `<h3>`, così che la lista delle FAQ sia percorribile anche navigando per intestazioni.
+
+Quando una risposta è chiusa, oltre a `max-height: 0` le viene applicato `visibility: hidden`, con la transizione ritardata a fine animazione: il testo non resta leggibile agli screen reader mentre `aria-expanded` dichiara il blocco chiuso.
+
+### 6.2 Contrasto cromatico
+
+L'analisi automatica ha inizialmente rilevato **200 violazioni** del criterio WCAG 2.1 AA sul contrasto (1.4.3), distribuite su tutte e cinque le pagine. Le cause erano tre:
+
+| Causa | Rapporto misurato | Richiesto |
 | :--- | :--- | :--- |
-| `Error: aria-label on div` | L'attributo `aria-label` era stato inserito direttamente su un `div` generico senza ruolo ARIA. | Aggiunti `role="button"` e `tabindex="0"` all'elemento `div.nav-burger` per renderlo semanticamente un pulsante accessibile anche da tastiera. |
-| `Error: Skipping heading level` | Presenza di tag `h4` direttamente sotto sezioni gestite con `h2` (es. box stack e colonne footer). | Ristrutturata l'alberatura dei titoli sostituendo gli `h4` con `h3` sia nei file HTML che nelle regole CSS del footer e della sidebar. |
-| `CSS Inline Warnings` | Utilizzo temporaneo di attributi `style="..."` all'interno dei div di layout. | Centralizzati i blocchi di stile all'interno del file unico `style.css` per mantenere la massima pulizia del codice. |
+| Oro `#B8821A` come testo su fondo pergamena (tutte le etichette in maiuscoletto) | 2,93:1 | 4,5:1 |
+| Testo avorio semitrasparente su fondo scuro con opacità troppo bassa (piè di pagina a `.25`) | 2,07:1 | 4,5:1 |
+| Testo avorio sul pulsante oro | 3,30:1 | 4,5:1 |
+
+Gli interventi hanno preservato l'identità visiva invece di appiattire la palette:
+
+* l'oro di marca `--gold` resta invariato per **filetti, bordi, pallini e sfondi**, dove il criterio sul contrasto del testo non si applica;
+* per il **testo** sono state introdotte due varianti calibrate sul fondo: `--gold-text: #845C10` sui fondi chiari (minimo 4,84:1) e `--gold-on-dark: #C9942B` sui fondi scuri (minimo 5,93:1);
+* le opacità del testo chiaro su fondo scuro sono state portate al valore minimo che soddisfa il criterio (0,62 sull'inchiostro, 0,72 sul verde archivio);
+* il pulsante oro ha ora testo color inchiostro (5,35:1), lo stesso trattamento già usato dalle altre etichette su fondo oro.
+
+Al termine, le violazioni rilevate sono **0** su tutte le pagine e su entrambe le larghezze di viewport.
+
+### 6.3 Struttura, landmark e collegamento di salto
+
+Il contenuto di ogni pagina è racchiuso in `<main id="contenuto">`; con `<nav>` e `<footer>` questo garantisce che nessuna porzione di pagina resti fuori da un landmark, e permette agli utenti di screen reader di saltare direttamente al contenuto.
+
+La prima tabulazione di ogni pagina incontra un **collegamento di salto**, nascosto fuori dallo schermo con `transform: translateY(-120%)` e reso visibile da `.skip-link:focus`. Senza di esso, un utente che naviga da tastiera dovrebbe attraversare l'intero menu su ogni pagina prima di raggiungere il testo.
+
+La gerarchia delle intestazioni è continua su tutte le pagine: un solo `<h1>`, sezioni `<h2>`, blocchi `<h3>`, senza salti di livello.
+
+### 6.4 Focus, movimento e modulo
+
+* **Focus visibile.** Una regola `:focus-visible` unica applica un contorno oro a ogni elemento attivabile, con una variante più chiara sui fondi scuri. I campi del modulo avevano `outline: none` e affidavano il segnale di focus al solo colore del bordo: la dichiarazione è stata rimossa.
+* **Movimento.** Le animazioni di ingresso e lo scorrimento morbido sono racchiusi in `@media (prefers-reduced-motion: no-preference)`; a chi ha richiesto meno animazioni nelle impostazioni di sistema il sito risponde senza transizioni.
+* **Modulo.** Le etichette sono associate ai campi tramite `for`/`id`. Il campo del messaggio, obbligatorio lato server, porta ora anche l'attributo `required`, così l'errore viene segnalato dal browser prima dell'invio invece di costare un cambio di pagina. Nella scheda dei recapiti alcuni `<label>` erano usati come testo decorativo, senza alcun controllo da etichettare: sono stati sostituiti da `<span>`.
+
+### 6.5 Validazione W3C
+
+Tutte le pagine, **incluse entrambe le varianti della pagina di esito** (conferma ed errore), superano la validazione senza errori né avvisi. Le segnalazioni emerse durante lo sviluppo e come sono state risolte:
+
+| Segnalazione | Causa | Soluzione |
+| :--- | :--- | :--- |
+| `aria-label on div` | Attributo ARIA su un `<div>` privo di ruolo | Elemento riscritto come `<button>` nativo (§6.1) |
+| `Skipping heading level` | `<h4>` sotto sezioni gestite con `<h2>` | Alberatura dei titoli ristrutturata su `<h3>` |
+| `Skipping heading level` (piè di pagina) | I titoli di colonna erano `<h3>`; nella pagina di esito, dove il titolo principale è un `<h1>` e non esistono sezioni `<h2>`, saltavano un livello | Titoli di colonna portati a `<h2>` |
+| Stili inline | Attributi `style="..."` nei blocchi di layout | Regole centralizzate nel solo `style.css` |
 
 ---
 
-## 7. ISTRUZIONI PER L'INSTALLAZIONE LOCALE
+## 7. INSTALLAZIONE E COLLAUDO IN LOCALE
 
-Per eseguire il collaudo completo della piattaforma e verificare l'interazione dinamica con il database relazionale:
-1. Avviare i moduli **Apache** e **MySQL** all'interno del proprio ambiente locale (XAMPP, MAMP o WAMP).
-2. Copiare l'intera cartella `algora_site` all'interno della directory root del server (es. `C:\xampp\htdocs\algora_site` oppure nella cartella  `C:\wamp64\www\algora_site` nel caso di WAMP).
-3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire le query DDL di creazione del database `algora_db` e della tabella `contatti` riportate al punto 5.2.
-4. Aprire il browser e digitare l'URL locale per la home: http://localhost/algora_site/index.html`
-5. Per testare le funzionalità server basta andare su `http://localhost/algora_site/contatti.html`, compilare il form e inviare i dati. Verificare che venga mostrata la schermata di conferma dinamica generata da `invia-contatto.php` e che la nuova riga sia presente nella tabella MySQL
+1. Avviare i moduli **Apache** e **MySQL/MariaDB** del proprio ambiente locale (XAMPP, MAMP o WAMP).
+2. Copiare la cartella del progetto nella directory servita dal server (per esempio `C:\xampp\htdocs\algora_site` oppure `C:\wamp64\www\algora_site`).
+3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algora_db` e la tabella `contatti`.
+4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione (i valori predefiniti sono quelli di XAMPP/MAMP: utente `root`, password vuota).
+5. Aprire `http://localhost/algora_site/index.php`.
+6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
 
-## 8. ISTRUZIONI PER L'UTILIZZO ONLINE
+### 7.1 Casi di prova eseguiti
 
-1. In alternativa la versione online è disponibile per la consultazione al sito www.algorastudio.it .
-2. Nel caso di utilizzo su hosting e dominio web, bisogna configurare nel file .php i parametri di connessione del database e del relativo user con i privilegi associati, impostati sul gestore del dominio.
-3. Qui una schermata di  **phpMyAdmin** che dimostra la corretta creazione del record relativa alla richiesta di contatto.
+| Caso | Esito atteso | Esito |
+| :--- | :--- | :--- |
+| Invio corretto | Pagina di conferma, riga inserita | Superato |
+| Nome con apostrofo e `&` (`Sant'Angelo & C.`) | Caratteri corretti a video **e** nel database | Superato |
+| Email formalmente non valida | Messaggio di errore specifico, nessun inserimento | Superato |
+| Campi obbligatori vuoti | Messaggio di errore specifico, nessun inserimento | Superato |
+| Apertura diretta di `invia-contatto.php` via URL | Redirect `303` al modulo | Superato |
+| Stringa di SQL injection nel campo nome | Memorizzata come testo, tabella intatta | Superato |
+| Database irraggiungibile | Messaggio generico all'utente, dettaglio nel log, nessun dato tecnico esposto | Superato |
 
-![image-20260819185633301](C:\Users\saintgold\AppData\Roaming\Typora\typora-user-images\image-20260819185633301.png)
+---
+
+## 8. PUBBLICAZIONE ONLINE
+
+Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su hosting condiviso la procedura è la seguente:
+
+1. Caricare i file del progetto nella cartella pubblica del dominio (tipicamente `public_html` o `httpdocs`).
+2. Creare il database dal pannello dell'hosting ed eseguirvi `crea_db.sql`.
+3. Aggiornare `config-db.php` con host, nome del database, utente e password forniti dal gestore del dominio, assegnando all'utente i soli privilegi necessari (`INSERT` e `SELECT` sulla tabella `contatti`).
+4. Verificare che `config-db.php` non sia raggiungibile dall'esterno e che non venga incluso nel versionamento.
+
+---
+
+## 9. LIMITI NOTI E SVILUPPI FUTURI
+
+Per completezza si segnalano gli aspetti che un'evoluzione del progetto dovrebbe affrontare:
+
+* **Contenuti multimediali.** Il sito è interamente testuale. Alcune schermate di Foliarium (ricerca fuzzy, albero delle proprietà) renderebbero più concreta la scheda prodotto e permetterebbero di mostrare la gestione dei testi alternativi.
+* **Foglio di stile responsive.** Il blocco `@media (max-width: 960px)` è uno strato di correzione; una riscrittura mobile-first eliminerebbe il ricorso a `!important` (§3.4).
+* **Informativa privacy.** Il modulo raccoglie dati personali e li memorizza: i collegamenti "Privacy" e "Cookie" nel piè di pagina sono al momento segnaposto e vanno sostituiti da un'informativa reale, con relativa casella di consenso nel modulo.
+* **Protezione del modulo.** Per un uso in produzione andrebbero aggiunti un token CSRF e una misura anti-spam.
+* **Caratteri tipografici.** Ospitare localmente i due font eliminerebbe l'unica dipendenza esterna (§3.2).

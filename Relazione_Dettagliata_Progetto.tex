@@ -1,94 +1,864 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[italic]{mathastext}
-\usepackage[italian]{babel}
-\usepackage{geometry}
-\geometry{a4paper, margin=20mm}
-\usepackage{hyperref}
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{DejaVu Serif}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
 \usepackage{xcolor}
-\usepackage{booktabs}
-\usepackage{listings}
-\usepackage{enumitem}
-
-\definecolor{primary}{RGB}{15, 23, 42}
-\definecolor{accent}{RGB}{217, 119, 6}
-\definecolor{codebg}{RGB}{15, 23, 42}
-
+\usepackage[a4paper,margin=22mm]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{italian}
+\ifPDFTeX
+\else
+\babelfont{rm}[]{DejaVu Serif}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
 \hypersetup{
-    colorlinks=true,
-    linkcolor=primary,
-    urlcolor=accent
-}
+  pdflang={it},
+  colorlinks=true,
+  linkcolor={black},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={[HTML]{845C10}},
+  pdfcreator={LaTeX via pandoc}}
 
-\lstset{
-    backgroundcolor=\color{codebg},
-    basicstyle=\ttfamily\small\color{white},
-    breaklines=true,
-    frame=single,
-    rulecolor=\color{accent},
-    language=SQL
-}
-
-\title{\textbf{\Large RELAZIONE TECNICA DETTAGLIATA DI PROGETTO}\\ \large Corso: Web and Multimedia Technologies — UNIPV}
-\author{\textbf{Marco Santoro}}
-\date{Anno Accademico 2025/2026}
+\author{}
+\date{}
 
 \begin{document}
 
-\maketitle
+\hypertarget{relazione-tecnica-di-progetto}{%
+\section{RELAZIONE TECNICA DI
+PROGETTO}\label{relazione-tecnica-di-progetto}}
 
-\section{Introduzione, Vision e Contesto Applicativo}
-La presente relazione descrive in dettaglio la progettazione, l'architettura tecnica e le scelte metodologiche alla base dello sviluppo del sito web e della piattaforma di gestione per \textbf{Algora Studio}. Algora Studio è una software house specializzata nella realizzazione di soluzioni verticali per il dominio del patrimonio culturale e della memoria storica documentale italiana.
+\textbf{Corso:} Web and Multimedia Technologies (Laurea Magistrale)
+\textbf{Docente:} Prof.~Marco Porta --- Università degli Studi di Pavia
+\textbf{Studente:} Marco Santoro \textbf{Progetto:} Algora Studio ---
+sito istituzionale e piattaforma di contatto \textbf{Anno Accademico:}
+2025/2026
 
-Il prodotto di punta è \textbf{Foliarium}, un software gestionale sviluppato per l'Archivio di Stato di Savona per la digitalizzazione e consultazione \textit{fuzzy} degli archivi catastali storici (dal 1830 ad oggi).
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\section{Architettura dell'Informazione e Mappatura delle Pagine}
-L'applicazione si articola su 5 pagine HTML5 statiche integrate da 1 script dinamico PHP:
+\hypertarget{introduzione-e-contesto-applicativo}{%
+\subsection{1. INTRODUZIONE E CONTESTO
+APPLICATIVO}\label{introduzione-e-contesto-applicativo}}
 
-\begin{table}[h!]
-\centering
-\small
-\begin{tabular}{lll}
-\toprule
-\textbf{Risorsa File} & \textbf{Stack} & \textbf{Ruolo nell'Architettura} \\
-\midrule
-\texttt{index.html} & HTML5, CSS3, JS & Home Page Istituzionale con manifesto e metriche. \\
-\texttt{chi-siamo.html} & HTML5, CSS3 & Profilo aziendale e filosofia dello sviluppo verticale. \\
-\texttt{foliarium.html} & HTML5, CSS3 & Scheda prodotto dettagliata e prezzi licenze PA. \\
-\texttt{caso-studio.html} & HTML5, CSS3 & Caso studio reale Archivio di Stato di Savona. \\
-\texttt{contatti.html} & HTML5, CSS3, JS & Interfaccia di contatto, FAQ accordion e form. \\
-\texttt{invia-contatto.php} & PHP 8, MySQLi & Backend server-side per la persistenza dei dati. \\
-\bottomrule
-\end{tabular}
-\end{table}
+Questa relazione descrive la progettazione e le scelte tecniche del sito
+web di \textbf{Algora Studio}, uno studio di sviluppo software
+specializzato in soluzioni verticali per il patrimonio culturale e la
+memoria storica documentale italiana (Archivi di Stato, archivi storici
+comunali, studi notarili, fondazioni).
 
-\section{Tecniche Frontend: HTML5, CSS3 e Layout Non Lineare}
-Il codice è stato sviluppato interamente a mano. Il layout "non lineare" è garantito dall'uso di \texttt{position: fixed} per la navigazione e da griglie asimmetriche in \textbf{CSS Grid} e \textbf{Flexbox}.
+Il prodotto attorno a cui ruota la comunicazione del sito è
+\textbf{Foliarium}, un gestionale sviluppato per l'Archivio di Stato di
+Savona per la digitalizzazione, la modellazione relazionale e la
+consultazione \emph{fuzzy} degli archivi catastali storici (dal 1830 a
+oggi).
 
-\section{Tecniche Client-Side: JavaScript Vanilla}
-Realizzato in JS Vanilla per la gestione del menu responsive (\texttt{toggleNav}), dello scroll listener e del sistema FAQ accordion.
+\hypertarget{motivazione-della-scelta}{%
+\subsubsection{Motivazione della
+scelta}\label{motivazione-della-scelta}}
 
-\section{Tecniche Server-Side e Persistenza Dati: PHP \& MySQL}
-Schema DDL della tabella \texttt{contatti}:
+La maggior parte dei siti per software house si appoggia a template
+generici o a CMS che frammentano il controllo sul codice. Realizzare un
+portale ad hoc risponde all'obiettivo di dimostrare che la
+programmazione web nativa (\textbf{HTML5, CSS3, JavaScript Vanilla, PHP
+e MySQL/MariaDB}) permette di ottenere:
 
-\begin{lstlisting}
-CREATE DATABASE IF NOT EXISTS algora_db;
-USE algora_db;
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  un'estetica caratterizzata (``Archivio Caldo'') coerente con il
+  dominio trattato;
+\item
+  un carico di rete ridotto, con un solo foglio di stile e un solo file
+  JavaScript;
+\item
+  conformità alla validazione W3C e alle regole di base di usabilità e
+  accessibilità viste a lezione.
+\end{enumerate}
 
-CREATE TABLE IF NOT EXISTS contatti (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    ente VARCHAR(100),
-    email VARCHAR(100) NOT NULL,
-    tipo VARCHAR(50),
-    messaggio TEXT NOT NULL,
-    data_invio DATETIME DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
-\end{lstlisting}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-Sicurezza garantita da Prepared Statements (\texttt{mysqli}) e sanitizzazione degli input (\texttt{trim()}, \texttt{htmlspecialchars()}).
+\hypertarget{architettura-dellinformazione-e-mappatura-dei-file}{%
+\subsection{2. ARCHITETTURA DELL'INFORMAZIONE E MAPPATURA DEI
+FILE}\label{architettura-dellinformazione-e-mappatura-dei-file}}
 
-\section{Conclusioni e Collaudo Locale}
-Per il collaudo locale: avviare Apache e MySQL su XAMPP, copiare la cartella in \texttt{htdocs}, importare il database e accedere a \texttt{http://localhost/algora_site/contatti.html}.
+Il sito si articola su \textbf{5 pagine di contenuto}, servite da PHP,
+più \textbf{1 script server-side} per la persistenza dei dati. Le parti
+comuni sono estratte in due \textbf{include PHP} riusati da tutte le
+pagine.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+File
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ruolo
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{index.php} & \textbf{Home.} Vision dello studio, manifesto,
+metriche di sintesi, anteprima del caso studio, sezione approccio, call
+to action finale. \\
+\texttt{chi-siamo.php} & \textbf{Profilo dello studio.} Filosofia dello
+sviluppo verticale, i tre valori guida, profilo del fondatore, stack
+tecnologico, prospettive future. \\
+\texttt{foliarium.php} & \textbf{Scheda prodotto.} Funzionalità di
+Foliarium (ricerca fuzzy, albero delle proprietà, audit trail,
+esportazione report), requisiti di sistema, licenze e pacchetti di
+assistenza. \\
+\texttt{caso-studio.php} & \textbf{Caso studio Archivio di Stato di
+Savona.} Risultati quantitativi (69 comuni, 12.000+ partite, 8.500+
+possessori), confronto ``prima e dopo'', fasi del progetto. \\
+\texttt{contatti.php} & \textbf{Contatti e demo.} Guida in quattro fasi,
+modulo di contatto, FAQ a fisarmonica. \\
+\texttt{nav.php} & Include: barra di navigazione, generata da un array
+PHP che marca automaticamente la voce attiva. \\
+\texttt{footer.php} & Include: piè di pagina comune a tutte le
+pagine. \\
+\texttt{invia-contatto.php} & \textbf{Backend.} Riceve il POST del
+modulo, valida, inserisce nel database con istruzione preparata,
+restituisce la pagina di esito. \\
+\texttt{config-db.php} & Parametri di connessione al database, isolati
+dalla logica applicativa. \\
+\texttt{crea\_db.sql} & Script DDL di creazione di database e
+tabella. \\
+\texttt{style.css} & Foglio di stile unico dell'intero sito (1.133
+righe, \textasciitilde41 KB). \\
+\texttt{main.js} & Comportamenti client-side (53 righe). \\
+\end{longtable}
+
+\hypertarget{perchuxe9-php-anche-sulle-pagine-di-contenuto}{%
+\subsubsection{2.1 Perché PHP anche sulle pagine di
+contenuto}\label{perchuxe9-php-anche-sulle-pagine-di-contenuto}}
+
+Le cinque pagine non contengono logica applicativa, ma hanno estensione
+\texttt{.php} per poter usare \texttt{include}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{\textless{}?php} \VariableTok{$active} \OperatorTok{=} \StringTok{\textquotesingle{}home\textquotesingle{}}\OtherTok{;} \KeywordTok{?\textgreater{}}
+\NormalTok{...}
+\OperatorTok{\textless{}}\OtherTok{?}\NormalTok{php }\KeywordTok{include} \StringTok{\textquotesingle{}nav.php\textquotesingle{}}\OtherTok{;} \KeywordTok{?\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+Barra di navigazione e piè di pagina esistono così in \textbf{un'unica
+copia}. La voce di menu corrispondente alla pagina corrente viene
+evidenziata confrontando la variabile \texttt{\$active} con le chiavi
+dell'array che descrive il menu:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$navItems} \OperatorTok{=}\NormalTok{ [}
+  \StringTok{\textquotesingle{}home\textquotesingle{}}\NormalTok{      =\textgreater{} [}\StringTok{\textquotesingle{}href\textquotesingle{}}\NormalTok{ =\textgreater{} }\StringTok{\textquotesingle{}index.php\textquotesingle{}}\OtherTok{,}    \StringTok{\textquotesingle{}label\textquotesingle{}}\NormalTok{ =\textgreater{} }\StringTok{\textquotesingle{}Home\textquotesingle{}}\NormalTok{]}\OtherTok{,}
+  \StringTok{\textquotesingle{}chi{-}siamo\textquotesingle{}}\NormalTok{ =\textgreater{} [}\StringTok{\textquotesingle{}href\textquotesingle{}}\NormalTok{ =\textgreater{} }\StringTok{\textquotesingle{}chi{-}siamo.php\textquotesingle{}}\OtherTok{,} \StringTok{\textquotesingle{}label\textquotesingle{}}\NormalTok{ =\textgreater{} }\StringTok{\textquotesingle{}Chi siamo\textquotesingle{}}\NormalTok{]}\OtherTok{,}
+  \CommentTok{/* ... */}
+\NormalTok{]}\OtherTok{;}
+\ControlFlowTok{foreach}\NormalTok{ (}\VariableTok{$navItems} \KeywordTok{as} \VariableTok{$key}\NormalTok{ =\textgreater{} }\VariableTok{$item}\NormalTok{) \{}
+  \CommentTok{/* class="active" quando $active === $key */}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Senza include, una modifica al menu andrebbe replicata a mano su sei
+file, con il rischio concreto di disallineamenti.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{frontend-html5-semantico-css3-e-design-system}{%
+\subsection{3. FRONTEND: HTML5 SEMANTICO, CSS3 E DESIGN
+SYSTEM}\label{frontend-html5-semantico-css3-e-design-system}}
+
+\hypertarget{scrittura-nativa-e-struttura-semantica}{%
+\subsubsection{3.1 Scrittura nativa e struttura
+semantica}\label{scrittura-nativa-e-struttura-semantica}}
+
+Il codice è scritto interamente a mano, senza editor WYSIWYG e senza
+framework CSS (Bootstrap, Tailwind). Ogni pagina usa i tag strutturali
+di HTML5: \texttt{\textless{}nav\textgreater{}} per la navigazione,
+\texttt{\textless{}main\textgreater{}} per il contenuto principale,
+\texttt{\textless{}header\textgreater{}} per le sezioni di apertura,
+\texttt{\textless{}section\textgreater{}} per i blocchi tematici,
+\texttt{\textless{}footer\textgreater{}} per la chiusura.
+
+L'intero contenuto di ogni pagina è racchiuso in
+\texttt{\textless{}main\ id="contenuto"\textgreater{}}: questo definisce
+il \emph{landmark} principale e permette il funzionamento del
+collegamento di salto descritto in §6.
+
+\hypertarget{design-system-archivio-caldo}{%
+\subsubsection{3.2 Design system ``Archivio
+Caldo''}\label{design-system-archivio-caldo}}
+
+La palette e la tipografia sono definite con \textbf{variabili CSS}
+(custom properties) raccolte in \texttt{:root}, così che un cambio di
+tonalità si propaghi a tutto il sito modificando una riga sola:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Colori:} fondo pergamena (\texttt{-\/-parchment:\ \#F4EFE4},
+  \texttt{-\/-cream:\ \#F9F6EF}), testo e contenitori inchiostro
+  (\texttt{-\/-ink:\ \#1E150A}), accenti dorati
+  (\texttt{-\/-gold:\ \#B8821A}), verde archivio per le conferme
+  (\texttt{-\/-green:\ \#1A3A28}).
+\item
+  \textbf{Tipografia:} \emph{Cormorant Garamond} per i titoli display e
+  \emph{Libre Baskerville} per il testo corrente, entrambi da Google
+  Fonts; \emph{Trebuchet MS / Calibri} in maiuscolo spaziato per
+  etichette e micro-testi.
+\end{itemize}
+
+I due caratteri sono l'unica dipendenza esterna del progetto, caricata
+via \texttt{@import} in testa a \texttt{style.css}. In un contesto di
+produzione converrebbe ospitarli localmente, sia per eliminare la
+richiesta a un dominio terzo sia per non far dipendere il rendering da
+un servizio esterno; per il perimetro di questo progetto la dipendenza è
+stata mantenuta e qui dichiarata esplicitamente.
+
+Come descritto in §6.2, l'oro di marca è usato per filetti, bordi e
+sfondi, mentre \textbf{come colore di testo} il foglio di stile ricorre
+a due varianti calibrate sul fondo, perché la tonalità originale non
+raggiungeva il contrasto minimo richiesto.
+
+\hypertarget{layout-non-lineare}{%
+\subsubsection{3.3 Layout non lineare}\label{layout-non-lineare}}
+
+Il requisito di un layout non semplicemente lineare è soddisfatto da tre
+tecniche, tutte fuori dal flusso normale del documento:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Barra di navigazione ancorata:} \texttt{\#nav} usa
+  \texttt{position:\ fixed;\ top:\ 0;\ left:\ 0;\ right:\ 0;\ z-index:\ 200},
+  restando visibile durante lo scorrimento.
+\item
+  \textbf{Griglie asimmetriche con CSS Grid:} la hero e il caso studio
+  usano colonne di larghezza diversa
+  (\texttt{grid-template-columns:\ 1fr\ 400px}) e griglie a
+  \texttt{gap:\ 1px} su fondo colorato, che producono l'effetto di
+  ``caselle'' archivistiche separate da un filetto. In tutto il foglio
+  di stile sono presenti 18 contesti di griglia.
+\item
+  \textbf{Confronto ``prima e dopo'':} in \texttt{caso-studio.php}, due
+  colonne a contrasto invertito (pergamena contro inchiostro) affiancano
+  il processo manuale e quello digitalizzato.
+\end{enumerate}
+
+A questi si aggiungono elementi in \texttt{position:\ absolute} usati
+come decorazione (la lettera ``A'' in filigrana nella hero, i punti
+della timeline).
+
+\hypertarget{comportamento-responsive}{%
+\subsubsection{3.4 Comportamento
+responsive}\label{comportamento-responsive}}
+
+Il layout desktop è definito nel corpo principale del foglio di stile;
+un blocco \texttt{@media\ (max-width:\ 960px)} riporta le griglie a
+colonna singola, riduce i margini laterali e attiva il menu a scomparsa.
+Il blocco funziona, ma è organizzato come strato di correzione che
+riscrive a valle le regole precedenti (con ricorso a
+\texttt{!important}): una riscrittura \emph{mobile-first}, in cui il
+layout a colonna singola è la regola di base e le griglie vengono
+introdotte da \texttt{@media\ (min-width:\ …)}, sarebbe più pulita ed è
+il primo intervento previsto per un'eventuale evoluzione.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{client-side-javascript-vanilla}{%
+\subsection{4. CLIENT-SIDE: JAVASCRIPT
+VANILLA}\label{client-side-javascript-vanilla}}
+
+\texttt{main.js} contiene tre comportamenti, scritti in JavaScript ES6+
+senza librerie.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Menu di navigazione (mobile).} Il pulsante apre e chiude
+  l'elenco dei collegamenti, aggiornando l'attributo
+  \texttt{aria-expanded}; il tasto \texttt{Esc} chiude il menu e riporta
+  il focus sul pulsante che lo aveva aperto.
+\item
+  \textbf{Ombra della barra allo scorrimento.} Un listener su
+  \texttt{scroll} aggiunge la classe \texttt{.scrolled} a \texttt{\#nav}
+  oltre i 20 px, staccando visivamente la barra dal contenuto.
+\item
+  \textbf{FAQ a fisarmonica.} Al clic su una domanda le altre risposte
+  si chiudono; l'apertura è animata sulla proprietà \texttt{max-height}
+  e comunicata alle tecnologie assistive tramite \texttt{aria-expanded}.
+\end{itemize}
+
+Entrambi i comandi interattivi sono elementi
+\textbf{\texttt{\textless{}button\textgreater{}} nativi}: la scelta è
+discussa in §6.1.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{server-side-e-persistenza-dati}{%
+\subsection{5. SERVER-SIDE E PERSISTENZA
+DATI}\label{server-side-e-persistenza-dati}}
+
+\hypertarget{architettura}{%
+\subsubsection{5.1 Architettura}\label{architettura}}
+
+Un modulo che invii una email via \texttt{mailto:} o simuli l'invio in
+JavaScript non garantisce né persistenza né tracciabilità. Il progetto
+adotta quindi l'architettura a tre livelli \textbf{Client (HTML/CSS/JS)
+→ Application server (PHP 8) → Database server (MySQL/MariaDB)}.
+
+\hypertarget{base-di-dati-algora_db}{%
+\subsubsection{\texorpdfstring{5.2 Base di dati
+(\texttt{algora\_db})}{5.2 Base di dati (algora\_db)}}\label{base-di-dati-algora_db}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{CREATE} \KeywordTok{DATABASE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ algora\_db}
+    \DataTypeTok{CHARACTER} \KeywordTok{SET}\NormalTok{ utf8mb4 COLLATE utf8mb4\_unicode\_ci;}
+\KeywordTok{USE}\NormalTok{ algora\_db;}
+
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ contatti (}
+    \KeywordTok{id}        \DataTypeTok{INT}\NormalTok{ AUTO\_INCREMENT }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    nome      }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{) }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    ente      }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{),}
+\NormalTok{    email     }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{) }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    tipo      }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{50}\NormalTok{),}
+\NormalTok{    messaggio TEXT         }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    data\_invio DATETIME }\KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{) ENGINE}\OperatorTok{=}\NormalTok{InnoDB;}
+\end{Highlighting}
+\end{Shaded}
+
+La codifica \texttt{utf8mb4} copre l'intero repertorio Unicode, inclusi
+i caratteri accentati e i segni tipografici usati nei nomi di enti e
+località.
+
+\hypertarget{flusso-di-elaborazione}{%
+\subsubsection{5.3 Flusso di
+elaborazione}\label{flusso-di-elaborazione}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Verifica del metodo HTTP.} Una richiesta che non sia
+  \texttt{POST} (tipicamente l'apertura diretta dell'URL) non ha dati da
+  elaborare: lo script risponde con un redirect \texttt{303\ See\ Other}
+  verso \texttt{contatti.php}, invece di mostrare una pagina di errore
+  priva di significato.
+\item
+  \textbf{Validazione.} \texttt{trim()} sui campi, controllo dei campi
+  obbligatori, \texttt{filter\_var(\$email,\ FILTER\_VALIDATE\_EMAIL)}
+  per la correttezza formale dell'indirizzo. Messaggi di errore distinti
+  per campi mancanti e per email non valida.
+\item
+  \textbf{Inserimento con istruzione preparata.}
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\VariableTok{$stmt} \OperatorTok{=} \VariableTok{$conn}\NormalTok{{-}\textgreater{}prepare(}
+    \StringTok{\textquotesingle{}INSERT INTO contatti (nome, ente, email, tipo, messaggio)}
+\StringTok{     VALUES (?, ?, ?, ?, ?)\textquotesingle{}}
+\NormalTok{)}\OtherTok{;}
+\VariableTok{$stmt}\NormalTok{{-}\textgreater{}bind\_param(}\StringTok{\textquotesingle{}sssss\textquotesingle{}}\OtherTok{,} \VariableTok{$nome}\OtherTok{,} \VariableTok{$ente}\OtherTok{,} \VariableTok{$email}\OtherTok{,} \VariableTok{$tipo}\OtherTok{,} \VariableTok{$messaggio}\NormalTok{)}\OtherTok{;}
+\VariableTok{$stmt}\NormalTok{{-}\textgreater{}execute()}\OtherTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+I segnaposto \texttt{?} e il binding separato dei parametri tengono
+distinti comandi SQL e dati forniti dall'utente: il contenuto dei campi
+non può essere reinterpretato come istruzione. Un invio con
+\texttt{nome\ =\ "Rossi\textquotesingle{});\ DROP\ TABLE\ contatti;\ -\/-"}
+viene memorizzato come stringa letterale e la tabella resta intatta. 4.
+\textbf{Pagina di esito.} In base all'esito lo script produce una pagina
+di conferma personalizzata o una scheda di errore, entrambe con la
+navigazione, il piè di pagina e il foglio di stile del resto del sito.
+
+\hypertarget{escaping-una-sola-volta-in-uscita}{%
+\subsubsection{5.4 Escaping: una sola volta, in
+uscita}\label{escaping-una-sola-volta-in-uscita}}
+
+I dati vengono salvati nel database \textbf{così come l'utente li ha
+scritti}, e \texttt{htmlspecialchars()} viene applicato soltanto al
+momento di stamparli nella pagina.
+
+Applicare l'escaping anche in ingresso --- errore frequente, perché
+sembra ``più sicuro'' --- produce una doppia codifica: un cognome come
+\texttt{Sant\textquotesingle{}Angelo} verrebbe memorizzato come
+\texttt{Sant\&\#039;Angelo} e ristampato a video come
+\texttt{Sant\&amp;\#039;Angelo}. Il database si riempirebbe di entità
+HTML al posto dei caratteri reali, rendendo inutilizzabili i dati per
+qualsiasi uso diverso dalla pagina web (esportazioni, email, ricerche).
+La protezione dalle \emph{SQL injection} è affidata all'istruzione
+preparata, non all'escaping HTML, che serve a un problema diverso
+(\emph{Cross-Site Scripting}, in uscita).
+
+\hypertarget{gestione-degli-errori-e-credenziali}{%
+\subsubsection{5.5 Gestione degli errori e
+credenziali}\label{gestione-degli-errori-e-credenziali}}
+
+I parametri di connessione stanno in \texttt{config-db.php}, separati
+dalla logica: il passaggio da ambiente locale a hosting richiede di
+modificare un solo file, e in un deployment reale il file va escluso dal
+versionamento.
+
+A partire da PHP 8.1 l'estensione \texttt{mysqli} segnala gli errori
+\textbf{sollevando eccezioni} anziché valorizzando
+\texttt{connect\_error}. Un controllo scritto nella forma tradizionale
+\texttt{if\ (\$conn-\textgreater{}connect\_error)} non verrebbe quindi
+mai eseguito, e un database irraggiungibile produrrebbe una traccia di
+stack contenente host, utente e percorso del file. La connessione è
+perciò racchiusa in un \texttt{try/catch}: all'utente arriva un
+messaggio generico, il dettaglio tecnico finisce nel log del server
+tramite \texttt{error\_log()}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{usabilituxe0-e-accessibilituxe0}{%
+\subsection{6. USABILITÀ E
+ACCESSIBILITÀ}\label{usabilituxe0-e-accessibilituxe0}}
+
+L'accessibilità è stata trattata come requisito di progetto e non come
+rifinitura finale. Le verifiche sono state condotte con il \textbf{W3C
+Nu Markup Validation Service} per la correttezza formale e con
+\textbf{axe-core} (motore di analisi automatica delle regole WCAG) per
+il comportamento, su tutte le pagine e su due larghezze di viewport
+(1440 px e 390 px).
+
+\hypertarget{comandi-interattivi-azionabili-da-tastiera}{%
+\subsubsection{6.1 Comandi interattivi azionabili da
+tastiera}\label{comandi-interattivi-azionabili-da-tastiera}}
+
+Il menu a scomparsa e la fisarmonica delle FAQ erano inizialmente
+\texttt{\textless{}div\textgreater{}} con un gestore \texttt{onclick}.
+Un \texttt{\textless{}div\textgreater{}} non è raggiungibile con il
+tasto \texttt{Tab} e non risponde a \texttt{Invio} o
+\texttt{Barra\ spaziatrice}: entrambi i comandi funzionavano solo con il
+mouse. L'aggiunta di \texttt{role="button"} e \texttt{tabindex="0"} al
+solo elemento del menu peggiorava anzi la situazione, perché faceva
+annunciare l'elemento come pulsante a uno screen reader senza renderlo
+effettivamente azionabile.
+
+Entrambi sono stati riscritti come elementi
+\textbf{\texttt{\textless{}button\ type="button"\textgreater{}} nativi}.
+Un pulsante nativo è già nell'ordine di tabulazione, risponde a
+\texttt{Invio} e \texttt{Barra\ spaziatrice} senza codice aggiuntivo,
+viene annunciato correttamente e riceve gli stili di focus del sistema.
+Lo stato di apertura è esposto con \texttt{aria-expanded}, e
+\texttt{aria-controls} collega il comando al blocco che governa:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DataTypeTok{\textless{}}\KeywordTok{button} \ErrorTok{type}\OtherTok{=}\StringTok{"button"} \ErrorTok{class}\OtherTok{=}\StringTok{"faq{-}trigger"}
+\OtherTok{        aria{-}expanded=}\StringTok{"false"} \ErrorTok{aria{-}controls}\OtherTok{=}\StringTok{"faq{-}a1"}\DataTypeTok{\textgreater{}}
+  \DataTypeTok{\textless{}}\KeywordTok{span}\DataTypeTok{\textgreater{}}\NormalTok{Quanto tempo ci vuole per installare Foliarium?}\DataTypeTok{\textless{}/}\KeywordTok{span}\DataTypeTok{\textgreater{}}
+  \DataTypeTok{\textless{}}\KeywordTok{span} \ErrorTok{class}\OtherTok{=}\StringTok{"faq{-}toggle"} \ErrorTok{aria{-}hidden}\OtherTok{=}\StringTok{"true"}\DataTypeTok{\textgreater{}}\NormalTok{+}\DataTypeTok{\textless{}/}\KeywordTok{span}\DataTypeTok{\textgreater{}}
+\DataTypeTok{\textless{}/}\KeywordTok{button}\DataTypeTok{\textgreater{}}
+\end{Highlighting}
+\end{Shaded}
+
+Il segno \texttt{+} che ruota in \texttt{×} è decorativo e duplicherebbe
+l'informazione già data da \texttt{aria-expanded}: è quindi marcato
+\texttt{aria-hidden="true"}. Ogni domanda è inoltre racchiusa in un
+\texttt{\textless{}h3\textgreater{}}, così che la lista delle FAQ sia
+percorribile anche navigando per intestazioni.
+
+Quando una risposta è chiusa, oltre a \texttt{max-height:\ 0} le viene
+applicato \texttt{visibility:\ hidden}, con la transizione ritardata a
+fine animazione: il testo non resta leggibile agli screen reader mentre
+\texttt{aria-expanded} dichiara il blocco chiuso.
+
+\hypertarget{contrasto-cromatico}{%
+\subsubsection{6.2 Contrasto cromatico}\label{contrasto-cromatico}}
+
+L'analisi automatica ha inizialmente rilevato \textbf{200 violazioni}
+del criterio WCAG 2.1 AA sul contrasto (1.4.3), distribuite su tutte e
+cinque le pagine. Le cause erano tre:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Causa
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Rapporto misurato
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Richiesto
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Oro \texttt{\#B8821A} come testo su fondo pergamena (tutte le etichette
+in maiuscoletto) & 2,93:1 & 4,5:1 \\
+Testo avorio semitrasparente su fondo scuro con opacità troppo bassa
+(piè di pagina a \texttt{.25}) & 2,07:1 & 4,5:1 \\
+Testo avorio sul pulsante oro & 3,30:1 & 4,5:1 \\
+\end{longtable}
+
+Gli interventi hanno preservato l'identità visiva invece di appiattire
+la palette:
+
+\begin{itemize}
+\tightlist
+\item
+  l'oro di marca \texttt{-\/-gold} resta invariato per \textbf{filetti,
+  bordi, pallini e sfondi}, dove il criterio sul contrasto del testo non
+  si applica;
+\item
+  per il \textbf{testo} sono state introdotte due varianti calibrate sul
+  fondo: \texttt{-\/-gold-text:\ \#845C10} sui fondi chiari (minimo
+  4,84:1) e \texttt{-\/-gold-on-dark:\ \#C9942B} sui fondi scuri (minimo
+  5,93:1);
+\item
+  le opacità del testo chiaro su fondo scuro sono state portate al
+  valore minimo che soddisfa il criterio (0,62 sull'inchiostro, 0,72 sul
+  verde archivio);
+\item
+  il pulsante oro ha ora testo color inchiostro (5,35:1), lo stesso
+  trattamento già usato dalle altre etichette su fondo oro.
+\end{itemize}
+
+Al termine, le violazioni rilevate sono \textbf{0} su tutte le pagine e
+su entrambe le larghezze di viewport.
+
+\hypertarget{struttura-landmark-e-collegamento-di-salto}{%
+\subsubsection{6.3 Struttura, landmark e collegamento di
+salto}\label{struttura-landmark-e-collegamento-di-salto}}
+
+Il contenuto di ogni pagina è racchiuso in
+\texttt{\textless{}main\ id="contenuto"\textgreater{}}; con
+\texttt{\textless{}nav\textgreater{}} e
+\texttt{\textless{}footer\textgreater{}} questo garantisce che nessuna
+porzione di pagina resti fuori da un landmark, e permette agli utenti di
+screen reader di saltare direttamente al contenuto.
+
+La prima tabulazione di ogni pagina incontra un \textbf{collegamento di
+salto}, nascosto fuori dallo schermo con
+\texttt{transform:\ translateY(-120\%)} e reso visibile da
+\texttt{.skip-link:focus}. Senza di esso, un utente che naviga da
+tastiera dovrebbe attraversare l'intero menu su ogni pagina prima di
+raggiungere il testo.
+
+La gerarchia delle intestazioni è continua su tutte le pagine: un solo
+\texttt{\textless{}h1\textgreater{}}, sezioni
+\texttt{\textless{}h2\textgreater{}}, blocchi
+\texttt{\textless{}h3\textgreater{}}, senza salti di livello.
+
+\hypertarget{focus-movimento-e-modulo}{%
+\subsubsection{6.4 Focus, movimento e
+modulo}\label{focus-movimento-e-modulo}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Focus visibile.} Una regola \texttt{:focus-visible} unica
+  applica un contorno oro a ogni elemento attivabile, con una variante
+  più chiara sui fondi scuri. I campi del modulo avevano
+  \texttt{outline:\ none} e affidavano il segnale di focus al solo
+  colore del bordo: la dichiarazione è stata rimossa.
+\item
+  \textbf{Movimento.} Le animazioni di ingresso e lo scorrimento morbido
+  sono racchiusi in
+  \texttt{@media\ (prefers-reduced-motion:\ no-preference)}; a chi ha
+  richiesto meno animazioni nelle impostazioni di sistema il sito
+  risponde senza transizioni.
+\item
+  \textbf{Modulo.} Le etichette sono associate ai campi tramite
+  \texttt{for}/\texttt{id}. Il campo del messaggio, obbligatorio lato
+  server, porta ora anche l'attributo \texttt{required}, così l'errore
+  viene segnalato dal browser prima dell'invio invece di costare un
+  cambio di pagina. Nella scheda dei recapiti alcuni
+  \texttt{\textless{}label\textgreater{}} erano usati come testo
+  decorativo, senza alcun controllo da etichettare: sono stati
+  sostituiti da \texttt{\textless{}span\textgreater{}}.
+\end{itemize}
+
+\hypertarget{validazione-w3c}{%
+\subsubsection{6.5 Validazione W3C}\label{validazione-w3c}}
+
+Tutte le pagine, \textbf{incluse entrambe le varianti della pagina di
+esito} (conferma ed errore), superano la validazione senza errori né
+avvisi. Le segnalazioni emerse durante lo sviluppo e come sono state
+risolte:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Segnalazione
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Causa
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Soluzione
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{aria-label\ on\ div} & Attributo ARIA su un
+\texttt{\textless{}div\textgreater{}} privo di ruolo & Elemento
+riscritto come \texttt{\textless{}button\textgreater{}} nativo (§6.1) \\
+\texttt{Skipping\ heading\ level} & \texttt{\textless{}h4\textgreater{}}
+sotto sezioni gestite con \texttt{\textless{}h2\textgreater{}} &
+Alberatura dei titoli ristrutturata su
+\texttt{\textless{}h3\textgreater{}} \\
+\texttt{Skipping\ heading\ level} (piè di pagina) & I titoli di colonna
+erano \texttt{\textless{}h3\textgreater{}}; nella pagina di esito, dove
+il titolo principale è un \texttt{\textless{}h1\textgreater{}} e non
+esistono sezioni \texttt{\textless{}h2\textgreater{}}, saltavano un
+livello & Titoli di colonna portati a
+\texttt{\textless{}h2\textgreater{}} \\
+Stili inline & Attributi \texttt{style="..."} nei blocchi di layout &
+Regole centralizzate nel solo \texttt{style.css} \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{installazione-e-collaudo-in-locale}{%
+\subsection{7. INSTALLAZIONE E COLLAUDO IN
+LOCALE}\label{installazione-e-collaudo-in-locale}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Avviare i moduli \textbf{Apache} e \textbf{MySQL/MariaDB} del proprio
+  ambiente locale (XAMPP, MAMP o WAMP).
+\item
+  Copiare la cartella del progetto nella directory servita dal server
+  (per esempio
+  \texttt{C:\textbackslash{}xampp\textbackslash{}htdocs\textbackslash{}algora\_site}
+  oppure
+  \texttt{C:\textbackslash{}wamp64\textbackslash{}www\textbackslash{}algora\_site}).
+\item
+  Aprire \textbf{phpMyAdmin} (\texttt{http://localhost/phpmyadmin}) ed
+  eseguire lo script \texttt{crea\_db.sql}, che crea il database
+  \texttt{algora\_db} e la tabella \texttt{contatti}.
+\item
+  Verificare che i parametri in \texttt{config-db.php} corrispondano
+  alla propria installazione (i valori predefiniti sono quelli di
+  XAMPP/MAMP: utente \texttt{root}, password vuota).
+\item
+  Aprire \texttt{http://localhost/algora\_site/index.php}.
+\item
+  Per collaudare la parte server-side, aprire
+  \texttt{http://localhost/algora\_site/contatti.php}, compilare il
+  modulo e inviarlo. Va verificato che compaia la pagina di conferma e
+  che la riga sia presente nella tabella \texttt{contatti}.
+\end{enumerate}
+
+\hypertarget{casi-di-prova-eseguiti}{%
+\subsubsection{7.1 Casi di prova
+eseguiti}\label{casi-di-prova-eseguiti}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Caso
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Esito atteso
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Esito
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Invio corretto & Pagina di conferma, riga inserita & Superato \\
+Nome con apostrofo e \texttt{\&}
+(\texttt{Sant\textquotesingle{}Angelo\ \&\ C.}) & Caratteri corretti a
+video \textbf{e} nel database & Superato \\
+Email formalmente non valida & Messaggio di errore specifico, nessun
+inserimento & Superato \\
+Campi obbligatori vuoti & Messaggio di errore specifico, nessun
+inserimento & Superato \\
+Apertura diretta di \texttt{invia-contatto.php} via URL & Redirect
+\texttt{303} al modulo & Superato \\
+Stringa di SQL injection nel campo nome & Memorizzata come testo,
+tabella intatta & Superato \\
+Database irraggiungibile & Messaggio generico all'utente, dettaglio nel
+log, nessun dato tecnico esposto & Superato \\
+\end{longtable}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{pubblicazione-online}{%
+\subsection{8. PUBBLICAZIONE ONLINE}\label{pubblicazione-online}}
+
+Il sito è pensato per essere pubblicato sul dominio
+\texttt{www.algorastudio.it}. Su hosting condiviso la procedura è la
+seguente:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Caricare i file del progetto nella cartella pubblica del dominio
+  (tipicamente \texttt{public\_html} o \texttt{httpdocs}).
+\item
+  Creare il database dal pannello dell'hosting ed eseguirvi
+  \texttt{crea\_db.sql}.
+\item
+  Aggiornare \texttt{config-db.php} con host, nome del database, utente
+  e password forniti dal gestore del dominio, assegnando all'utente i
+  soli privilegi necessari (\texttt{INSERT} e \texttt{SELECT} sulla
+  tabella \texttt{contatti}).
+\item
+  Verificare che \texttt{config-db.php} non sia raggiungibile
+  dall'esterno e che non venga incluso nel versionamento.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{limiti-noti-e-sviluppi-futuri}{%
+\subsection{9. LIMITI NOTI E SVILUPPI
+FUTURI}\label{limiti-noti-e-sviluppi-futuri}}
+
+Per completezza si segnalano gli aspetti che un'evoluzione del progetto
+dovrebbe affrontare:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Contenuti multimediali.} Il sito è interamente testuale.
+  Alcune schermate di Foliarium (ricerca fuzzy, albero delle proprietà)
+  renderebbero più concreta la scheda prodotto e permetterebbero di
+  mostrare la gestione dei testi alternativi.
+\item
+  \textbf{Foglio di stile responsive.} Il blocco
+  \texttt{@media\ (max-width:\ 960px)} è uno strato di correzione; una
+  riscrittura mobile-first eliminerebbe il ricorso a \texttt{!important}
+  (§3.4).
+\item
+  \textbf{Informativa privacy.} Il modulo raccoglie dati personali e li
+  memorizza: i collegamenti ``Privacy'' e ``Cookie'' nel piè di pagina
+  sono al momento segnaposto e vanno sostituiti da un'informativa reale,
+  con relativa casella di consenso nel modulo.
+\item
+  \textbf{Protezione del modulo.} Per un uso in produzione andrebbero
+  aggiunti un token CSRF e una misura anti-spam.
+\item
+  \textbf{Caratteri tipografici.} Ospitare localmente i due font
+  eliminerebbe l'unica dipendenza esterna (§3.2).
+\end{itemize}
 
 \end{document}
