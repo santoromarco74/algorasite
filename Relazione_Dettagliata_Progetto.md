@@ -40,7 +40,7 @@ Il sito si articola su **5 pagine di contenuto**, servite da PHP, più **1 scrip
 | `invia-contatto.php` | **Backend.** Riceve il POST del modulo, valida, inserisce nel database con istruzione preparata, restituisce la pagina di esito. |
 | `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
-| `style.css` | Foglio di stile unico dell'intero sito (1.133 righe, ~41 KB). |
+| `style.css` | Foglio di stile unico dell'intero sito (1.179 righe, ~44 KB). |
 | `main.js` | Comportamenti client-side (53 righe). |
 
 ### 2.1 Perché PHP anche sulle pagine di contenuto
@@ -99,9 +99,47 @@ Il requisito di un layout non semplicemente lineare è soddisfatto da tre tecnic
 
 A questi si aggiungono elementi in `position: absolute` usati come decorazione (la lettera "A" in filigrana nella hero, i punti della timeline).
 
-### 3.4 Comportamento responsive
+### 3.4 Comportamento responsive: impostazione mobile-first
 
-Il layout desktop è definito nel corpo principale del foglio di stile; un blocco `@media (max-width: 960px)` riporta le griglie a colonna singola, riduce i margini laterali e attiva il menu a scomparsa. Il blocco funziona, ma è organizzato come strato di correzione che riscrive a valle le regole precedenti (con ricorso a `!important`): una riscrittura *mobile-first*, in cui il layout a colonna singola è la regola di base e le griglie vengono introdotte da `@media (min-width: …)`, sarebbe più pulita ed è il primo intervento previsto per un'eventuale evoluzione.
+Il foglio di stile è scritto **mobile-first**: le regole di base descrivono lo schermo stretto, e un unico punto di rottura a `961px` introduce la disposizione desktop tramite `@media (min-width: 961px)`.
+
+Concretamente, ogni griglia nasce a colonna singola:
+
+```css
+.feat-grid {
+  display: grid; grid-template-columns: 1fr;
+  gap: 24px; background: var(--border);
+}
+```
+
+e le colonne multiple arrivano dal blocco desktop della sezione:
+
+```css
+@media (min-width: 961px) {
+  .feat-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+}
+```
+
+I blocchi `@media` non sono raccolti in coda al file ma collocati **al termine della sezione che riguardano** — uno per le griglie comuni, uno per il piè di pagina, uno per ciascuna pagina — così che la variante desktop di un componente si legga accanto alla sua definizione di base.
+
+Il passo orizzontale delle fasce a tutta larghezza è centralizzato in una variabile, ridichiarata una sola volta per il desktop:
+
+```css
+:root { --pad-x: 20px; }
+@media (min-width: 961px) {
+  :root { --pad-x: clamp(24px, 5vw, 72px); }
+}
+```
+
+Undici regole (barra di navigazione, sezioni, fasce, piè di pagina, intestazioni di pagina) usano `var(--pad-x)`: il margine di pagina si modifica in un punto solo.
+
+#### Perché non uno strato correttivo `max-width`
+
+L'impostazione precedente definiva il layout desktop nelle regole di base e lo correggeva a valle con un blocco `@media (max-width: 960px)` che riportava a colonna singola tutte le griglie. Quel blocco aveva bisogno di **nove dichiarazioni `!important`** per vincere sulle regole che stava annullando, ed è un difetto strutturale, non estetico: `!important` scavalca la specificità, quindi una regola mirata perde contro una regola generica dichiarata dopo di essa.
+
+Il caso concreto emerso in questo progetto: i titoli di colonna del piè di pagina sono governati da `.footer-col h2 { font-size: 10px }`, ma lo strato correttivo conteneva `h2 { font-size: clamp(28px, 6vw, 36px) !important }`. Su schermo stretto vinceva quest'ultima, e le etichette "Studio", "Prodotti", "Contatti" venivano rese a 28px anziché a 10px — visibile solo sotto i 960px. Rimosso lo strato, la regola specifica torna a valere e il difetto sparisce senza alcun intervento mirato.
+
+Nel foglio di stile non resta oggi nessun `!important` di layout: gli unici tre superstiti sono quelli, idiomatici, del blocco `prefers-reduced-motion`, dove servono proprio a scavalcare qualunque animazione dichiarata altrove.
 
 ---
 
@@ -264,6 +302,15 @@ Tutte le pagine, **incluse entrambe le varianti della pagina di esito** (conferm
 | Stringa di SQL injection nel campo nome | Memorizzata come testo, tabella intatta | Superato |
 | Database irraggiungibile | Messaggio generico all'utente, dettaglio nel log, nessun dato tecnico esposto | Superato |
 
+### 7.2 Verifica del passaggio a mobile-first
+
+La riscrittura del foglio di stile non doveva cambiare il risultato a video. Per dimostrarlo sono state acquisite le schermate a pagina intera delle cinque pagine a `390`, `768`, `960`, `961` e `1440` px prima e dopo l'intervento, e confrontate pixel per pixel:
+
+* a `961` e `1440` px le immagini sono risultate **identiche**, a conferma che la disposizione desktop è invariata;
+* a `390`, `768` e `960` px l'unica differenza misurata riguarda l'altezza del piè di pagina, cioè esattamente la correzione descritta in §3.4; l'altezza di ogni altro elemento è rimasta invariata.
+
+È stata inoltre verificata l'assenza di scorrimento orizzontale da `320` a `1920` px.
+
 ---
 
 ## 8. PUBBLICAZIONE ONLINE
@@ -282,7 +329,6 @@ Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su h
 Per completezza si segnalano gli aspetti che un'evoluzione del progetto dovrebbe affrontare:
 
 * **Contenuti multimediali.** Il sito è interamente testuale. Alcune schermate di Foliarium (ricerca fuzzy, albero delle proprietà) renderebbero più concreta la scheda prodotto e permetterebbero di mostrare la gestione dei testi alternativi.
-* **Foglio di stile responsive.** Il blocco `@media (max-width: 960px)` è uno strato di correzione; una riscrittura mobile-first eliminerebbe il ricorso a `!important` (§3.4).
 * **Informativa privacy.** Il modulo raccoglie dati personali e li memorizza: i collegamenti "Privacy" e "Cookie" nel piè di pagina sono al momento segnaposto e vanno sostituiti da un'informativa reale, con relativa casella di consenso nel modulo.
 * **Protezione del modulo.** Per un uso in produzione andrebbero aggiunti un token CSRF e una misura anti-spam.
 * **Caratteri tipografici.** Ospitare localmente i due font eliminerebbe l'unica dipendenza esterna (§3.2).
