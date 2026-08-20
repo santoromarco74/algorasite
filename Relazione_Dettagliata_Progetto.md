@@ -26,7 +26,7 @@ La maggior parte dei siti per software house si appoggia a template generici o a
 
 ## 2. ARCHITETTURA DELL'INFORMAZIONE E MAPPATURA DEI FILE
 
-Il sito si articola su **5 pagine di contenuto**, servite da PHP, più **1 script server-side** per la persistenza dei dati. Le parti comuni sono estratte in due **include PHP** riusati da tutte le pagine.
+Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 script server-side** per la persistenza dei dati. Le parti comuni sono estratte in due **include PHP** riusati da tutte le pagine.
 
 | File | Ruolo |
 | :--- | :--- |
@@ -34,14 +34,17 @@ Il sito si articola su **5 pagine di contenuto**, servite da PHP, più **1 scrip
 | `chi-siamo.php` | **Profilo dello studio.** Filosofia dello sviluppo verticale, i tre valori guida, profilo del fondatore, stack tecnologico, prospettive future. |
 | `foliarium.php` | **Scheda prodotto.** Funzionalità di Foliarium (ricerca fuzzy, albero delle proprietà, audit trail, esportazione report), requisiti di sistema, licenze e pacchetti di assistenza. |
 | `caso-studio.php` | **Caso studio Archivio di Stato di Savona.** Risultati quantitativi (69 comuni, 12.000+ partite, 8.500+ possessori), confronto "prima e dopo", fasi del progetto. |
-| `contatti.php` | **Contatti e demo.** Guida in quattro fasi, modulo di contatto, FAQ a fisarmonica. |
+| `contatti.php` | **Contatti e demo.** Guida in quattro fasi, modulo di contatto con consenso al trattamento, FAQ a fisarmonica. |
+| `privacy.php` | **Informativa privacy.** Dati raccolti, finalità, base giuridica, conservazione, diritti dell'interessato, sezione sui cookie. |
 | `nav.php` | Include: barra di navigazione, generata da un array PHP che marca automaticamente la voce attiva. |
 | `footer.php` | Include: piè di pagina comune a tutte le pagine. |
 | `invia-contatto.php` | **Backend.** Riceve il POST del modulo, valida, inserisce nel database con istruzione preparata, restituisce la pagina di esito. |
 | `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
-| `style.css` | Foglio di stile unico dell'intero sito (1.179 righe, ~44 KB). |
-| `main.js` | Comportamenti client-side (53 righe). |
+| `style.css` | Foglio di stile unico dell'intero sito (1.383 righe, ~51 KB). |
+| `main.js` | Comportamenti client-side (63 righe). |
+| `fonts/` | I due caratteri tipografici in formato WOFF2 (8 file, 300 KB). |
+| `img/` | Cartella per le schermate del prodotto, con le istruzioni in `LEGGIMI.md`. |
 
 ### 2.1 Perché PHP anche sulle pagine di contenuto
 
@@ -85,7 +88,26 @@ La palette e la tipografia sono definite con **variabili CSS** (custom propertie
 * **Colori:** fondo pergamena (`--parchment: #F4EFE4`, `--cream: #F9F6EF`), testo e contenitori inchiostro (`--ink: #1E150A`), accenti dorati (`--gold: #B8821A`), verde archivio per le conferme (`--green: #1A3A28`).
 * **Tipografia:** *Cormorant Garamond* per i titoli display e *Libre Baskerville* per il testo corrente, entrambi da Google Fonts; *Trebuchet MS / Calibri* in maiuscolo spaziato per etichette e micro-testi.
 
-I due caratteri sono l'unica dipendenza esterna del progetto, caricata via `@import` in testa a `style.css`. In un contesto di produzione converrebbe ospitarli localmente, sia per eliminare la richiesta a un dominio terzo sia per non far dipendere il rendering da un servizio esterno; per il perimetro di questo progetto la dipendenza è stata mantenuta e qui dichiarata esplicitamente.
+I due caratteri erano inizialmente caricati con un `@import` da `fonts.googleapis.com`. Era l'**unica richiesta a un dominio terzo** dell'intero sito, e non è un dettaglio tecnico: ogni visita comunicava l'indirizzo IP dell'utente a un server esterno, senza che ne fosse informato e senza che avesse modo di opporsi.
+
+I file WOFF2 sono quindi stati **scaricati e ospitati sul sito stesso**, in `fonts/`, e l'`@import` è stato sostituito da otto dichiarazioni `@font-face`:
+
+```css
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, /* ... */;
+}
+```
+
+Sono inclusi soltanto gli otto tagli effettivamente usati dal foglio di stile e soltanto il subset `latin`, che copre l'italiano accentato e la punteggiatura tipografica: in tutto 300 KB. I quattro segni presenti nelle pagine che escono da quel subset (`→ ● ○ ★`) ricadono sul carattere di sistema, esattamente come accadeva prima, perché nessun subset servito da Google li conteneva.
+
+La direttiva `font-display: swap` mostra subito il testo con il carattere di ripiego e lo sostituisce a caricamento concluso, evitando l'intervallo di pagina vuota che si avrebbe con il comportamento predefinito.
+
+Il sito non effettua oggi **nessuna richiesta a domini esterni**: è la premessa che rende possibile quanto descritto in §6.6.
 
 Come descritto in §6.2, l'oro di marca è usato per filetti, bordi e sfondi, mentre **come colore di testo** il foglio di stile ricorre a due varianti calibrate sul fondo, perché la tonalità originale non raggiungeva il contrasto minimo richiesto.
 
@@ -211,6 +233,27 @@ I parametri di connessione stanno in `config-db.php`, separati dalla logica: il 
 
 A partire da PHP 8.1 l'estensione `mysqli` segnala gli errori **sollevando eccezioni** anziché valorizzando `connect_error`. Un controllo scritto nella forma tradizionale `if ($conn->connect_error)` non verrebbe quindi mai eseguito, e un database irraggiungibile produrrebbe una traccia di stack contenente host, utente e percorso del file. La connessione è perciò racchiusa in un `try/catch`: all'utente arriva un messaggio generico, il dettaglio tecnico finisce nel log del server tramite `error_log()`.
 
+### 5.6 Consenso al trattamento
+
+Il modulo raccoglie dati personali e li scrive in un database: la base giuridica su cui poggia il trattamento è il consenso dell'interessato. Prima del pulsante di invio è quindi presente una casella obbligatoria che rimanda all'informativa:
+
+```html
+<div class="form-consenso">
+  <input type="checkbox" id="consenso" name="consenso" value="1" required>
+  <label for="consenso">Ho letto l'<a href="privacy.php">informativa
+    privacy</a> e acconsento al trattamento dei miei dati personali
+    per ricevere una risposta a questa richiesta.</label>
+</div>
+```
+
+L'attributo `required` fa segnalare l'omissione dal browser, ma il controllo che conta è quello lato server, perché la validazione client si aggira banalmente:
+
+```php
+$consenso = isset($_POST['consenso']) && $_POST['consenso'] === '1';
+```
+
+Senza consenso lo script non esegue alcun inserimento e restituisce un messaggio di errore specifico. Quando invece il consenso c'è, non viene registrato soltanto il fatto che la casella fosse spuntata: l'articolo 7 del Regolamento richiede di poter **dimostrare** che il consenso è stato prestato, quindi la tabella conserva anche il momento in cui è avvenuto, nelle colonne `consenso_privacy` e `data_consenso`.
+
 ---
 
 ## 6. USABILITÀ E ACCESSIBILITÀ
@@ -270,7 +313,7 @@ La gerarchia delle intestazioni è continua su tutte le pagine: un solo `<h1>`, 
 
 ### 6.5 Validazione W3C
 
-Tutte le pagine, **incluse entrambe le varianti della pagina di esito** (conferma ed errore), superano la validazione senza errori né avvisi. Le segnalazioni emerse durante lo sviluppo e come sono state risolte:
+Tutte le pagine, **incluse l'informativa privacy ed entrambe le varianti della pagina di esito** (conferma ed errore), superano la validazione senza errori né avvisi. Le segnalazioni emerse durante lo sviluppo e come sono state risolte:
 
 | Segnalazione | Causa | Soluzione |
 | :--- | :--- | :--- |
@@ -278,6 +321,14 @@ Tutte le pagine, **incluse entrambe le varianti della pagina di esito** (conferm
 | `Skipping heading level` | `<h4>` sotto sezioni gestite con `<h2>` | Alberatura dei titoli ristrutturata su `<h3>` |
 | `Skipping heading level` (piè di pagina) | I titoli di colonna erano `<h3>`; nella pagina di esito, dove il titolo principale è un `<h1>` e non esistono sezioni `<h2>`, saltavano un livello | Titoli di colonna portati a `<h2>` |
 | Stili inline | Attributi `style="..."` nei blocchi di layout | Regole centralizzate nel solo `style.css` |
+
+### 6.6 Nessun cookie e nessun terzo
+
+Il sito non imposta cookie — né propri né di terze parti — non usa strumenti di analisi statistica e, una volta ospitati localmente i caratteri tipografici (§3.2), non effettua alcuna richiesta a domini esterni. Di conseguenza **non è necessario alcun banner di consenso ai cookie**: non c'è nulla da consentire.
+
+È una scelta che vale la pena rendere esplicita, perché il banner è oggi la principale fonte di attrito nella navigazione, e nella grande maggioranza dei siti serve a giustificare trattamenti che il sito potrebbe semplicemente non fare. Qui l'ordine è stato invertito: prima si è eliminato il trattamento, poi è venuto a mancare il motivo del banner.
+
+L'informativa in `privacy.php` documenta comunque la situazione, perché l'assenza di cookie va dichiarata quanto la loro presenza, e descrive l'unico trattamento che l'utente non può evitare: la registrazione degli accessi nei file di log del server web.
 
 ---
 
@@ -294,7 +345,9 @@ Tutte le pagine, **incluse entrambe le varianti della pagina di esito** (conferm
 
 | Caso | Esito atteso | Esito |
 | :--- | :--- | :--- |
-| Invio corretto | Pagina di conferma, riga inserita | Superato |
+| Invio corretto, con consenso | Pagina di conferma, riga inserita | Superato |
+| Invio senza consenso al trattamento | Errore specifico, **nessun inserimento** | Superato |
+| Consenso falsificato (valore diverso da quello atteso) | Errore specifico, nessun inserimento | Superato |
 | Nome con apostrofo e `&` (`Sant'Angelo & C.`) | Caratteri corretti a video **e** nel database | Superato |
 | Email formalmente non valida | Messaggio di errore specifico, nessun inserimento | Superato |
 | Campi obbligatori vuoti | Messaggio di errore specifico, nessun inserimento | Superato |
@@ -326,9 +379,8 @@ Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su h
 
 ## 9. LIMITI NOTI E SVILUPPI FUTURI
 
-Per completezza si segnalano gli aspetti che un'evoluzione del progetto dovrebbe affrontare:
+Per completezza si segnalano gli aspetti ancora aperti:
 
-* **Contenuti multimediali.** Il sito è interamente testuale. Alcune schermate di Foliarium (ricerca fuzzy, albero delle proprietà) renderebbero più concreta la scheda prodotto e permetterebbero di mostrare la gestione dei testi alternativi.
-* **Informativa privacy.** Il modulo raccoglie dati personali e li memorizza: i collegamenti "Privacy" e "Cookie" nel piè di pagina sono al momento segnaposto e vanno sostituiti da un'informativa reale, con relativa casella di consenso nel modulo.
-* **Protezione del modulo.** Per un uso in produzione andrebbero aggiunti un token CSRF e una misura anti-spam.
-* **Caratteri tipografici.** Ospitare localmente i due font eliminerebbe l'unica dipendenza esterna (§3.2).
+* **Contenuti multimediali.** Il sito è tuttora interamente testuale. L'impianto per accogliere le schermate di Foliarium è predisposto nella scheda prodotto — struttura `<figure>`, didascalie, testi alternativi, dimensioni dichiarate per evitare lo slittamento del layout — ma resta disattivato in attesa delle immagini. Le istruzioni sono in `img/LEGGIMI.md`.
+* **Dati del titolare nell'informativa.** L'informativa privacy è completa nella struttura, ma i riferimenti anagrafici del titolare (ragione sociale, partita IVA, sede), il periodo di conservazione e i fornitori nominati responsabili esterni sono segnaposto, resi graficamente evidenti nella pagina. Vanno compilati prima della pubblicazione: un'informativa pubblicata a metà è peggio di nessuna informativa. Lo stesso segnaposto della partita IVA compare nel piè di pagina.
+* **Protezione del modulo.** Per un uso in produzione andrebbero aggiunti un token anti-CSRF e una misura anti-spam. Per quest'ultima è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.

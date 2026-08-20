@@ -1,4 +1,92 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+/* ═══════════════════════════════════════════════
+   CARATTERI TIPOGRAFICI — ospitati localmente
+   ───────────────────────────────────────────────
+   I due caratteri erano caricati con un @import da fonts.googleapis.com.
+   Era l'unica richiesta a un dominio terzo del sito: ogni visita
+   comunicava l'indirizzo IP dell'utente a un server esterno, senza che
+   ne fosse informato. I file WOFF2 sono ora serviti dal sito stesso.
+
+   Sono inclusi solo i tagli effettivamente usati dal foglio di stile e
+   solo il subset "latin", che copre l'italiano accentato e la
+   punteggiatura tipografica. I quattro segni fuori subset presenti nelle
+   pagine (→ ● ○ ★) ricadono sul carattere di sistema, esattamente come
+   accadeva prima: nessun subset di Google li conteneva.
+
+   font-display: swap mostra subito il testo con il ripiego e sostituisce
+   il carattere al termine del caricamento, evitando la pagina bianca.
+═══════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-300-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-400-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-300.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/libre-baskerville-400-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/libre-baskerville-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Libre Baskerville';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/libre-baskerville-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ═══════════════════════════════════════════════
    ALGORA STUDIO — Design System
@@ -920,6 +1008,34 @@ footer {
   .req-grid  { grid-template-columns: 1fr 1fr; gap: 2px; }
 }
 
+/* Schermate del prodotto.
+   Le regole restano attive anche senza immagini: il markup che le usa e'
+   commentato in foliarium.php e basta scommentarlo (vedi img/LEGGIMI.md). */
+.schermate { background: var(--cream); }
+
+.shot-grid {
+  display: grid; grid-template-columns: 1fr; gap: 40px;
+  margin-top: 48px;
+}
+
+.shot { margin: 0; }
+.shot img {
+  display: block; width: 100%; height: auto;
+  border: 1px solid var(--border);
+  background: var(--parchment);
+}
+.shot figcaption {
+  font-size: 14px; line-height: 1.7; color: var(--mid);
+  margin-top: 14px; padding-left: 16px;
+  border-left: 2px solid var(--gold);
+}
+
+@media (min-width: 961px) {
+  /* La prima schermata a piena larghezza, le altre due affiancate */
+  .shot-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
+  .shot-grid .shot:first-child { grid-column: 1 / -1; }
+}
+
 /* ═══════════════════════════════════════════════
    PAGINA: caso-studio.php
 ═══════════════════════════════════════════════ */
@@ -1087,6 +1203,24 @@ footer {
 
 .form-row { display: grid; grid-template-columns: 1fr; gap: 24px; }
 
+/* Consenso al trattamento: la casella e la sua etichetta sono un unico
+   bersaglio cliccabile, allineati sulla prima riga di testo. */
+.form-consenso {
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 24px;
+}
+.form-consenso input[type="checkbox"] {
+  width: 18px; height: 18px; flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: var(--green);
+}
+.form-consenso label {
+  font-size: 14px; line-height: 1.7; color: var(--mid);
+  font-family: var(--font-body);
+  letter-spacing: normal; text-transform: none;
+}
+.form-consenso a { color: var(--gold-text); }
+
 .form-submit {
   background: var(--ink); color: var(--ivory);
   width: 100%; padding: 16px;
@@ -1143,6 +1277,76 @@ footer {
   .ch-text      { padding: 0 64px 0 0; }
 
   .form-row { grid-template-columns: 1fr 1fr; gap: 20px; }
+}
+
+/* ═══════════════════════════════════════════════
+   PAGINA: privacy.php
+   Documento di sola lettura: misura di riga contenuta (circa 70 caratteri)
+   invece della griglia editoriale usata dalle pagine di presentazione.
+═══════════════════════════════════════════════ */
+.doc-hero {
+  padding: 130px var(--pad-x) 56px;
+  border-bottom: 1px solid var(--border);
+}
+.doc-hero .label { margin-bottom: 20px; }
+.doc-hero h1 { margin-bottom: 28px; }
+.doc-lead {
+  font-size: 17px; color: var(--mid); line-height: 1.9;
+  max-width: 62ch; border-top: 2px solid var(--gold); padding-top: 24px;
+}
+.doc-date {
+  font-family: var(--font-label);
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-top: 24px;
+}
+
+.doc-body { max-width: 70ch; }
+.doc-body h2 {
+  font-size: clamp(24px, 3vw, 30px);
+  margin: 48px 0 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.doc-body h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.doc-body p { margin-bottom: 16px; line-height: 1.9; color: var(--mid); }
+.doc-body a { color: var(--gold-text); }
+
+.doc-list { margin: 0 0 16px 20px; }
+.doc-list li { margin-bottom: 10px; line-height: 1.9; color: var(--mid); }
+
+.doc-table-scroll { overflow-x: auto; }
+.doc-table-scroll:focus-visible { outline: 2px solid var(--gold-text); outline-offset: 3px; }
+
+.doc-table {
+  width: 100%; border-collapse: collapse; margin: 8px 0 20px;
+  font-size: 15px;
+  min-width: 30rem;   /* sotto questa misura si scorre invece di comprimere */
+}
+.doc-table caption {
+  font-family: var(--font-label);
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold-text); text-align: left; padding-bottom: 12px;
+}
+.doc-table th, .doc-table td {
+  text-align: left; padding: 12px 16px 12px 0;
+  border-bottom: 1px solid var(--border); vertical-align: top;
+}
+.doc-table th {
+  font-family: var(--font-label);
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink); font-weight: 400;
+}
+.doc-table td { color: var(--mid); }
+
+/* Segnaposto ancora da compilare: resi volutamente vistosi, perche' una
+   informativa pubblicata a meta' e' peggio di nessuna informativa. */
+.da-compilare {
+  background: var(--gold-light);
+  border-bottom: 2px solid var(--gold-text);
+  color: var(--ink);
+  padding: 1px 6px;
+  font-family: var(--font-label);
+  font-size: .85em;
 }
 
 /* ═══════════════════════════════════════════════

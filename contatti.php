@@ -129,6 +129,11 @@
           <label for="messaggio">Descrivi brevemente la tua esigenza</label>
           <textarea id="messaggio" name="messaggio" placeholder="Es: gestiamo l'archivio catastale di 15 comuni e stiamo cercando un sistema per digitalizzarlo e renderlo consultabile..." required></textarea>
         </div>
+        <div class="form-consenso">
+          <input type="checkbox" id="consenso" name="consenso" value="1" required>
+          <label for="consenso">Ho letto l'<a href="privacy.php">informativa privacy</a> e acconsento al trattamento dei miei dati personali per ricevere una risposta a questa richiesta.</label>
+        </div>
+
         <button type="submit" class="form-submit">Invia richiesta →</button>
         <p class="form-note">Risponderemo entro 24 ore lavorative. Nessun impegno, nessun commerciale aggressivo.</p>
       </form>
