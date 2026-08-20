@@ -19,7 +19,8 @@ $navItems = [
     <?php endforeach; ?>
     <li><a href="contatti.php" class="nav-cta<?= $active === 'contatti' ? ' active' : '' ?>">Contatti</a></li>
   </ul>
-  <div class="nav-burger" onclick="toggleNav()" role="button" tabindex="0" aria-label="Menu">
+  <button type="button" class="nav-burger" id="navToggle"
+          aria-controls="navLinks" aria-expanded="false" aria-label="Apri il menu">
     <span></span><span></span><span></span>
-  </div>
+  </button>
 </nav>

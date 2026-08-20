@@ -6,7 +6,7 @@
       <p>Software verticale per domini specifici. Strumenti precisi, duraturi, costruiti per la complessità reale di chi li usa.</p>
     </div>
     <div class="footer-col">
-      <h3>Studio</h3>
+      <h2>Studio</h2>
       <ul>
         <li><a href="chi-siamo.php">Chi siamo</a></li>
         <li><a href="chi-siamo.php#approccio">Il nostro approccio</a></li>
@@ -14,7 +14,7 @@
       </ul>
     </div>
     <div class="footer-col">
-      <h3>Prodotti</h3>
+      <h2>Prodotti</h2>
       <ul>
         <li><a href="foliarium.php">Foliarium</a></li>
         <li><a href="foliarium.php#prezzi">Prezzi</a></li>
@@ -22,7 +22,7 @@
       </ul>
     </div>
     <div class="footer-col">
-      <h3>Contatti</h3>
+      <h2>Contatti</h2>
       <ul>
         <li><a href="contatti.php">Scrivici</a></li>
         <li><a href="contatti.php#demo">Richiedi demo</a></li>

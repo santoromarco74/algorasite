@@ -9,7 +9,11 @@
 </head>
 <body>
 
+<a class="skip-link" href="#contenuto">Vai al contenuto</a>
+
 <?php include 'nav.php'; ?>
+
+<main id="contenuto">
 
 <!-- HERO -->
 <header class="about-hero">
@@ -136,6 +140,8 @@
     <a href="foliarium.php" class="btn btn-outline-light">Scopri Foliarium</a>
   </div>
 </section>
+
+</main>
 
 <?php include 'footer.php'; ?>
 

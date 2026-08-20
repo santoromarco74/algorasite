@@ -10,7 +10,11 @@
 </head>
 <body>
 
+<a class="skip-link" href="#contenuto">Vai al contenuto</a>
+
 <?php include 'nav.php'; ?>
+
+<main id="contenuto">
 
 <!-- HERO PRODOTTO -->
 <header class="prod-hero">
@@ -243,6 +247,8 @@
     <a href="caso-studio.php" class="btn btn-outline-light">Caso Studio Savona</a>
   </div>
 </section>
+
+</main>
 
 <?php include 'footer.php'; ?>
 
