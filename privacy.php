@@ -101,13 +101,13 @@ $active = 'privacy';
     <p>Non usiamo i tuoi dati per inviarti comunicazioni commerciali non richieste, non facciamo profilazione e non prendiamo decisioni automatizzate.</p>
 
     <h2>4. Per quanto tempo li conserviamo</h2>
-    <p>Conserviamo le richieste di contatto per <span class="da-compilare">[periodo di conservazione, es. 24 mesi]</span> dall'ultimo scambio, dopodiché vengono cancellate dal database. Se dalla richiesta nasce un rapporto contrattuale, i dati necessari alla sua gestione seguono i termini di conservazione previsti dalla normativa fiscale e civilistica.</p>
+      <p>Conserviamo le richieste di contatto per <strong>24 mesi</strong> dall'ultimo scambio, dopodiché vengono cancellate dal database. Se dalla richiesta nasce un rapporto contrattuale, i dati necessari alla sua gestione seguono i termini di conservazione previsti dalla normativa fiscale e civilistica.</p>
 
     <h2>5. A chi vengono comunicati</h2>
     <p>I dati non vengono diffusi né ceduti a terzi per finalità commerciali. Possono essere trattati, per nostro conto e su nostra istruzione, dai soggetti che ci forniscono servizi tecnici, nominati responsabili del trattamento ai sensi dell'articolo 28 del Regolamento:</p>
     <ul class="doc-list">
-      <li><span class="da-compilare">[fornitore di hosting]</span>, che ospita il sito e il database su cui le richieste vengono salvate;</li>
-      <li><span class="da-compilare">[fornitore di posta elettronica, se diverso dall'hosting]</span>, attraverso cui viene inviata la risposta.</li>
+      <li><strong>VHosting Solution s.r.l.</strong>, che ospita il sito e il database su cui le richieste vengono salvate;</li>
+      <li><strong>VHosting Solution s.r.l.</strong>, attraverso cui viene inviata la risposta.</li>
     </ul>
     <p>Non trasferiamo dati personali fuori dallo Spazio economico europeo.</p>
 
