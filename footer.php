@@ -36,7 +36,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <p>© 2025 Algora Studio — Marco Santoro — P.IVA [inserire] — Savona, Liguria</p>
+    <p>© 2025 Algora Studio — Marco Santoro — P.IVA [01925090092] — Savona, Liguria</p>
     <p><a href="privacy.php">Privacy</a> · <a href="privacy.php#cookie">Cookie</a> · <a href="archivio.php">Area riservata</a></p>
   </div>
 </footer>

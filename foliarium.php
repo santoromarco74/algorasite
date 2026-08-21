@@ -344,7 +344,7 @@
     <div class="req-cell"><strong>PostgreSQL</strong><span>Versione 15 o superiore</span></div>
     <div class="req-cell"><strong>Python</strong><span>Versione 3.11 o superiore</span></div>
     <div class="req-cell"><strong>Spazio disco</strong><span>Minimo 10 GB liberi</span></div>
-    <div class="req-cell"><strong>Risoluzione schermo</strong><span>Minimo 1366 × 768</span></div>
+    <div class="req-cell"><strong>Risoluzione schermo</strong><span>Minimo 1366 x 768</span></div>
   </div>
 
   <p class="req-note">L'installazione può essere effettuata da remoto (se il cliente è autonomo nell'uso degli strumenti di accesso remoto) oppure on-site presso la sede del cliente. Tempi e costi variano in base alla modalità scelta — contattateci per un preventivo personalizzato.</p>
