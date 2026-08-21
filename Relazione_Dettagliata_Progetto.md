@@ -42,10 +42,10 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 | `footer.php` | Include: piè di pagina comune a tutte le pagine. |
 | `invia-contatto.php` | **Backend.** Riceve il POST del modulo, valida, inserisce nel database con istruzione preparata, restituisce la pagina di esito. |
 | `archivio.php` | **Area riservata.** Schermata di servizio protetta da password: elenco delle richieste, inserimento manuale, modifica ed eliminazione (§5.7). |
-| `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
+| `config-db.esempio.php` | Modello dei parametri di connessione. Il file vero, `config-db.php`, non sta in repository: va creato copiando questo (§5.5). |
 | `config-admin.php` | Impronta della password dell'area riservata, isolata come i parametri del database. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
-| `style.css` | Foglio di stile unico dell'intero sito (1.503 righe, ~55 KB). |
+| `style.css` | Foglio di stile unico dell'intero sito (1.518 righe, ~60 KB). |
 | `main.js` | Comportamenti client-side (63 righe). |
 | `fonts/` | I due caratteri tipografici in formato WOFF2 (8 file, 300 KB). |
 | `img/` | Schermate del prodotto e fotogramma poster del filmato, con le istruzioni in `LEGGIMI.md`. |
@@ -53,7 +53,7 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 
 ### 2.1 Perché PHP anche sulle pagine di contenuto
 
-Le cinque pagine non contengono logica applicativa, ma hanno estensione `.php` per poter usare `include`:
+Le sei pagine di contenuto non contengono logica applicativa, ma hanno estensione `.php` per poter usare `include`:
 
 ```php
 <?php $active = 'home'; ?>
@@ -74,7 +74,7 @@ foreach ($navItems as $key => $item) {
 }
 ```
 
-Senza include, una modifica al menu andrebbe replicata a mano su sei file, con il rischio concreto di disallineamenti.
+Senza include, una modifica al menu andrebbe replicata a mano sugli otto file che lo mostrano — le sei pagine di contenuto, la pagina di esito e l'area riservata — con il rischio concreto di disallineamenti.
 
 ---
 
@@ -127,7 +127,7 @@ Il consolidamento ha reso visibile una dipendenza dalla specificità che i nomi 
 Il requisito di un layout non semplicemente lineare è soddisfatto da tre tecniche, tutte fuori dal flusso normale del documento:
 
 1. **Barra di navigazione ancorata:** `#nav` usa `position: fixed; top: 0; left: 0; right: 0; z-index: 200`, restando visibile durante lo scorrimento.
-2. **Griglie asimmetriche con CSS Grid:** la hero e il caso studio usano colonne di larghezza diversa (`grid-template-columns: 1fr 400px`) e griglie a `gap: 1px` su fondo colorato, che producono l'effetto di "caselle" archivistiche separate da un filetto. In tutto il foglio di stile sono presenti 18 contesti di griglia.
+2. **Griglie asimmetriche con CSS Grid:** la hero e il caso studio usano colonne di larghezza diversa (`grid-template-columns: 1fr 400px`) e griglie a `gap: 1px` su fondo colorato, che producono l'effetto di "caselle" archivistiche separate da un filetto. In tutto il foglio di stile sono presenti 13 contesti di griglia: erano 18 prima che il consolidamento descritto in §3.2 riducesse a una sola le undici griglie di card.
 3. **Confronto "prima e dopo":** in `caso-studio.php`, due colonne a contrasto invertito (pergamena contro inchiostro) affiancano il processo manuale e quello digitalizzato.
 
 A questi si aggiungono elementi in `position: absolute` usati come decorazione (la lettera "A" in filigrana nella hero, i punti della timeline).
@@ -164,7 +164,7 @@ Il passo orizzontale delle fasce a tutta larghezza è centralizzato in una varia
 }
 ```
 
-Undici regole (barra di navigazione, sezioni, fasce, piè di pagina, intestazioni di pagina) usano `var(--pad-x)`: il margine di pagina si modifica in un punto solo.
+Dodici regole (barra di navigazione, sezioni, fasce, piè di pagina, intestazioni di pagina, area riservata) usano `var(--pad-x)`: il margine di pagina si modifica in un punto solo.
 
 #### Perché non uno strato correttivo `max-width`
 
@@ -270,7 +270,19 @@ Applicare l'escaping anche in ingresso — errore frequente, perché sembra "pi�
 
 ### 5.5 Gestione degli errori e credenziali
 
-I parametri di connessione stanno in `config-db.php`, separati dalla logica: il passaggio da ambiente locale a hosting richiede di modificare un solo file, e in un deployment reale il file va escluso dal versionamento.
+I parametri di connessione stanno in `config-db.php`, separati dalla logica. L'ambiente locale è stato inoltre configurato con **lo stesso nome di database, lo stesso utente e la stessa password** dell'hosting: il file è quindi identico nei due ambienti, e la pubblicazione non richiede di modificarlo affatto.
+
+È una precauzione contro l'errore più banale del passaggio in produzione, che non è sbagliare le credenziali ma dimenticarsene: si carica il sito, si lascia il file con i valori locali e il modulo di contatto smette di scrivere: oppure, più insidioso, si aggiorna il file sull'hosting e alla successiva sincronizzazione lo si sovrascrive con la copia locale. Se il file non deve cambiare, nessuna delle due cose può accadere. Il prezzo è dover tenere anche in locale credenziali non banali, invece dell'utente `root` senza password che gli ambienti di sviluppo propongono come impostazione predefinita — il che, per inciso, è comunque una buona abitudine.
+
+Proprio per questo il file vero è **escluso dal versionamento**: ora è l'unico punto in cui compare in chiaro una password che vale anche in produzione, e unificare le credenziali ha reso la precauzione più stringente, non meno. In repository sta al suo posto `config-db.esempio.php`, con la stessa struttura e valori segnaposto; dopo un `git clone` si copia in `config-db.php` e si riempie.
+
+È un fastidio di trenta secondi la prima volta, e in cambio la password non entra in nessun commit. Vale la pena raccontarlo per esperienza diretta, perché in questo progetto è andata storta prima di andare bene: le credenziali erano finite in un commit prima che il `.gitignore` esistesse, e da lì non se ne vanno più. Togliere il file dal versionamento protegge i commit futuri, non quelli passati: la stringa resta leggibile nella storia, in ogni copia del repository.
+
+Il caso è però istruttivo anche per il verso opposto, e liquidarlo come "credenziale esposta, quindi compromessa" sarebbe un'analisi pigra. Che cosa può farne, chi la legge? Quella password apre un solo database, non è riutilizzata altrove e — come quasi sempre sull'hosting condiviso — il server MySQL accetta connessioni **soltanto da `localhost`**: per usarla bisogna già essere dentro la macchina, e chi è dentro la macchina può leggere `config-db.php` direttamente, senza bisogno di cercarla su GitHub. Ciò che resta davvero esposto sono il nome del database e quello dell'utente, cioè informazione di ricognizione.
+
+La conclusione utile non è quindi un allarme ma una regola di lettura: il danno di una credenziale finita in un commit si misura su tre domande — se apre altro, se è raggiungibile dall'esterno, se il repository è pubblico. Qui le prime due rispondono di no, la terza di sì. Quando anche una sola delle prime due rispondesse di sì, l'unico rimedio effettivo non sarebbe togliere il file dai commit ma **cambiare la password**.
+
+Poiché `config-db.php` può ora mancare, gli script che lo leggono lo verificano prima di richiederlo: senza il controllo, un `require` su un file assente fermerebbe l'esecuzione e all'utente resterebbe una pagina bianca, mentre così ricade nello stesso messaggio generico previsto per il database irraggiungibile.
 
 A partire da PHP 8.1 l'estensione `mysqli` segnala gli errori **sollevando eccezioni** anziché valorizzando `connect_error`. Un controllo scritto nella forma tradizionale `if ($conn->connect_error)` non verrebbe quindi mai eseguito, e un database irraggiungibile produrrebbe una traccia di stack contenente host, utente e percorso del file. La connessione è perciò racchiusa in un `try/catch`: all'utente arriva un messaggio generico, il dettaglio tecnico finisce nel log del server tramite `error_log()`.
 
@@ -299,7 +311,13 @@ Senza consenso lo script non esegue alcun inserimento e restituisce un messaggio
 
 Il flusso descritto fin qui esegue **una sola** delle quattro operazioni fondamentali su una tabella: l'inserimento. Lettura, modifica ed eliminazione restavano possibili soltanto da phpMyAdmin, cioè dal pannello di amministrazione del DBMS. È un limite pratico e insieme giuridico: la sezione 4 dell'informativa promette che le richieste vengono cancellate al termine del periodo di conservazione, e gli articoli 16 e 17 del Regolamento riconoscono all'interessato il diritto di ottenere rettifica e cancellazione dei propri dati. Una promessa che si può mantenere solo aprendo il pannello del database è una promessa fragile.
 
-`archivio.php` completa il quadro con una schermata di servizio, protetta da password e raggiungibile da un collegamento discreto nel piè di pagina. Le quattro operazioni si distribuiscono così:
+`archivio.php` completa il quadro con una schermata di servizio protetta da password, raggiungibile da un collegamento nel piè di pagina, accanto a quelli dell'informativa privacy e della sezione cookie.
+
+Il collegamento è stato per un certo tempo anche una voce della barra di navigazione, ed è stato tolto. La ragione principale non è di sicurezza ma di architettura dell'informazione: il menu è rivolto a chi visita il sito, mentre l'area riservata ha un utente solo, che sa già dove si trova. Una voce di menu per una persona sola è rumore per tutte le altre, e sottrae spazio alle quattro voci che i visitatori cercano davvero.
+
+Va detto con chiarezza che **non annunciarla non è una misura di sicurezza**: la protezione è la password confrontata con la sua impronta, il token anti-CSRF e la sessione descritti in questa sezione, e resterebbe identica se l'indirizzo comparisse in prima pagina. Confondere la discrezione con la protezione — la cosiddetta *sicurezza per segretezza* — è un errore concettuale, non una scelta di progetto.
+
+Ridurre la visibilità ha però un effetto reale e misurabile su un archivio esposto in rete: meno indirizzi noti significano meno tentativi automatici da parte dei programmi che scandagliano i siti alla ricerca di pannelli di amministrazione. È la stessa considerazione che porta al `<meta name="robots" content="noindex, nofollow">` citato più avanti: le due decisioni sono la stessa decisione presa due volte, in due punti diversi. Le quattro operazioni si distribuiscono così:
 
 | Operazione | Istruzione SQL | Come viene richiesta |
 | :--- | :--- | :--- |
@@ -441,7 +459,9 @@ Tutte le pagine, **incluse l'informativa privacy ed entrambe le varianti della p
 
 ### 6.6 Nessun cookie e nessun terzo
 
-Il sito non imposta cookie — né propri né di terze parti — non usa strumenti di analisi statistica e, una volta ospitati localmente i caratteri tipografici (§3.2), non effettua alcuna richiesta a domini esterni. Di conseguenza **non è necessario alcun banner di consenso ai cookie**: non c'è nulla da consentire.
+Le pagine pubbliche non impostano cookie — né propri né di terze parti — non usano strumenti di analisi statistica e, una volta ospitati localmente i caratteri tipografici (§3.2), non effettuano alcuna richiesta a domini esterni. Di conseguenza **non è necessario alcun banner di consenso ai cookie**: non c'è nulla da consentire.
+
+L'unica eccezione è l'area riservata (§5.7): l'accesso apre una sessione PHP, e con essa il cookie tecnico `PHPSESSID`, senza il quale il pannello non avrebbe modo di riconoscere chi ha effettuato l'accesso da una richiesta alla successiva. È un cookie di sessione strettamente necessario a un servizio richiesto dall'utente, e come tale esente dal consenso ai sensi dell'articolo 122 del Codice privacy; per di più riguarda soltanto chi gestisce il sito, non chi lo visita. Va comunque dichiarato: un'eccezione taciuta vale quanto un banner mancante, ed è la ragione per cui questa relazione afferma "le pagine pubbliche" e non "il sito".
 
 È una scelta che vale la pena rendere esplicita, perché il banner è oggi la principale fonte di attrito nella navigazione, e nella grande maggioranza dei siti serve a giustificare trattamenti che il sito potrebbe semplicemente non fare. Qui l'ordine è stato invertito: prima si è eliminato il trattamento, poi è venuto a mancare il motivo del banner.
 
@@ -454,7 +474,7 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 1. Avviare i moduli **Apache** e **MySQL/MariaDB** del proprio ambiente locale (XAMPP, MAMP o WAMP).
 2. Copiare la cartella del progetto nella directory servita dal server (per esempio `C:\xampp\htdocs\algora_site` oppure `C:\wamp64\www\algora_site`).
 3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algorast_db` e la tabella `contatti`.
-4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione. Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso.
+4. Copiare `config-db.esempio.php` in `config-db.php` e riempirlo: il file vero non sta in repository (§5.5). Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso. Le credenziali sono deliberatamente le stesse dell'hosting, per la ragione spiegata in §5.5: così il file non va toccato al momento della pubblicazione.
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
 7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire il collegamento "Area riservata" nel piè di pagina — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
@@ -508,8 +528,8 @@ Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su h
 
 1. Caricare i file del progetto nella cartella pubblica del dominio (tipicamente `public_html` o `httpdocs`), `video/` compresa. Non serve invece caricare i marchi sorgente in `img/marchi/` che il `LEGGIMI` dichiara non usati dalle pagine: sono 5,7 MB che nessuna pagina richiede.
 2. Creare il database dal pannello dell'hosting ed eseguirvi `crea_db.sql`.
-3. Aggiornare `config-db.php` con host, nome del database, utente e password forniti dal gestore del dominio, assegnando all'utente i soli privilegi necessari (`INSERT` e `SELECT` sulla tabella `contatti`).
-4. Verificare che `config-db.php` non sia raggiungibile dall'esterno e che non venga incluso nel versionamento.
+3. Creare l'utente del database con le stesse credenziali usate in locale (§5.5), così che `config-db.php` non debba essere modificato, e assegnargli i soli privilegi che il codice usa davvero: `SELECT`, `INSERT`, `UPDATE` e `DELETE` sulla tabella `contatti`. Gli ultimi due servono all'area riservata (§5.7): con i soli `INSERT` e `SELECT` il modulo pubblico funzionerebbe e il pannello no.
+4. Caricare a mano `config-db.php`, che non arriva dal repository perché ne è escluso (§5.5), e verificare che non sia raggiungibile dall'esterno.
 
 ---
 
@@ -520,6 +540,7 @@ Per completezza si segnalano gli aspetti ancora aperti:
 * **Lingua dei contenuti multimediali.** Le cinque schermate e il filmato dimostrativo (§3.5) mostrano l'interfaccia in italiano, e la descrizione passo per passo che accompagna il filmato è scritta in italiano. Se il sito avrà una versione inglese, quei contenuti andranno rigirati oppure accompagnati da una nota: un filmato è l'unica parte del sito che una traduzione del testo non raggiunge.
 * **Dati del titolare nell'informativa.** L'informativa privacy è completa nella struttura, ma i riferimenti anagrafici del titolare (ragione sociale, partita IVA, sede), il periodo di conservazione e i fornitori nominati responsabili esterni sono segnaposto, resi graficamente evidenti nella pagina. Vanno compilati prima della pubblicazione: un'informativa pubblicata a metà è peggio di nessuna informativa. Lo stesso segnaposto della partita IVA compare nel piè di pagina.
 * **Protezione del modulo pubblico.** Il token anti-CSRF descritto in §5.7 protegge l'area riservata, ma non è stato esteso al modulo di contatto, che resta privo anche di una misura anti-spam. Per un uso in produzione andrebbero aggiunti entrambi. Per la seconda è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
+* **Credenziali già finite in un commit.** Il `.gitignore` e `config-db.esempio.php` descritti in §5.5 impediscono che accada di nuovo, ma non tolgono dalla storia di git ciò che vi è già entrato: la password del database resta leggibile nei commit precedenti, e il repository è pubblico. Il rischio effettivo è contenuto — la credenziale apre quel solo database, non è riutilizzata e il server MySQL non accetta connessioni dall'esterno — ma la via pulita per chiuderlo resta una sola, cambiare la password sull'hosting, e va fatta prima che una qualsiasi di quelle due condizioni cambi.
 * **Autenticazione dell'area riservata.** L'accesso a `archivio.php` poggia su un'unica password condivisa: basta a proteggere un pannello dimostrativo, non un archivio in produzione, che richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei tentativi di accesso e registro delle operazioni eseguite. Manca inoltre una cancellazione programmata al termine del periodo di conservazione: oggi la cancellazione è un gesto manuale, per quanto ora possibile senza aprire phpMyAdmin.
 
 ---
@@ -568,10 +589,10 @@ The site is built on **6 content pages**, served by PHP, plus **1 server-side sc
 | `footer.php` | Include: footer shared by every page. |
 | `invia-contatto.php` | **Backend.** Receives the form POST, validates, inserts into the database with a prepared statement, returns the outcome page. |
 | `archivio.php` | **Reserved area.** Password-protected service screen: list of requests, manual insertion, editing and deletion (§5.7). |
-| `config-db.php` | Database connection parameters, kept apart from the application logic. |
+| `config-db.esempio.php` | Template for the connection parameters. The real file, `config-db.php`, is not in the repository: it is created by copying this one (§5.5). |
 | `config-admin.php` | Hash of the reserved area password, isolated like the database parameters. |
 | `crea_db.sql` | DDL script creating the database and the table. |
-| `style.css` | Single stylesheet for the whole site (1,503 lines, ~55 KB). |
+| `style.css` | Single stylesheet for the whole site (1,518 lines, ~60 KB). |
 | `main.js` | Client-side behaviours (63 lines). |
 | `fonts/` | The two typefaces in WOFF2 format (8 files, 300 KB). |
 | `img/` | Product screenshots and the video poster frame, with instructions in `LEGGIMI.md`. |
@@ -579,7 +600,7 @@ The site is built on **6 content pages**, served by PHP, plus **1 server-side sc
 
 ### 2.1 Why PHP on the content pages too
 
-The five pages contain no application logic, but carry the `.php` extension so that they can use `include`:
+The six content pages contain no application logic, but carry the `.php` extension so that they can use `include`:
 
 ```php
 <?php $active = 'home'; ?>
@@ -600,7 +621,7 @@ foreach ($navItems as $key => $item) {
 }
 ```
 
-Without includes, a change to the menu would have to be replicated by hand across six files, with a real risk of them drifting apart.
+Without includes, a change to the menu would have to be replicated by hand across the eight files that display it — the six content pages, the outcome page and the reserved area — with a real risk of them drifting apart.
 
 ---
 
@@ -653,7 +674,7 @@ The consolidation made visible a dependency on specificity that the long names h
 The requirement for a layout that is not merely linear is met by three techniques, all of them outside the document's normal flow:
 
 1. **Pinned navigation bar:** `#nav` uses `position: fixed; top: 0; left: 0; right: 0; z-index: 200`, staying visible while scrolling.
-2. **Asymmetric CSS Grid layouts:** the hero and the case study use columns of different widths (`grid-template-columns: 1fr 400px`) and `gap: 1px` grids over a coloured background, producing the effect of archival "boxes" separated by a hairline. The stylesheet contains 18 grid contexts in all.
+2. **Asymmetric CSS Grid layouts:** the hero and the case study use columns of different widths (`grid-template-columns: 1fr 400px`) and `gap: 1px` grids over a coloured background, producing the effect of archival "boxes" separated by a hairline. The stylesheet contains 13 grid contexts in all: there were 18 before the consolidation described in §3.2 reduced eleven card grids to one.
 3. **"Before and after" comparison:** in `caso-studio.php`, two columns in inverted contrast (parchment against ink) set the manual process alongside the digitised one.
 
 To these are added `position: absolute` elements used as decoration (the watermark letter "A" in the hero, the timeline dots).
@@ -690,7 +711,7 @@ The horizontal padding of the full-width bands is centralised in a variable, red
 }
 ```
 
-Eleven rules (navigation bar, sections, bands, footer, page headers) use `var(--pad-x)`: the page margin is changed in a single place.
+Twelve rules (navigation bar, sections, bands, footer, page headers, reserved area) use `var(--pad-x)`: the page margin is changed in a single place.
 
 #### Why not a corrective `max-width` layer
 
@@ -745,12 +766,12 @@ Both interactive controls are native **`<button>` elements**: the reasoning is d
 
 A form that sends an email through `mailto:` or fakes the submission in JavaScript guarantees neither persistence nor traceability. The project therefore adopts the three-tier architecture **Client (HTML/CSS/JS) → Application server (PHP 8) → Database server (MySQL/MariaDB)**.
 
-### 5.2 Database (`algora_db`)
+### 5.2 Database (`algorast_db`)
 
 ```sql
-CREATE DATABASE IF NOT EXISTS algora_db
+CREATE DATABASE IF NOT EXISTS algorast_db
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE algora_db;
+USE algorast_db;
 
 CREATE TABLE IF NOT EXISTS contatti (
     id               INT AUTO_INCREMENT PRIMARY KEY,
@@ -767,6 +788,8 @@ CREATE TABLE IF NOT EXISTS contatti (
 
 The `utf8mb4` encoding covers the whole Unicode repertoire, including the accented characters and typographic marks that appear in the names of institutions and places.
 
+The `consenso_privacy` and `data_consenso` columns were added later, after the table had first gone into production; on a pre-existing installation `CREATE TABLE IF NOT EXISTS` does not add them by itself, so `crea_db.sql` also carries the corresponding one-off `ALTER TABLE`.
+
 ### 5.3 Processing flow
 
 1. **HTTP method check.** A request that is not a `POST` (typically someone opening the URL directly) has no data to process: the script answers with a `303 See Other` redirect to `contatti.php`, instead of showing a meaningless error page.
@@ -775,8 +798,9 @@ The `utf8mb4` encoding covers the whole Unicode repertoire, including the accent
 
 ```php
 $stmt = $conn->prepare(
-    'INSERT INTO contatti (nome, ente, email, tipo, messaggio)
-     VALUES (?, ?, ?, ?, ?)'
+    'INSERT INTO contatti (nome, ente, email, tipo, messaggio,
+                           consenso_privacy, data_consenso)
+     VALUES (?, ?, ?, ?, ?, 1, NOW())'
 );
 $stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
 $stmt->execute();
@@ -793,7 +817,19 @@ Escaping on the way in as well — a frequent mistake, because it feels "safer" 
 
 ### 5.5 Error handling and credentials
 
-The connection parameters live in `config-db.php`, separate from the logic: moving from a local environment to hosting means editing a single file, and in a real deployment that file must be excluded from version control.
+The connection parameters live in `config-db.php`, separate from the logic. The local environment has moreover been set up with **the same database name, the same user and the same password** as the hosting: the file is therefore identical in both environments, and publishing requires no edit to it at all.
+
+It is a precaution against the most banal mistake of going into production, which is not getting the credentials wrong but forgetting about them: you upload the site, leave the file with the local values, and the contact form quietly stops writing — or, more insidiously, you update the file on the host and then overwrite it with the local copy on the next sync. If the file never has to change, neither can happen. The price is having to keep non-trivial credentials locally too, instead of the passwordless `root` user that development environments offer by default — which, incidentally, is a good habit anyway.
+
+For exactly that reason the real file is **excluded from version control**: it is now the single place where a password that also works in production appears in clear text, and unifying the credentials made the precaution more pressing, not less. In its place the repository carries `config-db.esempio.php`, with the same structure and placeholder values; after a `git clone` you copy it to `config-db.php` and fill it in.
+
+It is thirty seconds of nuisance the first time, and in exchange the password enters no commit. It is worth telling from direct experience, because in this project it went wrong before it went right: the credentials did end up in a commit before the `.gitignore` existed, and from there they never leave. Removing the file from version control protects future commits, not past ones: the string stays readable in the history, in every copy of the repository.
+
+The case is instructive the other way round too, and writing it off as "credential exposed, therefore compromised" would be lazy analysis. What can a reader actually do with it? That password opens a single database, is not reused anywhere else and — as is almost always the case on shared hosting — the MySQL server accepts connections **from `localhost` only**: to use it you must already be inside the machine, and anyone inside the machine can read `config-db.php` directly, without going looking for it on GitHub. What is genuinely exposed are the database and user names, that is, reconnaissance information.
+
+The useful conclusion is therefore not an alarm but a rule for reading such cases: the damage of a credential that reached a commit is measured by three questions — whether it opens anything else, whether it is reachable from outside, and whether the repository is public. Here the first two answer no and the third yes. Were even one of the first two to answer yes, the only effective remedy would not be removing the file from the commits but **changing the password**.
+
+Since `config-db.php` may now be absent, the scripts that read it check for it before requiring it: without that check a `require` on a missing file would halt execution and leave the user a blank page, whereas this way it falls back to the same generic message provided for an unreachable database.
 
 From PHP 8.1 onwards the `mysqli` extension reports errors by **throwing exceptions** rather than setting `connect_error`. A check written in the traditional `if ($conn->connect_error)` form would therefore never run, and an unreachable database would produce a stack trace containing host, user and file path. The connection is consequently wrapped in a `try/catch`: the user receives a generic message, while the technical detail goes to the server log through `error_log()`.
 
@@ -822,7 +858,13 @@ Without consent the script performs no insertion and returns a specific error me
 
 The flow described so far performs **one only** of the four fundamental operations on a table: insertion. Reading, editing and deletion remained possible only through phpMyAdmin, that is, through the DBMS administration panel. This is a limitation at once practical and legal: section 4 of the privacy notice promises that requests are erased at the end of the retention period, and Articles 16 and 17 of the Regulation grant the data subject the right to obtain rectification and erasure of their data. A promise that can be kept only by opening the database panel is a fragile promise.
 
-`archivio.php` completes the picture with a service screen, password-protected and reachable from a discreet link in the footer. The four operations are distributed as follows:
+`archivio.php` completes the picture with a password-protected service screen, reachable from a link in the footer, next to those for the privacy notice and the cookie section.
+
+For a while the link was also an item in the navigation bar, and it was removed. The main reason is not security but information architecture: the menu addresses the people who visit the site, whereas the reserved area has a single user, who already knows where it is. A menu item for one person is noise for everybody else, and it takes space away from the four items visitors actually look for.
+
+It must be said plainly that **not advertising it is not a security measure**: the protection is the password checked against its hash, the anti-CSRF token and the session described in this section, and it would be exactly the same if the address appeared on the home page. Confusing discretion with protection — so-called *security through obscurity* — is a conceptual mistake, not a design decision.
+
+Reducing visibility does however have a real and measurable effect on an archive exposed to the internet: fewer known addresses mean fewer automated attempts by the programs that trawl sites looking for administration panels. It is the same consideration that leads to the `<meta name="robots" content="noindex, nofollow">` mentioned further down: the two decisions are the same decision taken twice, in two different places. The four operations are distributed as follows:
 
 | Operation | SQL statement | How it is requested |
 | :--- | :--- | :--- |
@@ -964,7 +1006,9 @@ All pages, **including the privacy notice and both variants of the outcome page*
 
 ### 6.6 No cookies and no third parties
 
-The site sets no cookies — neither its own nor third-party ones — uses no analytics, and, once the typefaces were self-hosted (§3.2), makes no request to external domains. Consequently **no cookie consent banner is required**: there is nothing to consent to.
+The public pages set no cookies — neither their own nor third-party ones — use no analytics, and, once the typefaces were self-hosted (§3.2), make no request to external domains. Consequently **no cookie consent banner is required**: there is nothing to consent to.
+
+The one exception is the reserved area (§5.7): logging in opens a PHP session, and with it the technical `PHPSESSID` cookie, without which the panel would have no way of recognising who logged in from one request to the next. It is a session cookie strictly necessary to a service the user requested, and as such exempt from consent under Article 122 of the Italian privacy code; moreover it concerns only whoever runs the site, not whoever visits it. It must be declared all the same: an unstated exception is worth as much as a missing banner, and it is why this report says "the public pages" and not "the site".
 
 It is a choice worth stating explicitly, because the banner is today the main source of friction in browsing, and on the vast majority of sites it exists to justify processing that the site could simply not carry out. Here the order was reversed: the processing was removed first, and the reason for the banner then disappeared on its own.
 
@@ -976,8 +1020,8 @@ The notice in `privacy.php` documents the situation anyway, because the absence 
 
 1. Start the **Apache** and **MySQL/MariaDB** modules of your local environment (XAMPP, MAMP or WAMP).
 2. Copy the project folder into the directory served by the server (for example `C:\xampp\htdocs\algora_site` or `C:\wamp64\www\algora_site`).
-3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algora_db` database and the `contatti` table.
-4. Check that the parameters in `config-db.php` match your installation (the defaults are XAMPP/MAMP's: user `root`, empty password).
+3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algorast_db` database and the `contatti` table.
+4. Copy `config-db.esempio.php` to `config-db.php` and fill it in: the real file is not in the repository (§5.5). The project uses a dedicated MySQL user (`algorast_user`) with privileges limited to the `algorast_db` database, rather than the `root` user that XAMPP/MAMP/WAMP provide by default: if that user does not exist yet it must be created and associated with the database, otherwise inserting a contact fails with an access error. The credentials are deliberately the same as the hosting's, for the reason explained in §5.5: this way the file needs no editing at publication time.
 5. Open `http://localhost/algora_site/index.php`.
 6. To test the server-side part, open `http://localhost/algora_site/contatti.php`, fill in the form and submit it. Check that the confirmation page appears and that the row is present in the `contatti` table.
 7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" link in the footer — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
@@ -1031,8 +1075,8 @@ The site is meant to be published on the domain `www.algorastudio.it`. On shared
 
 1. Upload the project files into the domain's public folder (typically `public_html` or `httpdocs`), `video/` included. There is no need to upload the source logos in `img/marchi/` that the `LEGGIMI` file marks as unused by the pages: they are 5.7 MB no page ever requests.
 2. Create the database from the hosting control panel and run `crea_db.sql` on it.
-3. Update `config-db.php` with the host, database name, user and password supplied by the hosting provider, granting the user only the privileges actually needed (`INSERT` and `SELECT` on the `contatti` table).
-4. Check that `config-db.php` is not reachable from outside and that it is not included in version control.
+3. Create the database user with the same credentials used locally (§5.5), so that `config-db.php` needs no editing, and grant it only the privileges the code actually uses: `SELECT`, `INSERT`, `UPDATE` and `DELETE` on the `contatti` table. The last two are for the reserved area (§5.7): with `INSERT` and `SELECT` alone the public form would work and the panel would not.
+4. Upload `config-db.php` by hand — it does not come from the repository, being excluded from it (§5.5) — and check that it is not reachable from outside.
 
 ---
 
@@ -1043,4 +1087,5 @@ For completeness, the points still open:
 * **Language of the multimedia content.** The five screenshots and the demo video (§3.5) show the interface in Italian, and the step-by-step description accompanying the video is written in Italian. Should the site gain an English version, that material will have to be re-recorded or accompanied by a note: a video is the one part of a site that translating the text does not reach.
 * **Controller details in the privacy notice.** The privacy notice is structurally complete, but the controller's identifying details (company name, VAT number, registered office), the retention period and the suppliers appointed as processors are placeholders, made graphically obvious on the page. They must be filled in before publication: a half-published notice is worse than no notice at all. The same VAT number placeholder appears in the footer.
 * **Protection of the public form.** The anti-CSRF token described in §5.7 protects the reserved area, but it has not been extended to the contact form, which also lacks an anti-spam measure. Both should be added for production use. For the latter a passive technique is preferable — a honeypot field plus a check on how long the form took to fill in — over a CAPTCHA: visual CAPTCHAs are an accessibility obstacle, and third-party services would reintroduce into the page the external dependency removed in §3.2.
+* **Credentials that already reached a commit.** The `.gitignore` and `config-db.esempio.php` described in §5.5 stop it happening again, but they do not remove from git's history what already entered it: the database password stays readable in earlier commits, and the repository is public. The actual risk is contained — the credential opens that one database, is not reused, and the MySQL server accepts no connections from outside — but there is still only one clean way to close it, changing the password on the hosting, and it should be done before either of those two conditions changes.
 * **Authentication of the reserved area.** Access to `archivio.php` rests on a single shared password: enough to protect a demonstration panel, not an archive in production, which would require named accounts, mandatory HTTPS, rate limiting on login attempts and a log of the operations performed. There is also no scheduled erasure at the end of the retention period: today erasure is a manual act, however much it is now possible without opening phpMyAdmin.

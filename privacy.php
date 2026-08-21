@@ -19,11 +19,17 @@
  * Lo stesso segnaposto della partita IVA compare in footer.php.
  * ─────────────────────────────────────────────────────────────────────
  *
- * NOTA SUI COOKIE: allo stato attuale il sito non imposta alcun cookie e
- * non effettua richieste a domini terzi (i caratteri tipografici sono
- * ospitati localmente). Se in futuro verra' introdotto il token anti-CSRF
- * basato su sessione PHP, comparira' il cookie tecnico PHPSESSID: non
- * richiede consenso, ma va dichiarato nella sezione "Cookie" qui sotto.
+ * NOTA SUI COOKIE: le pagine pubbliche non impostano alcun cookie e non
+ * effettuano richieste a domini terzi (i caratteri tipografici sono
+ * ospitati localmente).
+ *
+ * Il caso previsto da questa nota si e' poi verificato: con l'area
+ * riservata (archivio.php) e' arrivato il token anti-CSRF basato su
+ * sessione PHP, e con esso il cookie tecnico PHPSESSID. Non richiede
+ * consenso perche' e' strettamente necessario a un servizio richiesto
+ * dall'utente, ma va dichiarato, ed e' dichiarato nella sezione "Cookie"
+ * qui sotto. Viene impostato solo all'accesso al pannello: chi si limita a
+ * consultare il sito non lo riceve.
  */
 
 $active = 'privacy';
@@ -106,7 +112,8 @@ $active = 'privacy';
     <p>Non trasferiamo dati personali fuori dallo Spazio economico europeo.</p>
 
     <h2 id="cookie">6. Cookie e servizi di terze parti</h2>
-    <p><strong>Questo sito non utilizza cookie.</strong> Non ne imposta di propri, non ne imposta di terze parti, non usa strumenti di analisi statistica né pulsanti di condivisione sui social network. Per questo non trovi alcun banner di consenso: non c'è nulla da consentire.</p>
+    <p><strong>Navigando su questo sito non ricevi alcun cookie.</strong> Le pagine non ne impostano di propri, non ne impostano di terze parti, non usano strumenti di analisi statistica né pulsanti di condivisione sui social network. Per questo non trovi alcun banner di consenso: non c'è nulla da consentire.</p>
+    <p>Un'unica eccezione esiste e non ti riguarda: l'area riservata da cui il titolare gestisce le richieste ricevute imposta, al momento dell'accesso, un cookie tecnico di sessione (<code>PHPSESSID</code>) che serve soltanto a mantenere riconosciuto chi ha inserito la password. Viene cancellato alla chiusura del browser, non registra alcun comportamento e non viene mai impostato a chi si limita a consultare il sito. I cookie strettamente necessari a fornire un servizio richiesto dall'utente non richiedono consenso, ai sensi dell'articolo 122 del Codice in materia di protezione dei dati personali.</p>
     <p>Il sito non effettua inoltre alcuna richiesta a domini esterni. I caratteri tipografici usati nelle pagine sono ospitati sul server del sito stesso: navigando non comunichi il tuo indirizzo IP a nessun fornitore terzo.</p>
     <p>L'unico trattamento tecnico che avviene a tua insaputa è quello svolto dal server web, che registra nei propri file di log gli accessi ricevuti (indirizzo IP, data e ora, pagina richiesta) per finalità di sicurezza e diagnostica, secondo le impostazioni del fornitore di hosting.</p>
 

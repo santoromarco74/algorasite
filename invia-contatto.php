@@ -51,14 +51,21 @@ if ($nome === '' || $messaggio === '') {
     // ── Inserimento con istruzione preparata ──────────────────────────
     // I segnaposto "?" tengono separati comandi SQL e dati utente:
     // il contenuto dei campi non puo' essere interpretato come SQL.
-    $cfg = require 'config-db.php';
-
     // Con PHP 8.1+ mysqli segnala gli errori sollevando eccezioni: senza
     // un try/catch un errore di connessione stamperebbe a video una
     // traccia contenente i parametri del database.
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     try {
+        // config-db.php non sta in repository (vedi .gitignore): dopo un
+        // clone va creato copiando config-db.esempio.php. Senza questo
+        // controllo un require su un file assente fermerebbe lo script, e
+        // all'utente resterebbe una pagina bianca invece di un messaggio.
+        if (!is_file(__DIR__ . '/config-db.php')) {
+            throw new RuntimeException('config-db.php assente: copiare config-db.esempio.php');
+        }
+        $cfg = require __DIR__ . '/config-db.php';
+
         $conn = new mysqli($cfg['host'], $cfg['user'], $cfg['password'], $cfg['dbname']);
         $conn->set_charset($cfg['charset']);
 
@@ -75,7 +82,7 @@ if ($nome === '' || $messaggio === '') {
         $conn->close();
 
         $successo = true;
-    } catch (mysqli_sql_exception $e) {
+    } catch (mysqli_sql_exception | RuntimeException $e) {
         // All'utente un messaggio generico, il dettaglio tecnico nel log
         // del server: i messaggi del DBMS rivelano struttura e credenziali.
         error_log('[algora] inserimento contatto fallito: ' . $e->getMessage());
