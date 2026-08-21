@@ -116,7 +116,7 @@
   <div class="futuro-grid">
     <div class="fut-card">
       <p class="fut-n">Oggi</p>
-      <h3>Foliarium v1.5</h3>
+      <h3>Foliarium v1.0</h3>
       <p>Gestione archivi catastali storici. In uso presso l'Archivio di Stato di Savona. Disponibile per nuovi clienti.</p>
       <p class="fut-status">● Attivo · In evoluzione</p>
     </div>

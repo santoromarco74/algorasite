@@ -41,7 +41,7 @@
 
 <div class="strip">
   <span class="strip-item">Cliente: <strong>Ministero della Cultura — Archivio di Stato di Savona</strong></span>
-  <span class="strip-item">Prodotto: <strong>Foliarium v1.0 → v1.5</strong></span>
+  <span class="strip-item">Prodotto: <strong>Foliarium v1.0</strong></span>
   <span class="strip-item">Territorio: <strong>Provincia di Savona, Liguria</strong></span>
 </div>
 
@@ -149,7 +149,7 @@
         </li>
         <li>
           <span class="tl-label">Fase 5 — Aggiornamenti continui</span>
-          <p>Rapporto attivo con l'Archivio. Da Foliarium v1.0 a v1.5: ogni nuova versione nasce da feedback concreti del cliente. Il sistema evolve con le esigenze.</p>
+          <p>Rapporto attivo con l'Archivio. Da Foliarium v1.0 in poi: ogni nuova versione nasce da feedback concreti del cliente. Il sistema evolve con le esigenze.</p>
         </li>
       </ul>
     </div>
@@ -222,8 +222,8 @@
     </div>
     <div class="ris-card">
       <p class="ris-n">Affidabilità</p>
-      <strong>v 1.5</strong>
-      <p>Da Foliarium 1.0 a 1.5: il software è in uso continuativo e migliora ad ogni versione su feedback reali.</p>
+      <strong>v 1.0</strong>
+      <p>Da Foliarium 1.0 in poi: il software è in uso continuativo e migliora ad ogni versione su feedback reali.</p>
     </div>
   </div>
 </section>
