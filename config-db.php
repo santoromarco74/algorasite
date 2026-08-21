@@ -18,8 +18,8 @@
 
 return [
     'host'     => 'localhost',
-    'user'     => 'root',
-    'password' => '',
-    'dbname'   => 'algora_db',
+    'user'     => 'algorast_user',
+    'password' => 'Algorastudio1',
+    'dbname'   => 'algorast_db',
     'charset'  => 'utf8mb4',
 ];

@@ -1,9 +1,9 @@
 -- Creazione e selezione del database
-CREATE DATABASE IF NOT EXISTS algora_db
+CREATE DATABASE IF NOT EXISTS algorast_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE algora_db;
+USE algorast_db;
 
 -- Tabella delle richieste di contatto inviate dal modulo web.
 --
@@ -24,9 +24,10 @@ CREATE TABLE IF NOT EXISTS contatti (
     data_invio       DATETIME     DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Se la tabella esiste gia' da una versione precedente, le due colonne
--- vanno aggiunte cosi' (l'istruzione fallisce se sono gia' presenti):
---
---   ALTER TABLE contatti
---     ADD COLUMN consenso_privacy TINYINT(1) NOT NULL DEFAULT 0,
---     ADD COLUMN data_consenso    DATETIME   DEFAULT NULL;
+-- Se la tabella esiste gia' da una versione precedente senza queste due
+-- colonne, CREATE TABLE IF NOT EXISTS non le aggiunge: serve eseguire
+-- anche questo ALTER (fallisce se sono gia' presenti, in tal caso va
+-- ignorato):
+ALTER TABLE contatti
+    ADD COLUMN consenso_privacy TINYINT(1) NOT NULL DEFAULT 0,
+    ADD COLUMN data_consenso    DATETIME   DEFAULT NULL;

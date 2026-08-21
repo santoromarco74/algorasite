@@ -1,11 +1,13 @@
 <?php
 // Richiede $active impostata dalla pagina chiamante prima dell'include
-// (valori: 'home', 'chi-siamo', 'foliarium', 'caso-studio', 'contatti')
+// (valori: 'home', 'chi-siamo', 'foliarium', 'caso-studio', 'archivio',
+//  'contatti'; stringa vuota per le pagine che non stanno nel menu)
 $navItems = [
   'home'        => ['href' => 'index.php',       'label' => 'Home'],
   'chi-siamo'   => ['href' => 'chi-siamo.php',    'label' => 'Chi siamo'],
   'foliarium'   => ['href' => 'foliarium.php',    'label' => 'Foliarium'],
   'caso-studio' => ['href' => 'caso-studio.php',  'label' => 'Caso Studio'],
+  'archivio'    => ['href' => 'archivio.php',     'label' => 'Area riservata'],
 ];
 ?>
 <nav id="nav">

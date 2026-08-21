@@ -219,12 +219,12 @@ Entrambi i comandi interattivi sono elementi **`<button>` nativi**: la scelta è
 
 Un modulo che invii una email via `mailto:` o simuli l'invio in JavaScript non garantisce né persistenza né tracciabilità. Il progetto adotta quindi l'architettura a tre livelli **Client (HTML/CSS/JS) → Application server (PHP 8) → Database server (MySQL/MariaDB)**.
 
-### 5.2 Base di dati (`algora_db`)
+### 5.2 Base di dati (`algorast_db`)
 
 ```sql
-CREATE DATABASE IF NOT EXISTS algora_db
+CREATE DATABASE IF NOT EXISTS algorast_db
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE algora_db;
+USE algorast_db;
 
 CREATE TABLE IF NOT EXISTS contatti (
     id               INT AUTO_INCREMENT PRIMARY KEY,
@@ -238,6 +238,8 @@ CREATE TABLE IF NOT EXISTS contatti (
     data_invio       DATETIME     DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 ```
+
+Le colonne `consenso_privacy` e `data_consenso` sono state aggiunte in un secondo momento, dopo la prima messa in produzione della tabella; su un'installazione preesistente `CREATE TABLE IF NOT EXISTS` non le aggiunge da solo, quindi `crea_db.sql` prevede anche l'`ALTER TABLE` corrispondente da eseguire una tantum.
 
 La codifica `utf8mb4` copre l'intero repertorio Unicode, inclusi i caratteri accentati e i segni tipografici usati nei nomi di enti e località.
 
@@ -301,7 +303,7 @@ Senza consenso lo script non esegue alcun inserimento e restituisce un messaggio
 
 Il flusso descritto fin qui esegue **una sola** delle quattro operazioni fondamentali su una tabella: l'inserimento. Lettura, modifica ed eliminazione restavano possibili soltanto da phpMyAdmin, cioè dal pannello di amministrazione del DBMS. È un limite pratico e insieme giuridico: la sezione 4 dell'informativa promette che le richieste vengono cancellate al termine del periodo di conservazione, e gli articoli 16 e 17 del Regolamento riconoscono all'interessato il diritto di ottenere rettifica e cancellazione dei propri dati. Una promessa che si può mantenere solo aprendo il pannello del database è una promessa fragile.
 
-`archivio.php` completa il quadro con una schermata di servizio, protetta da password e raggiungibile da un collegamento discreto nel piè di pagina. Le quattro operazioni si distribuiscono così:
+`archivio.php` completa il quadro con una schermata di servizio protetta da password, raggiungibile dalla voce "Area riservata" della barra di navigazione e dal collegamento omonimo nel piè di pagina. Le quattro operazioni si distribuiscono così:
 
 | Operazione | Istruzione SQL | Come viene richiesta |
 | :--- | :--- | :--- |
@@ -457,11 +459,11 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 
 1. Avviare i moduli **Apache** e **MySQL/MariaDB** del proprio ambiente locale (XAMPP, MAMP o WAMP).
 2. Copiare la cartella del progetto nella directory servita dal server (per esempio `C:\xampp\htdocs\algora_site` oppure `C:\wamp64\www\algora_site`).
-3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algora_db` e la tabella `contatti`.
-4. Creare in locale database, utente e password con gli stessi valori previsti sull'hosting, e verificare che corrispondano a quelli in `config-db.php`. È la scelta descritta in §5.5: il file resta identico nei due ambienti e non va toccato al momento della pubblicazione.
+3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algorast_db` e la tabella `contatti`.
+4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione. Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso. Le credenziali sono deliberatamente le stesse dell'hosting, per la ragione spiegata in §5.5: così il file non va toccato al momento della pubblicazione.
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
-7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire il collegamento "Area riservata" nel piè di pagina — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
+7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire la voce "Area riservata" nella barra di navigazione — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
 
 ```
 php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
@@ -749,12 +751,12 @@ Both interactive controls are native **`<button>` elements**: the reasoning is d
 
 A form that sends an email through `mailto:` or fakes the submission in JavaScript guarantees neither persistence nor traceability. The project therefore adopts the three-tier architecture **Client (HTML/CSS/JS) → Application server (PHP 8) → Database server (MySQL/MariaDB)**.
 
-### 5.2 Database (`algora_db`)
+### 5.2 Database (`algorast_db`)
 
 ```sql
-CREATE DATABASE IF NOT EXISTS algora_db
+CREATE DATABASE IF NOT EXISTS algorast_db
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE algora_db;
+USE algorast_db;
 
 CREATE TABLE IF NOT EXISTS contatti (
     id               INT AUTO_INCREMENT PRIMARY KEY,
@@ -770,6 +772,8 @@ CREATE TABLE IF NOT EXISTS contatti (
 ```
 
 The `utf8mb4` encoding covers the whole Unicode repertoire, including the accented characters and typographic marks that appear in the names of institutions and places.
+
+The `consenso_privacy` and `data_consenso` columns were added later, after the table had first gone into production; on a pre-existing installation `CREATE TABLE IF NOT EXISTS` does not add them by itself, so `crea_db.sql` also carries the corresponding one-off `ALTER TABLE`.
 
 ### 5.3 Processing flow
 
@@ -831,7 +835,7 @@ Without consent the script performs no insertion and returns a specific error me
 
 The flow described so far performs **one only** of the four fundamental operations on a table: insertion. Reading, editing and deletion remained possible only through phpMyAdmin, that is, through the DBMS administration panel. This is a limitation at once practical and legal: section 4 of the privacy notice promises that requests are erased at the end of the retention period, and Articles 16 and 17 of the Regulation grant the data subject the right to obtain rectification and erasure of their data. A promise that can be kept only by opening the database panel is a fragile promise.
 
-`archivio.php` completes the picture with a service screen, password-protected and reachable from a discreet link in the footer. The four operations are distributed as follows:
+`archivio.php` completes the picture with a password-protected service screen, reachable from the "Area riservata" item in the navigation bar and from the matching link in the footer. The four operations are distributed as follows:
 
 | Operation | SQL statement | How it is requested |
 | :--- | :--- | :--- |
@@ -987,11 +991,11 @@ The notice in `privacy.php` documents the situation anyway, because the absence 
 
 1. Start the **Apache** and **MySQL/MariaDB** modules of your local environment (XAMPP, MAMP or WAMP).
 2. Copy the project folder into the directory served by the server (for example `C:\xampp\htdocs\algora_site` or `C:\wamp64\www\algora_site`).
-3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algora_db` database and the `contatti` table.
-4. Create the database, user and password locally with the same values used on the hosting, and check that they match those in `config-db.php`. This is the choice described in §5.5: the file stays identical in both environments and needs no editing at publication time.
+3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algorast_db` database and the `contatti` table.
+4. Check that the parameters in `config-db.php` match your installation. The project uses a dedicated MySQL user (`algorast_user`) with privileges limited to the `algorast_db` database, rather than the `root` user that XAMPP/MAMP/WAMP provide by default: if that user does not exist yet it must be created and associated with the database, otherwise inserting a contact fails with an access error. The credentials are deliberately the same as the hosting's, for the reason explained in §5.5: this way the file needs no editing at publication time.
 5. Open `http://localhost/algora_site/index.php`.
 6. To test the server-side part, open `http://localhost/algora_site/contatti.php`, fill in the form and submit it. Check that the confirmation page appears and that the row is present in the `contatti` table.
-7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" link in the footer — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
+7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" item in the navigation bar — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
 
 ```
 php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'

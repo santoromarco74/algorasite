@@ -38,7 +38,7 @@
 
 session_start();
 
-$active   = '';   // nessuna voce del menu corrisponde a questa pagina
+$active   = 'archivio';   // evidenzia la voce omonima nella barra
 $cfgAdmin = require 'config-admin.php';
 
 // Categorie proposte nel modulo pubblico: qui servono per la stessa
