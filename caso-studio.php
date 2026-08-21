@@ -53,9 +53,9 @@
     <p>L'Archivio di Stato di Savona custodisce i registri catastali storici dell'intera provincia — una documentazione che risale al primo impianto catastale post-unitario del 1830. Un patrimonio immenso, conservato in volumi cartacei, praticamente impossibile da consultare in modo efficiente.</p>
   </div>
 
-  <div class="before-after">
+  <div class="card-grid card-grid-2 before-after">
     <div class="ba-col before">
-      <p class="ba-label">Prima di Foliarium</p>
+      <p class="label-sm">Prima di Foliarium</p>
       <h3>Ricerca manuale tra i volumi</h3>
       <ul class="ba-list">
         <li><span class="ba-icon">—</span> Giorni o settimane per ricostruire la storia di una proprietà</li>
@@ -66,8 +66,8 @@
         <li><span class="ba-icon">—</span> Rischio di deterioramento progressivo dei documenti originali</li>
       </ul>
     </div>
-    <div class="ba-col after">
-      <p class="ba-label">Con Foliarium</p>
+    <div class="ba-col after card-dark">
+      <p class="label-sm">Con Foliarium</p>
       <h3>Consultazione digitale immediata</h3>
       <ul class="ba-list">
         <li><span class="ba-icon">+</span> Ricerca in pochi secondi su 12.000+ partite</li>
@@ -88,7 +88,7 @@
 
 <!-- LA SOLUZIONE -->
 <section class="soluzione">
-  <div class="grid-2 sol-grid">
+  <div class="grid-2 grid-2-tight">
     <div class="sol-text">
       <p class="label mb-16">La soluzione</p>
       <h2>Foliarium: progettato<br><em>per il catasto storico.</em></h2>
@@ -163,39 +163,39 @@
     <h2>Sei fasi.<br><em>Un sistema completo.</em></h2>
     <p>Il progetto si è sviluppato in fasi sequenziali, dalla raccolta dei requisiti alla messa in produzione, con un approccio iterativo che ha coinvolto il personale dell'Archivio in ogni passaggio chiave.</p>
   </div>
-  <div class="fasi-grid">
+  <div class="card-grid">
     <div class="fase-card">
-      <p class="fase-n">01</p>
+      <p class="label-sm">01</p>
       <h3>Analisi preliminare</h3>
       <p>Raccolta dati e analisi dettagliata dello schema ER. Setup dell'ambiente di sviluppo e del database di test.</p>
       <p class="fase-period">Aprile 2025 — 2 settimane</p>
     </div>
     <div class="fase-card">
-      <p class="fase-n">02</p>
+      <p class="label-sm">02</p>
       <h3>Struttura dati</h3>
       <p>Progettazione e implementazione delle tabelle gerarchiche, delle relazioni e dei vincoli di integrità referenziale.</p>
       <p class="fase-period">Aprile 2025 — 1 settimana</p>
     </div>
     <div class="fase-card">
-      <p class="fase-n">03</p>
+      <p class="label-sm">03</p>
       <h3>Implementazione core</h3>
       <p>Sviluppo dei trigger di audit, delle stored procedure e di tutta la logica di business del catasto storico.</p>
       <p class="fase-period">Aprile 2025 — 1 settimana</p>
     </div>
     <div class="fase-card">
-      <p class="fase-n">04</p>
+      <p class="label-sm">04</p>
       <h3>Sistema di ricerca</h3>
       <p>Implementazione degli indici GIN, delle funzioni fuzzy e delle viste materializzate per le query frequenti.</p>
       <p class="fase-period">Aprile–Maggio 2025 — 1 settimana</p>
     </div>
     <div class="fase-card">
-      <p class="fase-n">05</p>
+      <p class="label-sm">05</p>
       <h3>Test e ottimizzazione</h3>
       <p>Test con dati estesi, stress test del database e ottimizzazione delle performance. Documentazione tecnica completa.</p>
       <p class="fase-period">Maggio 2025 — 2 settimane</p>
     </div>
     <div class="fase-card">
-      <p class="fase-n">06</p>
+      <p class="label-sm">06</p>
       <h3>Pilota e formazione</h3>
       <p>Implementazione sul sistema dell'Archivio, formazione del personale, aggiustamenti finali e verifica.</p>
       <p class="fase-period">Maggio–Giugno 2025 — 2 settimane</p>
@@ -209,15 +209,15 @@
   <h2>L'archivio storico<br><em>è ora vivo.</em></h2>
   <p class="ris-lead">Foliarium ha trasformato un patrimonio documentale quasi inaccessibile in un sistema consultabile in tempo reale da tutto il personale autorizzato dell'Archivio.</p>
 
-  <div class="ris-grid">
+  <div class="card-grid ris-grid">
     <div class="ris-card">
-      <p class="ris-n">Efficienza</p>
-      <strong>Secondi</strong>
+      <p class="label-sm">Efficienza</p>
+      <strong class="card-price">Secondi</strong>
       <p>Da giorni di ricerca manuale a pochi secondi di ricerca digitale per trovare qualsiasi partita catastale.</p>
     </div>
     <div class="ris-card">
-      <p class="ris-n">Copertura</p>
-      <strong>190 anni</strong>
+      <p class="label-sm">Copertura</p>
+      <strong class="card-price">190 anni</strong>
       <p>L'intero patrimonio catastale dal 1830 ad oggi è accessibile in un unico sistema strutturato e consultabile.</p>
     </div>
     <div class="ris-card">

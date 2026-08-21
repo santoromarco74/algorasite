@@ -49,19 +49,19 @@
     <p class="label mb-16">I nostri valori</p>
     <h2>Cosa guida<br><em>ogni scelta.</em></h2>
   </div>
-  <div class="val-grid">
+  <div class="card-grid">
     <div class="val-card">
-      <p class="vn">01</p>
+      <p class="label-sm">01</p>
       <h3>Specializzazione verticale</h3>
       <p>Software costruito per domini precisi. La profondità conta più della larghezza. Ogni settore ha le sue regole — il software deve rifletterle, non costringere l'utente ad adattarsi a un modello che non gli appartiene.</p>
     </div>
-    <div class="val-card">
-      <p class="vn">02</p>
+    <div class="val-card card-dark">
+      <p class="label-sm">02</p>
       <h3>Il cliente come co-progettista</h3>
       <p>Non sviluppiamo ipotesi di prodotto. Ogni strumento nasce lavorando fianco a fianco con chi lo userà ogni giorno. Foliarium nasce dall'Archivio di Stato di Savona, non da una ricerca di mercato astratta.</p>
     </div>
     <div class="val-card">
-      <p class="vn">03</p>
+      <p class="label-sm">03</p>
       <h3>Tecnologie durevoli</h3>
       <p>Python, PostgreSQL, stack open source consolidato. Niente framework del momento, niente lock-in proprietario. Il software che costruiamo deve essere mantenibile tra dieci anni da chiunque.</p>
     </div>
@@ -70,7 +70,7 @@
 
 <!-- APPROCCIO -->
 <section class="approccio-section" id="approccio">
-  <div class="grid-2 approccio-grid">
+  <div class="grid-2">
     <div class="approccio-text">
       <p class="label mb-16">Il nostro approccio</p>
       <h2>Non adattiamo.<br><em>Progettiamo.</em></h2>
@@ -99,7 +99,7 @@
         <li><strong>PyInstaller</strong><span>Packaging applicazione desktop</span></li>
       </ul>
 
-      <div class="tools-note">
+      <div class="note-box tools-note">
         <p class="label mb-12">Perché questi strumenti</p>
         <p>Python è versatile, leggibile e ha un ecosistema maturo per le applicazioni gestionali. PostgreSQL è il database relazionale open source più avanzato disponibile — affidabile, performante, con funzionalità enterprise. PyQt6 garantisce interfacce desktop native su tutti i sistemi operativi. Stack consolidato, documentato, senza dipendenze esotiche.</p>
       </div>
@@ -113,7 +113,7 @@
   <h2>Algora Studio<br><em>nel tempo.</em></h2>
   <p class="futuro-lead">Foliarium è il primo prodotto. Non l'unico. Algora Studio è uno studio che vuole costruire un portfolio di strumenti specializzati per il patrimonio culturale e documentale italiano — ciascuno nato da un'esigenza reale del mercato.</p>
 
-  <div class="futuro-grid">
+  <div class="card-grid futuro-grid">
     <div class="fut-card">
       <p class="fut-n">Oggi</p>
       <h3>Foliarium v1.0</h3>
@@ -121,13 +121,13 @@
       <p class="fut-status">● Attivo · In evoluzione</p>
     </div>
     <div class="fut-card">
-      <p class="fut-n">Prossimamente</p>
+      <p class="label-sm">Prossimamente</p>
       <h3>Secondo prodotto</h3>
       <p>Il prossimo software Algora Studio nascerà dall'ascolto del mercato. Se hai un'esigenza specifica nel settore documentale, raccontacela — potrebbe diventare il nostro prossimo progetto.</p>
       <p class="fut-status">○ In ascolto</p>
     </div>
     <div class="fut-card">
-      <p class="fut-n">In esplorazione</p>
+      <p class="label-sm">In esplorazione</p>
       <h3>Formazione digitale</h3>
       <p>Percorsi formativi su digitalizzazione archivistica, gestione documentale e intelligenza artificiale applicata per professionisti del patrimonio culturale italiano.</p>
       <p class="fut-status">○ In definizione</p>

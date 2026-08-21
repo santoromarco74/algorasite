@@ -61,7 +61,7 @@
 
 <!-- FORM + INFO -->
 <section class="contact-form-section" id="demo">
-  <div class="grid-2 form-grid">
+  <div class="grid-2">
     <div class="form-intro">
       <p class="label mb-16">Richiedi una demo</p>
       <h2>Come funziona<br><em>la nostra demo.</em></h2>
@@ -152,19 +152,19 @@
     <p class="label mb-16">Perché Algora Studio</p>
     <h2>Non vendiamo software<br><em>vendiamo soluzioni.</em></h2>
   </div>
-  <div class="perche-grid">
+  <div class="card-grid">
     <div class="pc-card">
-      <p class="pc-n">Referenza reale</p>
+      <p class="label-sm">Referenza reale</p>
       <h3>L'Archivio di Savona usa Foliarium ogni giorno</h3>
       <p>Non è un prodotto in beta. È in produzione dall'inizio del 2025 su un archivio reale di 69 comuni. Puoi chiederci una referenza diretta.</p>
     </div>
     <div class="pc-card">
-      <p class="pc-n">Installazione inclusa</p>
+      <p class="label-sm">Installazione inclusa</p>
       <h3>Non dovete gestire nulla di tecnico</h3>
       <p>L'installazione avviene da remoto oppure on-site a seconda delle esigenze del cliente. Gestiamo tutto noi: il cliente non deve fare nulla di tecnico. Modalità e costi si concordano nel preventivo.</p>
     </div>
     <div class="pc-card">
-      <p class="pc-n">Rapporto diretto</p>
+      <p class="label-sm">Rapporto diretto</p>
       <h3>Parlate sempre con chi ha sviluppato il software</h3>
       <p>Nessun call center, nessun ticket system senza risposta. Il supporto è gestito direttamente da Marco Santoro, che conosce ogni riga di codice.</p>
     </div>

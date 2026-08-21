@@ -74,9 +74,9 @@
     <p>Foliarium non è un gestionale generico adattato. È un sistema progettato specificamente per le peculiarità degli archivi catastali italiani: denominazioni storiche, varianti grafiche dei cognomi, passaggi di proprietà su archi temporali di oltre un secolo.</p>
   </div>
 
-  <div class="feat-grid">
-    <div class="feat-card dark">
-      <p class="feat-n">Ricerca</p>
+  <div class="card-grid card-grid-2">
+    <div class="feat-card card-dark">
+      <p class="label-sm">Ricerca</p>
       <h3>Fuzzy Search multi-entità</h3>
       <p>Algoritmo Levenshtein con soglia configurabile. Trova possessori e partite anche con errori di battitura, varianti ortografiche storiche dei cognomi, grafie alternative tipiche dei documenti dell'Ottocento.</p>
       <ul class="feat-detail">
@@ -87,7 +87,7 @@
       </ul>
     </div>
     <div class="feat-card">
-      <p class="feat-n">Genealogia</p>
+      <p class="label-sm">Genealogia</p>
       <h3>Albero delle proprietà</h3>
       <p>Ricostruisce automaticamente la catena completa dei passaggi di proprietà dal primo impianto catastale ad oggi. Ogni variazione è collegata all'atto notarile corrispondente.</p>
       <ul class="feat-detail">
@@ -98,7 +98,7 @@
       </ul>
     </div>
     <div class="feat-card">
-      <p class="feat-n">Gestione dati</p>
+      <p class="label-sm">Gestione dati</p>
       <h3>Modello dati completo</h3>
       <p>Schema relazionale progettato per rappresentare fedelmente la struttura del catasto storico italiano: comuni con gestione storica dei nomi, partite, possessori, immobili, variazioni, contratti, consultazioni.</p>
       <ul class="feat-detail">
@@ -108,8 +108,8 @@
         <li>Import massivo da CSV</li>
       </ul>
     </div>
-    <div class="feat-card dark">
-      <p class="feat-n">Report</p>
+    <div class="feat-card card-dark">
+      <p class="label-sm">Report</p>
       <h3>Reportistica archivistica</h3>
       <p>Generazione di report PDF e Excel con un click. Ogni output rispetta gli standard archivistici e include metadati di autenticità. Ideale per ricerche storiche, pratiche notarili e documentazione ufficiale.</p>
       <ul class="feat-detail">
@@ -120,7 +120,7 @@
       </ul>
     </div>
     <div class="feat-card">
-      <p class="feat-n">Sicurezza</p>
+      <p class="label-sm">Sicurezza</p>
       <h3>Controllo accessi e audit</h3>
       <p>Gestione multi-utente con tre ruoli distinti. Ogni operazione viene registrata nell'audit trail in modo permanente e non modificabile — fondamentale per la compliance degli archivi pubblici.</p>
       <ul class="feat-detail">
@@ -131,7 +131,7 @@
       </ul>
     </div>
     <div class="feat-card">
-      <p class="feat-n">Infrastruttura</p>
+      <p class="label-sm">Infrastruttura</p>
       <h3>Backup e manutenzione</h3>
       <p>Sistema integrato di backup e ripristino. Ottimizzazione database con viste materializzate. Suggerimenti automatici di manutenzione. Tutto accessibile dall'interfaccia senza competenze tecniche.</p>
       <ul class="feat-detail">
@@ -150,10 +150,65 @@
   <div class="feat-intro">
     <p class="label mb-16">Schermate</p>
     <h2>Foliarium<br><em>in funzione.</em></h2>
-    <p>Le immagini che seguono sono riprese dall'archivio dimostrativo che usiamo durante le demo: contiene dati storici reali della provincia di Savona, in quantità ridotta rispetto all'archivio in produzione.</p>
+    <p>Il filmato e le immagini che seguono sono ripresi dall'archivio dimostrativo che usiamo durante le demo: contiene dati storici reali della provincia di Savona, in quantità ridotta rispetto all'archivio in produzione.</p>
   </div>
 
   <div class="shot-grid">
+    <?php /* Il filmato sta in prima posizione perche' .shot-grid assegna al
+             primo figlio la larghezza piena: prende lo slot che finora era
+             della schermata iniziale, senza una regola di layout in piu'.
+
+             Nessun autoplay e nessun loop: parte solo se lo si chiede.
+
+             preload="none" e non "metadata": misurando sul log di Apache si
+             vede che per leggere la durata il browser chiede l'intero file
+             (Range: bytes=0- , a cui il server risponde spedendo tutto), e
+             1,5 MB scaricati da chi il filmato non lo guarda sono 1,5 MB
+             sprecati. Cosi' invece parte l'immagine del poster e nient'altro;
+             il file si scarica al primo clic su Riproduci. Il prezzo e' che
+             la durata totale compare solo dopo l'avvio: per questo e' scritta
+             nella didascalia.
+
+             I controlli sono quelli nativi, per la stessa ragione per cui il
+             menu e le FAQ sono <button> e non <div>: sono gia' raggiungibili
+             da tastiera e annunciati correttamente. */ ?>
+    <figure class="shot">
+      <video controls preload="none" playsinline
+             poster="img/foliarium-demo-poster.jpg"
+             width="1280" height="686">
+        <?php /* Due codifiche dello stesso filmato. Il browser prende la prima
+                 che sa riprodurre, quindi il WebM va per primo: pesa poco meno,
+                 ma soprattutto copre i browser costruiti senza i codec
+                 proprietari, che dell'H.264 non sanno che farsene. L'MP4 resta
+                 come rete di sicurezza universale. */ ?>
+        <source src="video/foliarium-demo.webm" type="video/webm">
+        <source src="video/foliarium-demo.mp4"  type="video/mp4">
+        <p>Il browser non riesce a riprodurre il filmato:
+           <a href="video/foliarium-demo.mp4">scaricalo per vederlo</a> (1,6 MB).</p>
+      </video>
+      <figcaption>
+        Un minuto e diciotto di Foliarium in funzione, senza commento sonoro:
+        dalla ricerca di una partita alla sua storia completa, fino
+        all'esportazione dei dati.
+        <?php /* Il filmato non ha parlato, quindi i sottotitoli non si
+                 applicano; serve pero' un'alternativa al contenuto temporale
+                 (WCAG 1.2.1), ed e' questa. Utile anche a chi la pagina la
+                 legge e basta. */ ?>
+        <details class="shot-alt">
+          <summary>Che cosa mostra, passaggio per passaggio</summary>
+          <ol>
+            <li>La schermata iniziale: ricerca rapida su tutto il catasto, i quattro contatori dell'archivio dimostrativo (69 comuni, 330 partite, 120 possessori, 660 immobili), gli ultimi inserimenti e il registro delle attività.</li>
+            <li>L'elenco dei comuni registrati; da Carcare si aprono le partite del comune.</li>
+            <li>La scheda della partita 3003 bis, con le linguette per dati generali, possessori, immobili, variazioni e documenti allegati.</li>
+            <li>L'albero genealogico della partita: predecessori e successori ricostruiti all'indietro nel tempo, con il report testuale che se ne ricava.</li>
+            <li>La ricerca delle partite, filtrabile per comune, numero, possessore e natura dell'immobile.</li>
+            <li>L'esportazione in CSV, Excel e PDF, con il file salvato e riaperto nel foglio di calcolo.</li>
+            <li>Reportistica e statistiche: partite per comune, stato delle partite, variazioni per anno.</li>
+          </ol>
+        </details>
+      </figcaption>
+    </figure>
+
     <figure class="shot">
       <img src="img/foliarium-cruscotto.png"
            alt="Schermata iniziale di Foliarium: una barra di ricerca rapida sull'intero catasto e quattro contatori — 69 comuni, 330 partite, 120 possessori, 660 immobili — seguiti dagli ultimi inserimenti e dal registro delle attività degli utenti."
@@ -197,31 +252,31 @@
   <h2 class="mb-12">Scegli il tipo<br><em>di licenza.</em></h2>
   <p class="pricing-lead">La licenza è un acquisto una tantum che include installazione, onboarding e documentazione. Il canone di assistenza è separato e facoltativo.</p>
 
-  <div class="lic-grid">
+  <div class="card-grid lic-grid">
     <div class="lic-card">
-      <p class="lic-name">Singola postazione</p>
-      <div class="lic-price">€ 1.200</div>
+      <p class="label-sm">Singola postazione</p>
+      <div class="card-price">€ 1.200</div>
       <p class="lic-note">+ IVA · una tantum</p>
       <p class="lic-desc">1 postazione. Ideale per studi professionali, genealogisti, piccoli archivi.</p>
       <p class="lic-upsell">Con assistenza Standard: <strong>€ 3.600</strong></p>
     </div>
-    <div class="lic-card featured">
-      <p class="lic-name">Multi-postazione</p>
-      <div class="lic-price">€ 1.800</div>
+    <div class="lic-card card-dark">
+      <p class="label-sm">Multi-postazione</p>
+      <div class="card-price">€ 1.800</div>
       <p class="lic-note">+ IVA · una tantum · fino a 5 postazioni</p>
       <p class="lic-desc">Fino a 5 postazioni. Per studi strutturati e archivi con più operatori.</p>
       <p class="lic-upsell">Con assistenza Standard: <strong>€ 4.200</strong></p>
     </div>
     <div class="lic-card">
-      <p class="lic-name">Sito</p>
-      <div class="lic-price">€ 3.600</div>
+      <p class="label-sm">Sito</p>
+      <div class="card-price">€ 3.600</div>
       <p class="lic-note">+ IVA · una tantum · postazioni illimitate</p>
       <p class="lic-desc">Postazioni illimitate. Per enti, archivi di Stato, PA strutturate.</p>
       <p class="lic-upsell">Con assistenza Standard: <strong>€ 4.800</strong></p>
     </div>
   </div>
 
-  <div class="pa-note">
+  <div class="note-box pa-note">
     <div class="pa-note-icon">i</div>
     <div>
       <p class="pa-note-title">Nota per la Pubblica Amministrazione</p>
@@ -236,10 +291,10 @@
   <h2 class="mb-12">Scegli il livello<br><em>di supporto.</em></h2>
   <p class="pricing-lead">I contratti di assistenza garantiscono continuità operativa, aggiornamenti e formazione. Si rinnovano automaticamente con 30 giorni di preavviso per la disdetta.</p>
 
-  <div class="pack-grid">
+  <div class="card-grid">
     <div class="pack-card">
-      <p class="pack-name">Base</p>
-      <div class="pack-price">€ 1.200</div>
+      <p class="label-sm">Base</p>
+      <div class="card-price">€ 1.200</div>
       <p class="pack-cadence">+ IVA / anno</p>
       <ul class="pack-feats">
         <li>Supporto email</li>
@@ -249,9 +304,9 @@
       </ul>
       <a href="contatti.php" class="pack-cta">Richiedi info</a>
     </div>
-    <div class="pack-card featured">
-      <p class="pack-name">★ Standard · Più scelto</p>
-      <div class="pack-price">€ 2.400</div>
+    <div class="pack-card card-dark">
+      <p class="label-sm">★ Standard · Più scelto</p>
+      <div class="card-price">€ 2.400</div>
       <p class="pack-cadence">+ IVA / anno</p>
       <ul class="pack-feats">
         <li>Tutto di Base, più:</li>
@@ -263,8 +318,8 @@
       <a href="contatti.php" class="pack-cta">Richiedi preventivo</a>
     </div>
     <div class="pack-card">
-      <p class="pack-name">Premium</p>
-      <div class="pack-price">€ 3.600</div>
+      <p class="label-sm">Premium</p>
+      <div class="card-price">€ 3.600</div>
       <p class="pack-cadence">+ IVA / anno</p>
       <ul class="pack-feats">
         <li>Tutto di Standard, più:</li>
@@ -283,7 +338,7 @@
   <p class="label mb-16">Requisiti di sistema</p>
   <h2 class="mb-40"><em>Cosa serve</em><br>per installare Foliarium.</h2>
 
-  <div class="req-grid">
+  <div class="card-grid card-grid-2 req-grid">
     <div class="req-cell"><strong>Sistema operativo</strong><span>Windows 10/11, Linux, macOS</span></div>
     <div class="req-cell"><strong>RAM minima</strong><span>4 GB (consigliati 8 GB)</span></div>
     <div class="req-cell"><strong>PostgreSQL</strong><span>Versione 15 o superiore</span></div>

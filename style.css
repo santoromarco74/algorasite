@@ -354,25 +354,23 @@ section { padding: clamp(64px, 8vw, 112px) var(--pad-x); }
 
 /* Impianto a colonna singola: e' la disposizione di base, non un ripiego.
    Le colonne multiple arrivano dal blocco @media in fondo alla sezione. */
-.grid-2 { display: grid; grid-template-columns: 1fr; gap: 24px; }
-/* Varianti di .grid-2 usate nell'HTML come "grid-2 <variante>" */
-.ch-grid, .approccio-grid, .form-grid, .app-grid, .sol-grid { align-items: start; }
+.grid-2 { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
 
 /* Griglia di card: impilate su schermo stretto, affiancate e separate da
-   una linea di 2px (il gap che lascia trasparire lo sfondo) su desktop. */
-.ph-grid, .val-grid, .pack-grid, .fasi-grid, .perche-grid {
+   una linea di 2px (il gap che lascia trasparire lo sfondo) su desktop.
+   Tre colonne di base, due con .card-grid-2. Margini e larghezze massime
+   della singola griglia restano nella sezione della pagina che la usa. */
+.card-grid {
   display: grid; grid-template-columns: 1fr;
   gap: 24px; background: var(--border);
 }
 
 @media (min-width: 961px) {
   .grid-2 { grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 88px); }
-  .app-grid, .sol-grid { gap: clamp(40px,6vw,80px); }
+  .grid-2-tight { gap: clamp(40px,6vw,80px); }
 
-  .ph-grid, .val-grid, .pack-grid, .fasi-grid, .perche-grid {
-    grid-template-columns: repeat(3,1fr);
-    gap: 2px;
-  }
+  .card-grid   { grid-template-columns: repeat(3,1fr); gap: 2px; }
+  .card-grid-2 { grid-template-columns: repeat(2,1fr); }
 }
 
 /* ── SFONDI DI SEZIONE ────────────────────────── */
@@ -394,58 +392,62 @@ section { padding: clamp(64px, 8vw, 112px) var(--pad-x); }
 .section-intro { max-width: 640px; margin-bottom: 52px; }
 
 /* ── CARD: OCCHIELLO / VARIANTE SCURA / TESTO ─── */
-/* Occhiello: etichetta piccola maiuscola sopra il titolo.
-   Qui il colore lo decide la card che la contiene (chiara o scura). */
-.ph-num, .vn, .feat-n, .ba-label, .lic-name, .pack-name {
+/* Occhiello: etichetta piccola maiuscola sopra il titolo di una card.
+   E' la stessa idea di .label un gradino piu' in piccolo, e ne esiste una
+   forma sola: il colore predefinito e' l'oro su fondo chiaro, e chi ha
+   bisogno di un'altra tonalita' o di meno spazio lo dichiara qui sotto o
+   nella propria sezione di pagina. */
+.label-sm {
   font-family: var(--font-label);
   font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
-  margin-bottom: 20px;
+  color: var(--gold-text); margin-bottom: 20px;
 }
-.lic-name { margin-bottom: 16px; }
+/* Card in cui l'occhiello sta piu' vicino a cio' che introduce */
+.lic-card .label-sm, .fut-card .label-sm, .fase-card .label-sm,
+.pc-card .label-sm, .ris-card .label-sm,
+.footer-col .label-sm { margin-bottom: 16px; }
+.footer-col .label-sm { color: var(--gold-on-dark); }
 
-/* Occhiello sempre oro: stessa forma, tonalita' scelta in base al fondo */
-.footer-col h2, .pc-n, .fut-n, .fase-n, .ris-card .ris-n {
-  font-family: var(--font-label);
-  font-size: 10px; letter-spacing: 4px; color: var(--gold-text);
-  text-transform: uppercase; margin-bottom: 16px;
-}
-.footer-col h2 { color: var(--gold-on-dark); }
+/* Dove la card colora tutti i propri paragrafi, l'occhiello (che e' un
+   paragrafo anche lui) va dichiarato un gradino piu' in profondita',
+   altrimenti perde il confronto di specificita' e viene trascinato al
+   colore e al corpo del testo corrente. */
+.val-card .label-sm, .feat-card .label-sm,
+.ris-card .label-sm { color: var(--gold-text); }
+.ris-card .label-sm { font-size: 10px; }
 
-/* Card nella variante scura (una card "in evidenza" per ogni griglia) */
-.ph-card.active, .val-card:nth-child(2), .feat-card.dark,
-.lic-card.featured, .pack-card.featured, .ba-col.after { background: var(--ink); }
+/* Card nella variante scura: una card "in evidenza" per ogni griglia.
+   Ogni pagina la marcava a modo suo (.active, .dark, .featured, .after, e
+   su chi-siamo con un :nth-child(2) che dipendeva dalla posizione); ora
+   la marca una classe sola. Restano le vecchie che dicono cos'e' la card
+   e non solo come e' colorata: .active (la fase in corso), .before/.after
+   (il confronto prima/dopo).
+   Le regole partono dalla griglia che contiene la card: senza quel
+   gradino di specificita' in piu' perderebbero contro il fondo che ogni
+   pagina assegna alla propria card, dichiarato piu' avanti nel foglio. */
+.card-grid .card-dark { background: var(--ink); }
+.card-grid .card-dark h3 { color: var(--ivory); }
+.card-grid .card-dark .label-sm { color: var(--gold-on-dark); }
+.card-dark .card-price { color: var(--gold-on-dark); }
 
-.ph-card.active h3, .val-card:nth-child(2) h3,
-.feat-card.dark h3, .ba-col.after h3 { color: var(--ivory); }
-
-.val-card:nth-child(2) p, .feat-card.dark p { color: rgba(249,246,239,.6); }
-
-.val-card:nth-child(2) .vn, .feat-card.dark .feat-n,
-.lic-card.featured .lic-name { color: var(--gold-on-dark); }
-
-/* Occhiello oro sulle card chiare... */
-.val-card .vn, .feat-card .feat-n, .lic-card .lic-name,
-.pack-card .pack-name { color: var(--gold-text); }
-/* ...e sulle card scure, dove serve la variante piu' chiara */
-.ph-card.active .ph-num,
-.ba-col.after .ba-label { color: var(--gold-on-dark); }
+.val-card.card-dark p, .feat-card.card-dark p { color: rgba(249,246,239,.6); }
 
 /* Prezzo grande in cifre display */
-.lic-price, .pack-price {
+.card-price {
   font-family: var(--font-display);
-  font-size: 44px; font-weight: 300; line-height: 1;
+  font-size: 44px; font-weight: 300; line-height: 1; color: var(--ink);
 }
-.lic-card .lic-price, .pack-card .pack-price { color: var(--ink); }
-.lic-card.featured .lic-price, .pack-card.featured .pack-price { color: var(--gold-on-dark); }
 
 /* Testo corrente dentro le card */
 .val-card p, .fut-card p, .feat-card p,
 .fase-card p, .pc-card p { font-size: 15px; color: var(--mid); line-height: 1.7; }
 
 /* Riquadro nota su fondo oro tenue */
-.founder-box, .tools-note, .pa-note {
+.note-box {
   background: var(--gold-faint); border: 1px solid var(--gold-light);
 }
+/* Il corpo della nota resta un elenco esplicito: dentro al riquadro c'e'
+   anche un titoletto, che ha una classe propria e va lasciato stare. */
 .founder-box p, .tools-note p, .pa-note-body {
   font-size: 15px; color: var(--mid); line-height: 1.8;
 }
@@ -660,10 +662,10 @@ footer {
 
 .ph-card { background: var(--cream); padding: 40px 36px; }
 
-.ph-card .ph-num { color: var(--muted); }
+.ph-card:not(.card-dark) .label-sm { color: var(--muted); }
 .ph-card h3 { margin-bottom: 12px; color: var(--ink); }
 .ph-card p { font-size: 15px; line-height: 1.7; margin-bottom: 28px; color: var(--mid); }
-.ph-card.active p { color: rgba(249,246,239,.65); }
+.ph-card.card-dark p { color: rgba(249,246,239,.65); }
 
 .ph-tag {
   display: inline-block; padding: 5px 16px;
@@ -683,8 +685,8 @@ footer {
 }
 .link-arrow:hover { border-color: var(--gold); }
 /* Stessi elementi collocati su card a fondo inchiostro */
-.ph-card.active .link-arrow,
-.lic-card.featured .lic-upsell { color: var(--gold-on-dark); }
+.ph-card.card-dark .link-arrow,
+.lic-card.card-dark .lic-upsell { color: var(--gold-on-dark); }
 
 .ch-stat-band {
   background: var(--ink); padding: 28px 32px;
@@ -827,7 +829,7 @@ footer {
 
 .futuro-lead { font-size: 17px; color: var(--mid); max-width: 580px; margin-top: 16px; line-height: 1.8; }
 
-.futuro-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); margin-top: 48px; }
+.futuro-grid { margin-top: 48px; }
 .fut-card { background: var(--parchment-2); padding: 36px 32px; }
 .fut-status { font-family: var(--font-label); font-size: 11px; color: var(--muted); margin-top: 16px; letter-spacing: 1px; }
 
@@ -836,8 +838,6 @@ footer {
   .about-hero { grid-template-columns: 1fr 380px; gap: 0; }
   .ah-left    { padding: 0 64px 0 0; border-right: 1px solid var(--border); }
   .ah-right   { padding: 0 0 0 52px; }
-
-  .futuro-grid { grid-template-columns: repeat(3,1fr); gap: 2px; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -926,7 +926,6 @@ footer {
 .feat-intro { max-width: 640px; margin-bottom: 60px; }
 .feat-intro p { font-size: 17px; color: var(--mid); margin-top: 16px; line-height: 1.8; }
 
-.feat-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); }
 
 .feat-card { background: var(--cream); padding: 40px 36px; }
 .feat-card h3 { margin-bottom: 14px; color: var(--ink); }
@@ -941,21 +940,21 @@ footer {
 .feat-detail li:last-child { border-bottom: none; }
 .feat-detail li::before { content: '—'; color: var(--gold-text); }
 .feat-card .feat-detail li { color: var(--mid); }
-.feat-card.dark .feat-detail li { color: rgba(249,246,239,.6); border-color: rgba(249,246,239,.08); }
+.feat-card.card-dark .feat-detail li { color: rgba(249,246,239,.6); border-color: rgba(249,246,239,.08); }
 
 .pricing-lead { font-size: 17px; color: var(--mid); max-width: 560px; margin-bottom: 56px; line-height: 1.8; }
 
-.lic-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); max-width: 900px; }
+.lic-grid { max-width: 900px; }
 
 .lic-card { padding: 36px 32px; background: var(--cream); }
 
 .lic-note { font-family: var(--font-label); font-size: 12px; margin-bottom: 20px; }
 .lic-card .lic-note { color: var(--muted); }
-.lic-card.featured .lic-note { color: rgba(249,246,239,.62); }
+.lic-card.card-dark .lic-note { color: rgba(249,246,239,.62); }
 
 .lic-desc { font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
 .lic-card .lic-desc { color: var(--mid); }
-.lic-card.featured .lic-desc { color: rgba(249,246,239,.65); }
+.lic-card.card-dark .lic-desc { color: rgba(249,246,239,.65); }
 
 .lic-upsell { font-family: var(--font-label); font-size: 11px; color: var(--gold-text); letter-spacing: 1px; }
 
@@ -971,15 +970,14 @@ footer {
 }
 
 .pack-card { background: var(--parchment); padding: 40px 32px; }
-.pack-name { font-size: 11px; margin-bottom: 12px; }
-.pack-card.featured .pack-name { color: var(--gold-on-dark); }
-.pack-price { margin-bottom: 4px; }
+.pack-card .label-sm { font-size: 11px; margin-bottom: 12px; }
+.pack-card .card-price { margin-bottom: 4px; }
 
 .pack-cadence {
   font-family: var(--font-label);
   font-size: 12px; color: var(--muted); margin-bottom: 28px;
 }
-.pack-card.featured .pack-cadence { color: rgba(249,246,239,.62); }
+.pack-card.card-dark .pack-cadence { color: rgba(249,246,239,.62); }
 
 .pack-feats { list-style: none; margin-bottom: 32px; }
 .pack-feats li {
@@ -994,7 +992,7 @@ footer {
   background: var(--gold); flex-shrink: 0;
 }
 .pack-card .pack-feats li { color: var(--mid); }
-.pack-card.featured .pack-feats li { color: rgba(249,246,239,.7); border-color: rgba(249,246,239,.08); }
+.pack-card.card-dark .pack-feats li { color: rgba(249,246,239,.7); border-color: rgba(249,246,239,.08); }
 
 .pack-cta {
   display: block; text-align: center; padding: 13px;
@@ -1004,10 +1002,10 @@ footer {
 }
 .pack-card .pack-cta { background: var(--ink); color: var(--ivory); }
 .pack-card .pack-cta:hover { background: var(--green); }
-.pack-card.featured .pack-cta { background: var(--gold); color: var(--ink); }
-.pack-card.featured .pack-cta:hover { background: var(--gold-hi); }
+.pack-card.card-dark .pack-cta { background: var(--gold); color: var(--ink); }
+.pack-card.card-dark .pack-cta:hover { background: var(--gold-hi); }
 
-.req-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); max-width: 800px; }
+.req-grid { max-width: 800px; }
 .req-cell { background: var(--parchment-2); padding: 24px 28px; }
 .req-cell strong {
   display: block; font-family: var(--font-label);
@@ -1023,9 +1021,6 @@ footer {
   .ph-left  { padding: 0 64px 80px 0; border-right: 1px solid var(--border); }
   .ph-right { padding: 0 0 80px 52px; }
 
-  .feat-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
-  .lic-grid  { grid-template-columns: repeat(3,1fr); gap: 2px; }
-  .req-grid  { grid-template-columns: 1fr 1fr; gap: 2px; }
 }
 
 /* Schermate del prodotto.
@@ -1040,16 +1035,31 @@ footer {
 }
 
 .shot { margin: 0; }
-.shot img {
+.shot img,
+.shot video {
   display: block; width: 100%; height: auto;
   border: 1px solid var(--border);
   background: var(--parchment);
 }
+/* Il fondo scuro sotto al filmato evita il lampo chiaro fra il fotogramma
+   poster e il primo fotogramma riprodotto. */
+.shot video { background: var(--ink); }
 .shot figcaption {
   font-size: 14px; line-height: 1.7; color: var(--mid);
   margin-top: 14px; padding-left: 16px;
   border-left: 2px solid var(--gold);
 }
+
+/* Alternativa testuale al filmato: chiusa di suo, ma raggiungibile da
+   tastiera e apribile senza JavaScript, perche' <details> se ne occupa da se'. */
+.shot-alt { margin-top: 12px; }
+.shot-alt summary {
+  font-family: var(--font-label);
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold-text); cursor: pointer;
+}
+.shot-alt ol { margin: 14px 0 0; padding-left: 20px; }
+.shot-alt li { margin-bottom: 10px; }
 
 @media (min-width: 961px) {
   /* La prima schermata a piena larghezza, le altre due affiancate */
@@ -1092,14 +1102,11 @@ footer {
 .section-title { margin-bottom: clamp(40px,5vw,64px); max-width: 600px; }
 .section-title p { font-size: 17px; color: var(--mid); margin-top: 16px; line-height: 1.8; }
 
-.before-after {
-  display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border);
-  margin-bottom: 60px;
-}
+.before-after { margin-bottom: 60px; }
 .ba-col { padding: 40px; }
 .ba-col.before { background: var(--parchment-2); }
 
-.ba-col.before .ba-label { color: var(--muted); }
+.ba-col.before .label-sm { color: var(--muted); }
 .ba-col h3 { margin-bottom: 20px; }
 .ba-col.before h3 { color: var(--ink); }
 
@@ -1127,16 +1134,14 @@ footer {
 
 .ris-lead { font-size: 17px; color: var(--mid); max-width: 600px; margin-top: 16px; line-height: 1.8; }
 
-.ris-grid { display: grid; grid-template-columns: 1fr; gap: 24px; background: var(--border); margin-top: 48px; }
+.ris-grid { margin-top: 48px; }
 .ris-card { background: var(--parchment-2); padding: 36px; }
-.ris-card strong { display: block; font-family: var(--font-display); font-size: 44px; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 8px; }
+.ris-card .card-price { display: block; margin-bottom: 8px; }
 .ris-card p { font-size: 15px; color: var(--mid); }
 
 /* Disposizione desktop del caso studio */
 @media (min-width: 961px) {
   .cs-sband-inner { grid-template-columns: repeat(4,1fr); gap: 1px; }
-  .before-after   { grid-template-columns: 1fr 1fr; gap: 2px; }
-  .ris-grid       { grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
 }
 
 /* ═══════════════════════════════════════════════
