@@ -2,18 +2,12 @@
 
 ## Relazione
 
-Il sorgente della relazione è **`Relazione_Dettagliata_Progetto.md`**: è l'unico
-file da modificare.
+La relazione vive in un unico file: **`Relazione_Dettagliata_Progetto.md`**.
 
-Il `.pdf` si rigenera da lì, direttamente dal Markdown:
+Contiene due versioni dello stesso documento, nell'ordine: prima l'italiano,
+poi la traduzione inglese, separate da una riga di divisione e collegate da un
+rimando in testa a ciascuna. **Ogni modifica va riportata in entrambe**: se si
+tocca solo una delle due, il documento resta disallineato.
 
-```
-pandoc Relazione_Dettagliata_Progetto.md -s -o Relazione_Dettagliata_Progetto.pdf \
-  --pdf-engine=xelatex --highlight-style=tango \
-  -V fontsize=11pt -V geometry:a4paper -V geometry:margin=22mm \
-  -V mainfont="DejaVu Serif" -V monofont="DejaVu Sans Mono" \
-  -V colorlinks=true -V lang=it -V linkcolor=black -V 'urlcolor=[HTML]{845C10}'
-```
-
-Non va più tenuta in repository una versione `.tex` intermedia: il LaTeX resta
-un dettaglio interno di pandoc.
+Niente `.tex` e niente `.pdf` in repository: il Markdown è il documento, non un
+sorgente da cui generarne altri.

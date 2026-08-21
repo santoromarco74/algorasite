@@ -1,5 +1,7 @@
 # RELAZIONE TECNICA DI PROGETTO
 
+*Versione italiana — [English version ↓](#project-technical-report)*
+
 **Corso:** Web and Multimedia Technologies (Laurea Magistrale)
 **Docente:** Prof. Marco Porta — Università degli Studi di Pavia
 **Studente:** Marco Santoro
@@ -136,7 +138,7 @@ Il foglio di stile è scritto **mobile-first**: le regole di base descrivono lo 
 Concretamente, ogni griglia nasce a colonna singola:
 
 ```css
-.feat-grid {
+.card-grid {
   display: grid; grid-template-columns: 1fr;
   gap: 24px; background: var(--border);
 }
@@ -146,7 +148,7 @@ e le colonne multiple arrivano dal blocco desktop della sezione:
 
 ```css
 @media (min-width: 961px) {
-  .feat-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+  .card-grid { grid-template-columns: repeat(3,1fr); gap: 2px; }
 }
 ```
 
@@ -486,3 +488,496 @@ Per completezza si segnalano gli aspetti ancora aperti:
 * **Dati del titolare nell'informativa.** L'informativa privacy è completa nella struttura, ma i riferimenti anagrafici del titolare (ragione sociale, partita IVA, sede), il periodo di conservazione e i fornitori nominati responsabili esterni sono segnaposto, resi graficamente evidenti nella pagina. Vanno compilati prima della pubblicazione: un'informativa pubblicata a metà è peggio di nessuna informativa. Lo stesso segnaposto della partita IVA compare nel piè di pagina.
 * **Protezione del modulo pubblico.** Il token anti-CSRF descritto in §5.7 protegge l'area riservata, ma non è stato esteso al modulo di contatto, che resta privo anche di una misura anti-spam. Per un uso in produzione andrebbero aggiunti entrambi. Per la seconda è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
 * **Autenticazione dell'area riservata.** L'accesso a `archivio.php` poggia su un'unica password condivisa: basta a proteggere un pannello dimostrativo, non un archivio in produzione, che richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei tentativi di accesso e registro delle operazioni eseguite. Manca inoltre una cancellazione programmata al termine del periodo di conservazione: oggi la cancellazione è un gesto manuale, per quanto ora possibile senza aprire phpMyAdmin.
+
+---
+
+# PROJECT TECHNICAL REPORT
+
+*English version — [↑ Versione italiana](#relazione-tecnica-di-progetto)*
+
+**Course:** Web and Multimedia Technologies (Master's Degree)
+**Lecturer:** Prof. Marco Porta — University of Pavia
+**Student:** Marco Santoro
+**Project:** Algora Studio — corporate website and contact platform
+**Academic Year:** 2025/2026
+
+---
+
+## 1. INTRODUCTION AND APPLICATION CONTEXT
+
+This report describes the design and the technical decisions behind the website of **Algora Studio**, a software development studio specialising in vertical solutions for Italian cultural heritage and historical documentary records (State Archives, municipal historical archives, notarial offices, foundations).
+
+The product the site's communication revolves around is **Foliarium**, a management application developed for the State Archive of Savona to digitise, relationally model and *fuzzy*-search historical land registry archives (from 1830 to the present day).
+
+### Rationale
+
+Most software-house websites rely on generic templates or on CMSs that fragment control over the code. Building a bespoke site serves the goal of demonstrating that native web programming (**HTML5, CSS3, Vanilla JavaScript, PHP and MySQL/MariaDB**) is enough to obtain:
+
+1. a distinctive aesthetic ("Warm Archive") consistent with the subject matter;
+2. a light network payload, with a single stylesheet and a single JavaScript file;
+3. compliance with W3C validation and with the basic usability and accessibility rules covered in the course.
+
+---
+
+## 2. INFORMATION ARCHITECTURE AND FILE MAP
+
+The site is built on **6 content pages**, served by PHP, plus **1 server-side script** for data persistence and **1 service screen** reserved for whoever runs the site. The shared parts are extracted into two **PHP includes** reused by every page.
+
+| File | Role |
+| :--- | :--- |
+| `index.php` | **Home.** Studio vision, manifesto, summary metrics, case study preview, approach section, closing call to action. |
+| `chi-siamo.php` | **Studio profile.** The philosophy of vertical development, the three guiding values, founder profile, technology stack, future prospects. |
+| `foliarium.php` | **Product page.** Foliarium's features (fuzzy search, property tree, audit trail, report export), system requirements, licences and support packages. |
+| `caso-studio.php` | **Case study: State Archive of Savona.** Quantitative results (69 municipalities, 12,000+ land registry entries, 8,500+ owners), "before and after" comparison, project phases. |
+| `contatti.php` | **Contact and demo.** Four-step guide, contact form with consent to data processing, accordion FAQ. |
+| `privacy.php` | **Privacy notice.** Data collected, purposes, legal basis, retention, data subject rights, cookie section. |
+| `nav.php` | Include: navigation bar, generated from a PHP array that automatically marks the current item. |
+| `footer.php` | Include: footer shared by every page. |
+| `invia-contatto.php` | **Backend.** Receives the form POST, validates, inserts into the database with a prepared statement, returns the outcome page. |
+| `archivio.php` | **Reserved area.** Password-protected service screen: list of requests, manual insertion, editing and deletion (§5.7). |
+| `config-db.php` | Database connection parameters, kept apart from the application logic. |
+| `config-admin.php` | Hash of the reserved area password, isolated like the database parameters. |
+| `crea_db.sql` | DDL script creating the database and the table. |
+| `style.css` | Single stylesheet for the whole site (1,503 lines, ~55 KB). |
+| `main.js` | Client-side behaviours (63 lines). |
+| `fonts/` | The two typefaces in WOFF2 format (8 files, 300 KB). |
+| `img/` | Folder for the product screenshots, with instructions in `LEGGIMI.md`. |
+
+### 2.1 Why PHP on the content pages too
+
+The five pages contain no application logic, but carry the `.php` extension so that they can use `include`:
+
+```php
+<?php $active = 'home'; ?>
+...
+<?php include 'nav.php'; ?>
+```
+
+Navigation bar and footer therefore exist in **a single copy**. The menu item matching the current page is highlighted by comparing the `$active` variable against the keys of the array that describes the menu:
+
+```php
+$navItems = [
+  'home'      => ['href' => 'index.php',    'label' => 'Home'],
+  'chi-siamo' => ['href' => 'chi-siamo.php', 'label' => 'Chi siamo'],
+  /* ... */
+];
+foreach ($navItems as $key => $item) {
+  /* class="active" when $active === $key */
+}
+```
+
+Without includes, a change to the menu would have to be replicated by hand across six files, with a real risk of them drifting apart.
+
+---
+
+## 3. FRONT END: SEMANTIC HTML5, CSS3 AND DESIGN SYSTEM
+
+### 3.1 Hand-written code and semantic structure
+
+The code is written entirely by hand, without WYSIWYG editors and without CSS frameworks (Bootstrap, Tailwind). Every page uses the structural tags of HTML5: `<nav>` for navigation, `<main>` for the main content, `<header>` for opening sections, `<section>` for thematic blocks, `<footer>` for the closing.
+
+The entire content of each page is wrapped in `<main id="contenuto">`: this defines the main *landmark* and makes the skip link described in §6 work.
+
+### 3.2 The "Warm Archive" design system
+
+Palette and typography are defined with **CSS variables** (custom properties) collected in `:root`, so that a change of shade propagates across the whole site by editing a single line:
+
+* **Colours:** parchment backgrounds (`--parchment: #F4EFE4`, `--cream: #F9F6EF`), ink text and containers (`--ink: #1E150A`), golden accents (`--gold: #B8821A`), archive green for confirmations (`--green: #1A3A28`).
+* **Typography:** *Cormorant Garamond* for display headings and *Libre Baskerville* for body text, both from Google Fonts; *Trebuchet MS / Calibri* in letter-spaced uppercase for labels and micro-copy.
+
+The two typefaces were initially loaded with an `@import` from `fonts.googleapis.com`. That was the **only request to a third-party domain** in the entire site, and it is not a technical detail: every visit disclosed the user's IP address to an external server, without their being informed and without any way to object.
+
+The WOFF2 files were therefore **downloaded and self-hosted**, under `fonts/`, and the `@import` was replaced by eight `@font-face` declarations:
+
+```css
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/cormorant-garamond-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, /* ... */;
+}
+```
+
+Only the eight weights actually used by the stylesheet are included, and only the `latin` subset, which covers accented Italian and typographic punctuation: 300 KB in total. The four characters used in the pages that fall outside that subset (`→ ● ○ ★`) fall back to the system font, exactly as they did before, because no subset served by Google contained them either.
+
+The `font-display: swap` directive shows the text immediately in the fallback face and swaps it once loading completes, avoiding the blank interval that the default behaviour would produce.
+
+The site today makes **no request to any external domain**: that is the premise which makes §6.6 possible.
+
+As described in §6.2, the brand gold is used for rules, borders and backgrounds, whereas **as a text colour** the stylesheet falls back on two variants calibrated for the background, because the original shade did not reach the required minimum contrast.
+
+The design system also covers the **class names**. In the first draft each page had christened identical components in its own way: the same card grid appeared under eleven different names (`.ph-grid`, `.val-grid`, `.feat-grid`, `.lic-grid`, `.ris-grid`…), the eyebrow above the heading under just as many (`.ph-num`, `.vn`, `.feat-n`, `.ris-n`…), and the highlighted card was marked variously `.active`, `.dark`, `.featured`, `.after` or — on *chi siamo* — by a `:nth-child(2)` that depended on its position in the grid. The stylesheet paid for that translation in every rule, in the form of selector lists five or six entries long.
+
+Repeated components now have a single name each: `.card-grid` (with `.card-grid-2` for two-column grids), `.label-sm` for the eyebrow — the same idea as `.label`, one step smaller — `.card-dark` for the dark variant, `.card-price` for the display-face figure, `.note-box` for the panel on a faint gold background. The classes that say *what* an element is, and not merely how it is coloured, have been kept (`.active` for the phase under way, `.before` and `.after` for the before/after comparison), while the purely descriptive ones (`.dark`, `.featured`) are gone. The section names also stay (`.valori`, `.problema`, `.faq`…): they group several sections under a shared background, but they describe the content, and replacing them with classes such as `.sfondo-crema` would move into the HTML a decision that belongs to the stylesheet.
+
+The consolidation made visible a dependency on specificity that the long names had kept hidden. `.ph-card.active` (two classes) beat `.ph-card` (one) regardless of position in the file; `.card-dark` on its own would instead lose against the background each page assigns to its own card, declared further down. The two rules that paint the dark card are therefore written starting from the grid that contains it, `.card-grid .card-dark`, which supplies exactly the missing step of specificity. The same holds for the eyebrow: being a `<p>`, it loses against the rule that colours every paragraph of the card, and wherever that rule exists the colour has to be declared one level deeper.
+
+### 3.3 Non-linear layout
+
+The requirement for a layout that is not merely linear is met by three techniques, all of them outside the document's normal flow:
+
+1. **Pinned navigation bar:** `#nav` uses `position: fixed; top: 0; left: 0; right: 0; z-index: 200`, staying visible while scrolling.
+2. **Asymmetric CSS Grid layouts:** the hero and the case study use columns of different widths (`grid-template-columns: 1fr 400px`) and `gap: 1px` grids over a coloured background, producing the effect of archival "boxes" separated by a hairline. The stylesheet contains 18 grid contexts in all.
+3. **"Before and after" comparison:** in `caso-studio.php`, two columns in inverted contrast (parchment against ink) set the manual process alongside the digitised one.
+
+To these are added `position: absolute` elements used as decoration (the watermark letter "A" in the hero, the timeline dots).
+
+### 3.4 Responsive behaviour: a mobile-first stylesheet
+
+The stylesheet is written **mobile-first**: the base rules describe the narrow screen, and a single breakpoint at `961px` introduces the desktop layout through `@media (min-width: 961px)`.
+
+Concretely, every grid starts as a single column:
+
+```css
+.card-grid {
+  display: grid; grid-template-columns: 1fr;
+  gap: 24px; background: var(--border);
+}
+```
+
+and the multiple columns arrive from the section's desktop block:
+
+```css
+@media (min-width: 961px) {
+  .card-grid { grid-template-columns: repeat(3,1fr); gap: 2px; }
+}
+```
+
+The `@media` blocks are not gathered at the end of the file but placed **at the end of the section they concern** — one for the shared grids, one for the footer, one for each page — so that the desktop variant of a component reads next to its base definition.
+
+The horizontal padding of the full-width bands is centralised in a variable, redeclared just once for desktop:
+
+```css
+:root { --pad-x: 20px; }
+@media (min-width: 961px) {
+  :root { --pad-x: clamp(24px, 5vw, 72px); }
+}
+```
+
+Eleven rules (navigation bar, sections, bands, footer, page headers) use `var(--pad-x)`: the page margin is changed in a single place.
+
+#### Why not a corrective `max-width` layer
+
+The previous arrangement defined the desktop layout in the base rules and corrected it downstream with a `@media (max-width: 960px)` block that pushed every grid back to a single column. That block needed **nine `!important` declarations** to win against the rules it was undoing, and that is a structural flaw rather than a cosmetic one: `!important` bypasses specificity, so a targeted rule loses against a generic rule declared after it.
+
+The concrete case that surfaced in this project: the footer column headings are governed by `.footer-col h2 { font-size: 10px }`, but the corrective layer contained `h2 { font-size: clamp(28px, 6vw, 36px) !important }`. On narrow screens the latter won, and the labels "Studio", "Prodotti", "Contatti" were rendered at 28px instead of 10px — visible only below 960px. With the layer removed, the specific rule applies again and the defect disappears with no targeted fix.
+
+No layout `!important` remains in the stylesheet today: the only three survivors are the idiomatic ones inside the `prefers-reduced-motion` block, where their whole purpose is to override any animation declared elsewhere.
+
+---
+
+## 4. CLIENT SIDE: VANILLA JAVASCRIPT
+
+`main.js` contains three behaviours, written in ES6+ JavaScript without libraries.
+
+* **Navigation menu (mobile).** The button opens and closes the list of links, updating the `aria-expanded` attribute; the `Esc` key closes the menu and returns focus to the button that opened it.
+* **Navigation bar shadow on scroll.** A `scroll` listener adds the `.scrolled` class to `#nav` beyond 20 px, visually detaching the bar from the content.
+* **Accordion FAQ.** Clicking a question closes the other answers; opening is animated on the `max-height` property and communicated to assistive technologies through `aria-expanded`.
+
+Both interactive controls are native **`<button>` elements**: the reasoning is discussed in §6.1.
+
+---
+
+## 5. SERVER SIDE AND DATA PERSISTENCE
+
+### 5.1 Architecture
+
+A form that sends an email through `mailto:` or fakes the submission in JavaScript guarantees neither persistence nor traceability. The project therefore adopts the three-tier architecture **Client (HTML/CSS/JS) → Application server (PHP 8) → Database server (MySQL/MariaDB)**.
+
+### 5.2 Database (`algora_db`)
+
+```sql
+CREATE DATABASE IF NOT EXISTS algora_db
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE algora_db;
+
+CREATE TABLE IF NOT EXISTS contatti (
+    id               INT AUTO_INCREMENT PRIMARY KEY,
+    nome             VARCHAR(100) NOT NULL,
+    ente             VARCHAR(100),
+    email            VARCHAR(100) NOT NULL,
+    tipo             VARCHAR(50),
+    messaggio        TEXT         NOT NULL,
+    consenso_privacy TINYINT(1)   NOT NULL DEFAULT 0,
+    data_consenso    DATETIME     DEFAULT NULL,
+    data_invio       DATETIME     DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+```
+
+The `utf8mb4` encoding covers the whole Unicode repertoire, including the accented characters and typographic marks that appear in the names of institutions and places.
+
+### 5.3 Processing flow
+
+1. **HTTP method check.** A request that is not a `POST` (typically someone opening the URL directly) has no data to process: the script answers with a `303 See Other` redirect to `contatti.php`, instead of showing a meaningless error page.
+2. **Validation.** `trim()` on the fields, check of the mandatory ones, `filter_var($email, FILTER_VALIDATE_EMAIL)` for the formal correctness of the address. Distinct error messages for missing fields and for an invalid email.
+3. **Insertion with a prepared statement.**
+
+```php
+$stmt = $conn->prepare(
+    'INSERT INTO contatti (nome, ente, email, tipo, messaggio)
+     VALUES (?, ?, ?, ?, ?)'
+);
+$stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
+$stmt->execute();
+```
+
+   The `?` placeholders and the separate binding of parameters keep SQL commands and user-supplied data apart: the content of the fields cannot be reinterpreted as an instruction. A submission with `nome = "Rossi'); DROP TABLE contatti; --"` is stored as a literal string and the table is left intact.
+4. **Outcome page.** Depending on the result the script produces either a personalised confirmation page or an error panel, both carrying the navigation, footer and stylesheet of the rest of the site.
+
+### 5.4 Escaping: once only, on the way out
+
+Data is stored in the database **exactly as the user typed it**, and `htmlspecialchars()` is applied only at the moment of printing it into the page.
+
+Escaping on the way in as well — a frequent mistake, because it feels "safer" — produces double encoding: a surname such as `Sant'Angelo` would be stored as `Sant&#039;Angelo` and printed back on screen as `Sant&amp;#039;Angelo`. The database would fill up with HTML entities instead of real characters, making the data unusable for anything other than the web page (exports, emails, searches). Protection against *SQL injection* rests on the prepared statement, not on HTML escaping, which addresses a different problem (*Cross-Site Scripting*, on output).
+
+### 5.5 Error handling and credentials
+
+The connection parameters live in `config-db.php`, separate from the logic: moving from a local environment to hosting means editing a single file, and in a real deployment that file must be excluded from version control.
+
+From PHP 8.1 onwards the `mysqli` extension reports errors by **throwing exceptions** rather than setting `connect_error`. A check written in the traditional `if ($conn->connect_error)` form would therefore never run, and an unreachable database would produce a stack trace containing host, user and file path. The connection is consequently wrapped in a `try/catch`: the user receives a generic message, while the technical detail goes to the server log through `error_log()`.
+
+### 5.6 Consent to data processing
+
+The form collects personal data and writes it to a database: the legal basis for the processing is the data subject's consent. Before the submit button there is therefore a mandatory checkbox pointing to the privacy notice:
+
+```html
+<div class="form-consenso">
+  <input type="checkbox" id="consenso" name="consenso" value="1" required>
+  <label for="consenso">Ho letto l'<a href="privacy.php">informativa
+    privacy</a> e acconsento al trattamento dei miei dati personali
+    per ricevere una risposta a questa richiesta.</label>
+</div>
+```
+
+The `required` attribute makes the browser flag the omission, but the check that counts is the server-side one, because client validation is trivially bypassed:
+
+```php
+$consenso = isset($_POST['consenso']) && $_POST['consenso'] === '1';
+```
+
+Without consent the script performs no insertion and returns a specific error message. When consent is given, what gets recorded is not merely the fact that the box was ticked: Article 7 of the Regulation requires being able to **demonstrate** that consent was given, so the table also preserves the moment at which it happened, in the `consenso_privacy` and `data_consenso` columns.
+
+### 5.7 Reserved area: the other three operations on the archive
+
+The flow described so far performs **one only** of the four fundamental operations on a table: insertion. Reading, editing and deletion remained possible only through phpMyAdmin, that is, through the DBMS administration panel. This is a limitation at once practical and legal: section 4 of the privacy notice promises that requests are erased at the end of the retention period, and Articles 16 and 17 of the Regulation grant the data subject the right to obtain rectification and erasure of their data. A promise that can be kept only by opening the database panel is a fragile promise.
+
+`archivio.php` completes the picture with a service screen, password-protected and reachable from a discreet link in the footer. The four operations are distributed as follows:
+
+| Operation | SQL statement | How it is requested |
+| :--- | :--- | :--- |
+| Read | `SELECT` | `GET archivio.php` |
+| Create | `INSERT` | `POST` with `azione=crea` |
+| Update | `UPDATE` | `POST` with `azione=aggiorna` |
+| Delete | `DELETE` | `POST` with `azione=elimina` |
+
+#### One file, three views
+
+List, edit and delete confirmation are branches of the same page, not separate files: the **request → action → response** sequence stays readable from top to bottom, as in `invia-contatto.php`. The actions that write sit at the head of the script, the read queries just below, and only at the bottom the markup. No line of HTML is produced before the outcome of the operation is known: that is the precondition for the redirect described next, since HTTP headers must be sent before the response body.
+
+#### Writes travel by POST only
+
+A `GET` link is followed by search-engine crawlers and repeated by the browser's reload button: entrusting the deletion of a row to a `GET` means handing the archive to the first indexer that comes along. In the screen the "Modifica" and "Elimina" links are indeed `GET`, but they touch nothing: they merely open the corresponding view. Everything that writes is a `POST`.
+
+#### Post/Redirect/Get
+
+After every write the script does not produce a page directly but answers with a `303 See Other` redirect to itself. Reloading the outcome page therefore repeats a read, not the insertion or the deletion just performed — the classic problem of the form submitted twice because of one `F5` too many. The outcome message and, in case of a validation error, the values typed by the user travel **in the session** rather than in the query string: a message taken from the URL would be externally supplied text printed into the page, precisely what §5.4 avoids.
+
+#### Anti-CSRF token
+
+The session cookie is attached by the browser to **any** request directed at the site, including one originating from a hostile page open in another tab. Without countermeasures, a hidden form on a third-party site could send `archivio.php` a deletion `POST`, and the server would carry it out as though it were legitimate. The countermeasure is a random value known only to the session, copied into every form on the page and verified on every write:
+
+```php
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(32));
+}
+/* ... on every operation that writes ... */
+if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
+    /* request rejected */
+}
+```
+
+A third-party page cannot read that value, and therefore cannot build a valid request. The comparison uses `hash_equals()` rather than the `===` operator because the former does not stop at the first differing character: the response time gives away nothing about how close an attacker got to the token.
+
+#### Authentication
+
+The file `config-admin.php` does not hold the password but its **hash**, computed with `password_hash()` and isolated from the application logic just like the database parameters:
+
+```php
+if (password_verify($_POST['password'] ?? '', $cfgAdmin['password_hash'])) {
+    session_regenerate_id(true);
+    $_SESSION['archivio_admin'] = true;
+}
+```
+
+The bcrypt algorithm is slow by design and applies a different *salt* on every call: two hashes of the same password differ from each other and cannot be looked up in a precomputed table. `session_regenerate_id(true)` replaces the session identifier at the moment privileges change, so that an identifier possibly imposed before login is worth nothing afterwards (*session fixation*). The error message is single and generic: a stranger is never told which half of the credentials they guessed right.
+
+The limits of the arrangement are stated in the comment at the head of the file: one shared password is enough for a demonstration panel on a single workstation, whereas an archive in production would call for named accounts, mandatory HTTPS, rate limiting on login attempts and an access log.
+
+#### The delete confirmation is a page, not a dialog box
+
+A JavaScript `confirm()` would vanish with scripting disabled, leaving a button that deletes on the first click. The confirmation is therefore a view of its own, reached by `GET`, showing in full the record about to disappear — name, address, date and the complete text of the message — and containing the only `POST` form that actually performs the deletion. It works without JavaScript and gives you a chance to notice you picked the wrong row.
+
+#### The consent date is not rewritten on every save
+
+If editing overwrote `data_consenso` with `NOW()` on every save, the evidence required by Article 7 of the Regulation (§5.6) would become the date of the last typo correction rather than the moment consent was given. The column is therefore set only on the first tick and cleared if consent is withdrawn:
+
+```sql
+UPDATE contatti
+   SET nome = ?, ente = ?, email = ?, tipo = ?, messaggio = ?,
+       consenso_privacy = ?,
+       data_consenso = IF(? = 1, COALESCE(data_consenso, NOW()), NULL)
+ WHERE id = ?
+```
+
+#### Continuity with the rest of the project
+
+Every query goes through a prepared statement and every value printed on screen goes through `htmlspecialchars()`: the same two rules as §5.3 and §5.4, applied here to a far larger number of output values. The screen reuses the components already defined in the stylesheet and, on narrow screens, the table does not compress but scrolls horizontally inside a container declared `role="region"` and focusable from the keyboard, so it can be scrolled without a mouse; the outcome message is marked `role="status"`, so that screen readers announce it without stealing focus. Finally the page carries `<meta name="robots" content="noindex, nofollow">`: a service screen has no reason to appear in search engines.
+
+---
+
+## 6. USABILITY AND ACCESSIBILITY
+
+Accessibility was treated as a project requirement rather than as a finishing touch. Checks were carried out with the **W3C Nu Markup Validation Service** for formal correctness and with **axe-core** (an automated WCAG rule engine) for behaviour, across every page and at two viewport widths (1440 px and 390 px).
+
+### 6.1 Interactive controls operable from the keyboard
+
+The collapsible menu and the FAQ accordion were initially `<div>`s with an `onclick` handler. A `<div>` cannot be reached with `Tab` and does not respond to `Enter` or `Space`: both controls worked with the mouse only. Adding `role="button"` and `tabindex="0"` to the menu element alone actually made things worse, because it made a screen reader announce the element as a button without making it genuinely operable.
+
+Both were rewritten as native **`<button type="button">`** elements. A native button is already in the tab order, responds to `Enter` and `Space` with no extra code, is announced correctly and receives the system focus styles. The open state is exposed with `aria-expanded`, and `aria-controls` ties the control to the block it governs:
+
+```html
+<button type="button" class="faq-trigger"
+        aria-expanded="false" aria-controls="faq-a1">
+  <span>Quanto tempo ci vuole per installare Foliarium?</span>
+  <span class="faq-toggle" aria-hidden="true">+</span>
+</button>
+```
+
+The `+` sign that rotates into `×` is decorative and would duplicate the information already carried by `aria-expanded`: it is therefore marked `aria-hidden="true"`. Each question is moreover wrapped in an `<h3>`, so that the FAQ list can also be traversed by navigating through headings.
+
+When an answer is closed, besides `max-height: 0` it also receives `visibility: hidden`, with the transition delayed to the end of the animation: the text does not stay readable to screen readers while `aria-expanded` declares the block closed.
+
+### 6.2 Colour contrast
+
+Automated analysis initially reported **200 violations** of WCAG 2.1 AA contrast (1.4.3), spread across all five pages. There were three causes:
+
+| Cause | Measured ratio | Required |
+| :--- | :--- | :--- |
+| Gold `#B8821A` as text on parchment (all the small-caps labels) | 2.93:1 | 4.5:1 |
+| Semi-transparent ivory text on a dark background with too low an opacity (footer at `.25`) | 2.07:1 | 4.5:1 |
+| Ivory text on the gold button | 3.30:1 | 4.5:1 |
+
+The fixes preserved the visual identity instead of flattening the palette:
+
+* the brand gold `--gold` is unchanged for **rules, borders, dots and backgrounds**, where the text contrast criterion does not apply;
+* for **text**, two variants calibrated for the background were introduced: `--gold-text: #845C10` on light backgrounds (4.84:1 minimum) and `--gold-on-dark: #C9942B` on dark ones (5.93:1 minimum);
+* the opacities of light text on dark backgrounds were raised to the lowest value that satisfies the criterion (0.62 on ink, 0.72 on archive green);
+* the gold button now has ink-coloured text (5.35:1), the same treatment already used by the other labels on gold.
+
+Afterwards the violations detected are **0** on every page and at both viewport widths.
+
+### 6.3 Structure, landmarks and skip link
+
+The content of each page is wrapped in `<main id="contenuto">`; together with `<nav>` and `<footer>` this guarantees that no portion of the page falls outside a landmark, and lets screen reader users jump straight to the content.
+
+The first tab stop on every page is a **skip link**, hidden off-screen with `transform: translateY(-120%)` and revealed by `.skip-link:focus`. Without it, a keyboard user would have to traverse the entire menu on every page before reaching the text.
+
+The heading hierarchy is continuous across all pages: a single `<h1>`, `<h2>` sections, `<h3>` blocks, with no skipped levels.
+
+### 6.4 Focus, motion and the form
+
+* **Visible focus.** A single `:focus-visible` rule applies a gold outline to every actionable element, with a lighter variant on dark backgrounds. The form fields had `outline: none` and entrusted the focus signal to the border colour alone: that declaration was removed.
+* **Motion.** The entrance animations and the smooth scrolling are wrapped in `@media (prefers-reduced-motion: no-preference)`; anyone who has asked for less motion in their system settings gets the site without transitions.
+* **Form.** Labels are tied to fields through `for`/`id`. The message field, mandatory server-side, now also carries the `required` attribute, so the error is flagged by the browser before submission instead of costing a page change. In the contact details panel some `<label>`s were being used as decorative text, with no control to label: they were replaced by `<span>`s.
+
+### 6.5 W3C validation
+
+All pages, **including the privacy notice and both variants of the outcome page** (confirmation and error), pass validation with neither errors nor warnings. The issues that came up during development and how they were resolved:
+
+| Issue | Cause | Solution |
+| :--- | :--- | :--- |
+| `aria-label on div` | ARIA attribute on a `<div>` with no role | Element rewritten as a native `<button>` (§6.1) |
+| `Skipping heading level` | `<h4>` under sections handled with `<h2>` | Heading tree restructured on `<h3>` |
+| `Skipping heading level` (footer) | The column headings were `<h3>`; on the outcome page, where the main heading is an `<h1>` and there are no `<h2>` sections, they skipped a level | Column headings raised to `<h2>` |
+| Inline styles | `style="..."` attributes in the layout blocks | Rules centralised in `style.css` alone |
+
+### 6.6 No cookies and no third parties
+
+The site sets no cookies — neither its own nor third-party ones — uses no analytics, and, once the typefaces were self-hosted (§3.2), makes no request to external domains. Consequently **no cookie consent banner is required**: there is nothing to consent to.
+
+It is a choice worth stating explicitly, because the banner is today the main source of friction in browsing, and on the vast majority of sites it exists to justify processing that the site could simply not carry out. Here the order was reversed: the processing was removed first, and the reason for the banner then disappeared on its own.
+
+The notice in `privacy.php` documents the situation anyway, because the absence of cookies deserves to be declared as much as their presence, and it describes the one processing operation the user cannot avoid: the recording of accesses in the web server's log files.
+
+---
+
+## 7. LOCAL INSTALLATION AND TESTING
+
+1. Start the **Apache** and **MySQL/MariaDB** modules of your local environment (XAMPP, MAMP or WAMP).
+2. Copy the project folder into the directory served by the server (for example `C:\xampp\htdocs\algora_site` or `C:\wamp64\www\algora_site`).
+3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algora_db` database and the `contatti` table.
+4. Check that the parameters in `config-db.php` match your installation (the defaults are XAMPP/MAMP's: user `root`, empty password).
+5. Open `http://localhost/algora_site/index.php`.
+6. To test the server-side part, open `http://localhost/algora_site/contatti.php`, fill in the form and submit it. Check that the confirmation page appears and that the row is present in the `contatti` table.
+7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" link in the footer — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
+
+```
+php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
+```
+
+### 7.1 Test cases executed
+
+| Case | Expected outcome | Result |
+| :--- | :--- | :--- |
+| Correct submission, with consent | Confirmation page, row inserted | Passed |
+| Submission without consent to processing | Specific error, **no insertion** | Passed |
+| Forged consent (value other than the expected one) | Specific error, no insertion | Passed |
+| Name with an apostrophe and `&` (`Sant'Angelo & C.`) | Correct characters on screen **and** in the database | Passed |
+| Formally invalid email | Specific error message, no insertion | Passed |
+| Empty mandatory fields | Specific error message, no insertion | Passed |
+| Opening `invia-contatto.php` directly via URL | `303` redirect to the form | Passed |
+| SQL injection string in the name field | Stored as text, table intact | Passed |
+| Unreachable database | Generic message to the user, detail in the log, no technical data exposed | Passed |
+| Reserved area: wrong password | Generic message, no access | Passed |
+| Reserved area: deletion `POST` without a valid session | Request rejected, row intact | Passed |
+| Reserved area: `POST` with no anti-CSRF token | Request rejected, row intact | Passed |
+| Editing with an invalid email | Specific error, typed values returned to the form, no write | Passed |
+| Saving twice with consent already given | `data_consenso` unchanged | Passed |
+| Withdrawing consent while editing | `consenso_privacy` set to `0` and `data_consenso` cleared | Passed |
+| Deleting a non-existent number | Specific message, no row touched | Passed |
+| Name containing `<b>` and an apostrophe, shown in the list | Printed as text, not interpreted by the browser | Passed |
+
+### 7.2 Verifying the move to mobile-first
+
+Rewriting the stylesheet was not supposed to change anything on screen. To demonstrate it, full-page screenshots of the five pages were captured at `390`, `768`, `960`, `961` and `1440` px before and after the change, and compared pixel by pixel:
+
+* at `961` and `1440` px the images came out **identical**, confirming that the desktop layout is unchanged;
+* at `390`, `768` and `960` px the only measured difference concerns the height of the footer, which is exactly the fix described in §3.4; the height of every other element stayed the same.
+
+The absence of horizontal scrolling was also verified from `320` to `1920` px.
+
+The same method was applied to the class-name consolidation described in §3.2, which by definition was not supposed to change anything on screen: twenty-eight full-page screenshots (the seven pages at four widths) were compared pixel by pixel before and after, and came out **all identical**, together with the two state screenshots — FAQ open and mobile menu open — and the three extreme widths. The first comparisons had instead reported real differences, all of them caused by rules that had lost the specificity contest: they were the guide for correcting the consolidation before considering it finished.
+
+---
+
+## 8. PUBLISHING ONLINE
+
+The site is meant to be published on the domain `www.algorastudio.it`. On shared hosting the procedure is as follows:
+
+1. Upload the project files into the domain's public folder (typically `public_html` or `httpdocs`).
+2. Create the database from the hosting control panel and run `crea_db.sql` on it.
+3. Update `config-db.php` with the host, database name, user and password supplied by the hosting provider, granting the user only the privileges actually needed (`INSERT` and `SELECT` on the `contatti` table).
+4. Check that `config-db.php` is not reachable from outside and that it is not included in version control.
+
+---
+
+## 9. KNOWN LIMITATIONS AND FUTURE WORK
+
+For completeness, the points still open:
+
+* **Multimedia content.** The site is still entirely textual. The scaffolding for hosting the Foliarium screenshots is in place on the product page — `<figure>` structure, captions, alternative text, declared dimensions to prevent layout shift — but stays disabled while the images are pending. Instructions are in `img/LEGGIMI.md`.
+* **Controller details in the privacy notice.** The privacy notice is structurally complete, but the controller's identifying details (company name, VAT number, registered office), the retention period and the suppliers appointed as processors are placeholders, made graphically obvious on the page. They must be filled in before publication: a half-published notice is worse than no notice at all. The same VAT number placeholder appears in the footer.
+* **Protection of the public form.** The anti-CSRF token described in §5.7 protects the reserved area, but it has not been extended to the contact form, which also lacks an anti-spam measure. Both should be added for production use. For the latter a passive technique is preferable — a honeypot field plus a check on how long the form took to fill in — over a CAPTCHA: visual CAPTCHAs are an accessibility obstacle, and third-party services would reintroduce into the page the external dependency removed in §3.2.
+* **Authentication of the reserved area.** Access to `archivio.php` rests on a single shared password: enough to protect a demonstration panel, not an archive in production, which would require named accounts, mandatory HTTPS, rate limiting on login attempts and a log of the operations performed. There is also no scheduled erasure at the end of the retention period: today erasure is a manual act, however much it is now possible without opening phpMyAdmin.
