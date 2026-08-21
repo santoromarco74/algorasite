@@ -64,22 +64,22 @@
     <p>Non facciamo tutto. Ogni prodotto Algora Studio nasce da un problema reale, costruito su misura per chi lavora quotidianamente in un settore specifico. Il software generico non basta quando il dominio ha la complessità della storia.</p>
   </div>
 
-  <div class="ph-grid">
-    <div class="ph-card active">
-      <p class="ph-num">01 — Attivo</p>
+  <div class="card-grid">
+    <div class="ph-card active card-dark">
+      <p class="label-sm">01 — Attivo</p>
       <h3>Foliarium</h3>
       <p>Sistema completo per la gestione e consultazione degli archivi catastali storici italiani. In uso presso l'Archivio di Stato di Savona dalla versione 1.0.</p>
       <span class="ph-tag">Disponibile · v1.5</span><br>
       <a href="foliarium.php" class="link-arrow">Scopri il prodotto →</a>
     </div>
     <div class="ph-card">
-      <p class="ph-num">02 — In definizione</p>
+      <p class="label-sm">02 — In definizione</p>
       <h3>Prossimo prodotto</h3>
       <p>Il secondo prodotto Algora Studio nascerà dall'ascolto del mercato. Se hai un'esigenza specifica nel settore archivistico o documentale, raccontacela.</p>
       <span class="ph-tag">In ascolto</span>
     </div>
     <div class="ph-card">
-      <p class="ph-num">03 — In esplorazione</p>
+      <p class="label-sm">03 — In esplorazione</p>
       <h3>Formazione digitale</h3>
       <p>Percorsi formativi su digitalizzazione archivistica e intelligenza artificiale applicata per professionisti del patrimonio culturale.</p>
       <span class="ph-tag">Prossimamente</span>
@@ -90,7 +90,7 @@
 <!-- CASO STUDIO TEASER -->
 <section class="caso-home">
   <p class="label mb-16">Riferimento attivo</p>
-  <div class="grid-2 ch-grid">
+  <div class="grid-2">
     <div class="ch-left">
       <div class="quote-block">
         <blockquote>"In pochi secondi troviamo qualsiasi partita catastale. Quello che prima richiedeva ore di ricerca manuale oggi è immediato."</blockquote>
@@ -115,7 +115,7 @@
 
 <!-- APPROCCIO -->
 <section class="approccio">
-  <div class="grid-2 app-grid">
+  <div class="grid-2 grid-2-tight">
     <div class="app-text">
       <p class="label mb-16">Il nostro approccio</p>
       <h2>Specializzazione.<br><em>Non generalismo.</em></h2>
@@ -155,7 +155,7 @@
           <div class="stack-item"><strong>Open source</strong><span>Stack completo</span></div>
         </div>
       </div>
-      <div class="founder-box">
+      <div class="note-box founder-box">
         <p class="fn">Marco Santoro — Fondatore</p>
         <p>Sviluppatore software specializzato in applicazioni gestionali per enti pubblici e privati. Ha progettato e sviluppato Foliarium su commissione dell'Archivio di Stato di Savona. Specializzato in Python, database relazionali e interfacce desktop native.</p>
         <a href="chi-siamo.php" class="link-arrow">Chi siamo →</a>

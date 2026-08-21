@@ -239,7 +239,7 @@ dalla logica applicativa. \\
 isolata come i parametri del database. \\
 \texttt{crea\_db.sql} & Script DDL di creazione di database e
 tabella. \\
-\texttt{style.css} & Foglio di stile unico dell'intero sito (1.513
+\texttt{style.css} & Foglio di stile unico dell'intero sito (1.503
 righe, \textasciitilde55 KB). \\
 \texttt{main.js} & Comportamenti client-side (63 righe). \\
 \texttt{fonts/} & I due caratteri tipografici in formato WOFF2 (8 file,
@@ -373,6 +373,48 @@ Come descritto in §6.2, l'oro di marca è usato per filetti, bordi e
 sfondi, mentre \textbf{come colore di testo} il foglio di stile ricorre
 a due varianti calibrate sul fondo, perché la tonalità originale non
 raggiungeva il contrasto minimo richiesto.
+
+Al design system appartengono anche i \textbf{nomi delle classi}. Nella
+prima stesura ogni pagina aveva battezzato a modo suo componenti
+identici: la stessa griglia di card compariva con undici nomi diversi
+(\texttt{.ph-grid}, \texttt{.val-grid}, \texttt{.feat-grid},
+\texttt{.lic-grid}, \texttt{.ris-grid}\ldots), l'occhiello sopra il
+titolo con altrettanti (\texttt{.ph-num}, \texttt{.vn},
+\texttt{.feat-n}, \texttt{.ris-n}\ldots), e la card in evidenza era
+marcata di volta in volta \texttt{.active}, \texttt{.dark},
+\texttt{.featured}, \texttt{.after} o --- su \emph{chi siamo} --- da un
+\texttt{:nth-child(2)} che dipendeva dalla posizione nella griglia. Il
+foglio pagava quella traduzione a ogni regola, sotto forma di elenchi di
+selettori lunghi cinque o sei voci.
+
+I componenti che si ripetono hanno ora un nome solo: \texttt{.card-grid}
+(con \texttt{.card-grid-2} per le griglie a due colonne),
+\texttt{.label-sm} per l'occhiello --- la stessa idea di
+\texttt{.label}, un gradino più in piccolo --- \texttt{.card-dark} per
+la variante scura, \texttt{.card-price} per la cifra in caratteri
+display, \texttt{.note-box} per il riquadro su fondo oro tenue. Sono
+rimaste le classi che dicono \emph{cosa} è un elemento e non solo come è
+colorato (\texttt{.active} per la fase in corso, \texttt{.before} e
+\texttt{.after} per il confronto prima e dopo), mentre quelle puramente
+descrittive (\texttt{.dark}, \texttt{.featured}) sono sparite. Restano
+al loro posto anche i nomi delle sezioni (\texttt{.valori},
+\texttt{.problema}, \texttt{.faq}\ldots): raggruppano più sezioni sotto
+uno stesso sfondo, ma descrivono il contenuto, e sostituirli con classi
+come \texttt{.sfondo-crema} sposterebbe nell'HTML una decisione che
+appartiene al foglio di stile.
+
+Il consolidamento ha reso visibile una dipendenza dalla specificità che
+i nomi lunghi tenevano nascosta. \texttt{.ph-card.active} (due classi)
+vinceva su \texttt{.ph-card} (una) a prescindere dalla posizione nel
+foglio; \texttt{.card-dark} da sola perderebbe invece contro il fondo
+che ogni pagina assegna alla propria card, dichiarato più avanti. Le due
+regole che dipingono la card scura sono perciò scritte a partire dalla
+griglia che la contiene, \texttt{.card-grid\ .card-dark}, che è
+esattamente il gradino di specificità mancante. Lo stesso vale per
+l'occhiello: essendo un \texttt{\textless{}p\textgreater{}}, perde il
+confronto con la regola che colora tutti i paragrafi della card, e dove
+quella regola esiste il colore va dichiarato un livello più in
+profondità.
 
 \hypertarget{layout-non-lineare}{%
 \subsubsection{3.3 Layout non lineare}\label{layout-non-lineare}}
@@ -1214,6 +1256,17 @@ pixel per pixel:
 
 È stata inoltre verificata l'assenza di scorrimento orizzontale da
 \texttt{320} a \texttt{1920} px.
+
+Lo stesso metodo è stato applicato al consolidamento dei nomi di classe
+descritto in §3.2, che per definizione non doveva cambiare nulla a
+video: ventotto schermate a pagina intera (le sette pagine per quattro
+larghezze) sono state confrontate pixel per pixel prima e dopo
+l'intervento e sono risultate \textbf{tutte identiche}, insieme alle due
+schermate di stato --- FAQ aperta e menu mobile aperto --- e alle tre
+larghezze estreme. I primi confronti avevano invece segnalato differenze
+reali, tutte dovute a regole che avevano perso il confronto di
+specificità: sono state la guida per correggere il consolidamento prima
+di considerarlo concluso.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 

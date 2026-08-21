@@ -43,7 +43,7 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 | `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
 | `config-admin.php` | Impronta della password dell'area riservata, isolata come i parametri del database. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
-| `style.css` | Foglio di stile unico dell'intero sito (1.513 righe, ~55 KB). |
+| `style.css` | Foglio di stile unico dell'intero sito (1.503 righe, ~55 KB). |
 | `main.js` | Comportamenti client-side (63 righe). |
 | `fonts/` | I due caratteri tipografici in formato WOFF2 (8 file, 300 KB). |
 | `img/` | Cartella per le schermate del prodotto, con le istruzioni in `LEGGIMI.md`. |
@@ -112,6 +112,12 @@ La direttiva `font-display: swap` mostra subito il testo con il carattere di rip
 Il sito non effettua oggi **nessuna richiesta a domini esterni**: è la premessa che rende possibile quanto descritto in §6.6.
 
 Come descritto in §6.2, l'oro di marca è usato per filetti, bordi e sfondi, mentre **come colore di testo** il foglio di stile ricorre a due varianti calibrate sul fondo, perché la tonalità originale non raggiungeva il contrasto minimo richiesto.
+
+Al design system appartengono anche i **nomi delle classi**. Nella prima stesura ogni pagina aveva battezzato a modo suo componenti identici: la stessa griglia di card compariva con undici nomi diversi (`.ph-grid`, `.val-grid`, `.feat-grid`, `.lic-grid`, `.ris-grid`…), l'occhiello sopra il titolo con altrettanti (`.ph-num`, `.vn`, `.feat-n`, `.ris-n`…), e la card in evidenza era marcata di volta in volta `.active`, `.dark`, `.featured`, `.after` o — su *chi siamo* — da un `:nth-child(2)` che dipendeva dalla posizione nella griglia. Il foglio pagava quella traduzione a ogni regola, sotto forma di elenchi di selettori lunghi cinque o sei voci.
+
+I componenti che si ripetono hanno ora un nome solo: `.card-grid` (con `.card-grid-2` per le griglie a due colonne), `.label-sm` per l'occhiello — la stessa idea di `.label`, un gradino più in piccolo — `.card-dark` per la variante scura, `.card-price` per la cifra in caratteri display, `.note-box` per il riquadro su fondo oro tenue. Sono rimaste le classi che dicono *cosa* è un elemento e non solo come è colorato (`.active` per la fase in corso, `.before` e `.after` per il confronto prima e dopo), mentre quelle puramente descrittive (`.dark`, `.featured`) sono sparite. Restano al loro posto anche i nomi delle sezioni (`.valori`, `.problema`, `.faq`…): raggruppano più sezioni sotto uno stesso sfondo, ma descrivono il contenuto, e sostituirli con classi come `.sfondo-crema` sposterebbe nell'HTML una decisione che appartiene al foglio di stile.
+
+Il consolidamento ha reso visibile una dipendenza dalla specificità che i nomi lunghi tenevano nascosta. `.ph-card.active` (due classi) vinceva su `.ph-card` (una) a prescindere dalla posizione nel foglio; `.card-dark` da sola perderebbe invece contro il fondo che ogni pagina assegna alla propria card, dichiarato più avanti. Le due regole che dipingono la card scura sono perciò scritte a partire dalla griglia che la contiene, `.card-grid .card-dark`, che è esattamente il gradino di specificità mancante. Lo stesso vale per l'occhiello: essendo un `<p>`, perde il confronto con la regola che colora tutti i paragrafi della card, e dove quella regola esiste il colore va dichiarato un livello più in profondità.
 
 ### 3.3 Layout non lineare
 
@@ -456,6 +462,8 @@ La riscrittura del foglio di stile non doveva cambiare il risultato a video. Per
 * a `390`, `768` e `960` px l'unica differenza misurata riguarda l'altezza del piè di pagina, cioè esattamente la correzione descritta in §3.4; l'altezza di ogni altro elemento è rimasta invariata.
 
 È stata inoltre verificata l'assenza di scorrimento orizzontale da `320` a `1920` px.
+
+Lo stesso metodo è stato applicato al consolidamento dei nomi di classe descritto in §3.2, che per definizione non doveva cambiare nulla a video: ventotto schermate a pagina intera (le sette pagine per quattro larghezze) sono state confrontate pixel per pixel prima e dopo l'intervento e sono risultate **tutte identiche**, insieme alle due schermate di stato — FAQ aperta e menu mobile aperto — e alle tre larghezze estreme. I primi confronti avevano invece segnalato differenze reali, tutte dovute a regole che avevano perso il confronto di specificità: sono state la guida per correggere il consolidamento prima di considerarlo concluso.
 
 ---
 
