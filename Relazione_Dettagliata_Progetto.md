@@ -183,23 +183,27 @@ Entrambi i comandi interattivi sono elementi **`<button>` nativi**: la scelta è
 
 Un modulo che invii una email via `mailto:` o simuli l'invio in JavaScript non garantisce né persistenza né tracciabilità. Il progetto adotta quindi l'architettura a tre livelli **Client (HTML/CSS/JS) → Application server (PHP 8) → Database server (MySQL/MariaDB)**.
 
-### 5.2 Base di dati (`algora_db`)
+### 5.2 Base di dati (`algorast_db`)
 
 ```sql
-CREATE DATABASE IF NOT EXISTS algora_db
+CREATE DATABASE IF NOT EXISTS algorast_db
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE algora_db;
+USE algorast_db;
 
 CREATE TABLE IF NOT EXISTS contatti (
-    id        INT AUTO_INCREMENT PRIMARY KEY,
-    nome      VARCHAR(100) NOT NULL,
-    ente      VARCHAR(100),
-    email     VARCHAR(100) NOT NULL,
-    tipo      VARCHAR(50),
-    messaggio TEXT         NOT NULL,
-    data_invio DATETIME DEFAULT CURRENT_TIMESTAMP
+    id               INT AUTO_INCREMENT PRIMARY KEY,
+    nome             VARCHAR(100) NOT NULL,
+    ente             VARCHAR(100),
+    email            VARCHAR(100) NOT NULL,
+    tipo             VARCHAR(50),
+    messaggio        TEXT         NOT NULL,
+    consenso_privacy TINYINT(1)   NOT NULL DEFAULT 0,
+    data_consenso    DATETIME     DEFAULT NULL,
+    data_invio       DATETIME     DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 ```
+
+Le colonne `consenso_privacy` e `data_consenso` sono state aggiunte in un secondo momento, dopo la prima messa in produzione della tabella; su un'installazione preesistente `CREATE TABLE IF NOT EXISTS` non le aggiunge da solo, quindi `crea_db.sql` prevede anche l'`ALTER TABLE` corrispondente da eseguire una tantum.
 
 La codifica `utf8mb4` copre l'intero repertorio Unicode, inclusi i caratteri accentati e i segni tipografici usati nei nomi di enti e località.
 
@@ -211,8 +215,9 @@ La codifica `utf8mb4` copre l'intero repertorio Unicode, inclusi i caratteri acc
 
 ```php
 $stmt = $conn->prepare(
-    'INSERT INTO contatti (nome, ente, email, tipo, messaggio)
-     VALUES (?, ?, ?, ?, ?)'
+    'INSERT INTO contatti (nome, ente, email, tipo, messaggio,
+                           consenso_privacy, data_consenso)
+     VALUES (?, ?, ?, ?, ?, 1, NOW())'
 );
 $stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
 $stmt->execute();
@@ -336,8 +341,8 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 
 1. Avviare i moduli **Apache** e **MySQL/MariaDB** del proprio ambiente locale (XAMPP, MAMP o WAMP).
 2. Copiare la cartella del progetto nella directory servita dal server (per esempio `C:\xampp\htdocs\algora_site` oppure `C:\wamp64\www\algora_site`).
-3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algora_db` e la tabella `contatti`.
-4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione (i valori predefiniti sono quelli di XAMPP/MAMP: utente `root`, password vuota).
+3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algorast_db` e la tabella `contatti`.
+4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione. Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso.
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
 
