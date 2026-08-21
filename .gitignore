@@ -1,0 +1,4 @@
+# I parametri di connessione contengono una password valida in produzione:
+# il file vero resta fuori dal repository, il modello lo accompagna.
+# Vedi config-db.esempio.php e la sezione 5.5 della relazione.
+config-db.php

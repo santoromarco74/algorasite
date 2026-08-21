@@ -42,7 +42,7 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 | `footer.php` | Include: piè di pagina comune a tutte le pagine. |
 | `invia-contatto.php` | **Backend.** Riceve il POST del modulo, valida, inserisce nel database con istruzione preparata, restituisce la pagina di esito. |
 | `archivio.php` | **Area riservata.** Schermata di servizio protetta da password: elenco delle richieste, inserimento manuale, modifica ed eliminazione (§5.7). |
-| `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
+| `config-db.esempio.php` | Modello dei parametri di connessione. Il file vero, `config-db.php`, non sta in repository: va creato copiando questo (§5.5). |
 | `config-admin.php` | Impronta della password dell'area riservata, isolata come i parametri del database. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
 | `style.css` | Foglio di stile unico dell'intero sito (1.518 righe, ~60 KB). |
@@ -274,7 +274,11 @@ I parametri di connessione stanno in `config-db.php`, separati dalla logica. L'a
 
 È una precauzione contro l'errore più banale del passaggio in produzione, che non è sbagliare le credenziali ma dimenticarsene: si carica il sito, si lascia il file con i valori locali e il modulo di contatto smette di scrivere: oppure, più insidioso, si aggiorna il file sull'hosting e alla successiva sincronizzazione lo si sovrascrive con la copia locale. Se il file non deve cambiare, nessuna delle due cose può accadere. Il prezzo è dover tenere anche in locale credenziali non banali, invece dell'utente `root` senza password che gli ambienti di sviluppo propongono come impostazione predefinita — il che, per inciso, è comunque una buona abitudine.
 
-Resta valido, e anzi diventa più stringente, che in un deployment reale il file vada **escluso dal versionamento**: ora è l'unico punto in cui compare in chiaro una password che vale anche in produzione.
+Proprio per questo il file vero è **escluso dal versionamento**: ora è l'unico punto in cui compare in chiaro una password che vale anche in produzione, e unificare le credenziali ha reso la precauzione più stringente, non meno. In repository sta al suo posto `config-db.esempio.php`, con la stessa struttura e valori segnaposto; dopo un `git clone` si copia in `config-db.php` e si riempie.
+
+È un fastidio di trenta secondi la prima volta, e in cambio la password non entra in nessun commit. Vale la pena dirlo per esperienza diretta: in questo progetto le credenziali erano finite in un commit prima che il `.gitignore` esistesse, e una volta entrate nella storia di git non se ne vanno più — restano leggibili in ogni copia del repository, e l'unico rimedio effettivo non è toglierle dai file ma **cambiare la password**.
+
+Poiché `config-db.php` può ora mancare, gli script che lo leggono lo verificano prima di richiederlo: senza il controllo, un `require` su un file assente fermerebbe l'esecuzione e all'utente resterebbe una pagina bianca, mentre così ricade nello stesso messaggio generico previsto per il database irraggiungibile.
 
 A partire da PHP 8.1 l'estensione `mysqli` segnala gli errori **sollevando eccezioni** anziché valorizzando `connect_error`. Un controllo scritto nella forma tradizionale `if ($conn->connect_error)` non verrebbe quindi mai eseguito, e un database irraggiungibile produrrebbe una traccia di stack contenente host, utente e percorso del file. La connessione è perciò racchiusa in un `try/catch`: all'utente arriva un messaggio generico, il dettaglio tecnico finisce nel log del server tramite `error_log()`.
 
@@ -466,7 +470,7 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 1. Avviare i moduli **Apache** e **MySQL/MariaDB** del proprio ambiente locale (XAMPP, MAMP o WAMP).
 2. Copiare la cartella del progetto nella directory servita dal server (per esempio `C:\xampp\htdocs\algora_site` oppure `C:\wamp64\www\algora_site`).
 3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algorast_db` e la tabella `contatti`.
-4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione. Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso. Le credenziali sono deliberatamente le stesse dell'hosting, per la ragione spiegata in §5.5: così il file non va toccato al momento della pubblicazione.
+4. Copiare `config-db.esempio.php` in `config-db.php` e riempirlo: il file vero non sta in repository (§5.5). Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso. Le credenziali sono deliberatamente le stesse dell'hosting, per la ragione spiegata in §5.5: così il file non va toccato al momento della pubblicazione.
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
 7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire il collegamento "Area riservata" nel piè di pagina — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
@@ -521,7 +525,7 @@ Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su h
 1. Caricare i file del progetto nella cartella pubblica del dominio (tipicamente `public_html` o `httpdocs`), `video/` compresa. Non serve invece caricare i marchi sorgente in `img/marchi/` che il `LEGGIMI` dichiara non usati dalle pagine: sono 5,7 MB che nessuna pagina richiede.
 2. Creare il database dal pannello dell'hosting ed eseguirvi `crea_db.sql`.
 3. Creare l'utente del database con le stesse credenziali usate in locale (§5.5), così che `config-db.php` non debba essere modificato, e assegnargli i soli privilegi che il codice usa davvero: `SELECT`, `INSERT`, `UPDATE` e `DELETE` sulla tabella `contatti`. Gli ultimi due servono all'area riservata (§5.7): con i soli `INSERT` e `SELECT` il modulo pubblico funzionerebbe e il pannello no.
-4. Verificare che `config-db.php` non sia raggiungibile dall'esterno e che non venga incluso nel versionamento.
+4. Caricare a mano `config-db.php`, che non arriva dal repository perché ne è escluso (§5.5), e verificare che non sia raggiungibile dall'esterno.
 
 ---
 
@@ -532,6 +536,7 @@ Per completezza si segnalano gli aspetti ancora aperti:
 * **Lingua dei contenuti multimediali.** Le cinque schermate e il filmato dimostrativo (§3.5) mostrano l'interfaccia in italiano, e la descrizione passo per passo che accompagna il filmato è scritta in italiano. Se il sito avrà una versione inglese, quei contenuti andranno rigirati oppure accompagnati da una nota: un filmato è l'unica parte del sito che una traduzione del testo non raggiunge.
 * **Dati del titolare nell'informativa.** L'informativa privacy è completa nella struttura, ma i riferimenti anagrafici del titolare (ragione sociale, partita IVA, sede), il periodo di conservazione e i fornitori nominati responsabili esterni sono segnaposto, resi graficamente evidenti nella pagina. Vanno compilati prima della pubblicazione: un'informativa pubblicata a metà è peggio di nessuna informativa. Lo stesso segnaposto della partita IVA compare nel piè di pagina.
 * **Protezione del modulo pubblico.** Il token anti-CSRF descritto in §5.7 protegge l'area riservata, ma non è stato esteso al modulo di contatto, che resta privo anche di una misura anti-spam. Per un uso in produzione andrebbero aggiunti entrambi. Per la seconda è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
+* **Credenziali già finite in un commit.** Il `.gitignore` e `config-db.esempio.php` descritti in §5.5 impediscono che accada di nuovo, ma non tolgono dalla storia di git ciò che vi è già entrato: la password del database resta leggibile nei commit precedenti, e in un repository pubblico questo significa leggibile da chiunque. L'unico rimedio effettivo è cambiarla sull'hosting; finché non avviene, va considerata compromessa.
 * **Autenticazione dell'area riservata.** L'accesso a `archivio.php` poggia su un'unica password condivisa: basta a proteggere un pannello dimostrativo, non un archivio in produzione, che richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei tentativi di accesso e registro delle operazioni eseguite. Manca inoltre una cancellazione programmata al termine del periodo di conservazione: oggi la cancellazione è un gesto manuale, per quanto ora possibile senza aprire phpMyAdmin.
 
 ---
@@ -580,7 +585,7 @@ The site is built on **6 content pages**, served by PHP, plus **1 server-side sc
 | `footer.php` | Include: footer shared by every page. |
 | `invia-contatto.php` | **Backend.** Receives the form POST, validates, inserts into the database with a prepared statement, returns the outcome page. |
 | `archivio.php` | **Reserved area.** Password-protected service screen: list of requests, manual insertion, editing and deletion (§5.7). |
-| `config-db.php` | Database connection parameters, kept apart from the application logic. |
+| `config-db.esempio.php` | Template for the connection parameters. The real file, `config-db.php`, is not in the repository: it is created by copying this one (§5.5). |
 | `config-admin.php` | Hash of the reserved area password, isolated like the database parameters. |
 | `crea_db.sql` | DDL script creating the database and the table. |
 | `style.css` | Single stylesheet for the whole site (1,518 lines, ~60 KB). |
@@ -812,7 +817,11 @@ The connection parameters live in `config-db.php`, separate from the logic. The 
 
 It is a precaution against the most banal mistake of going into production, which is not getting the credentials wrong but forgetting about them: you upload the site, leave the file with the local values, and the contact form quietly stops writing — or, more insidiously, you update the file on the host and then overwrite it with the local copy on the next sync. If the file never has to change, neither can happen. The price is having to keep non-trivial credentials locally too, instead of the passwordless `root` user that development environments offer by default — which, incidentally, is a good habit anyway.
 
-It remains true, and indeed becomes more pressing, that in a real deployment the file must be **excluded from version control**: it is now the single place where a password that also works in production appears in clear text.
+For exactly that reason the real file is **excluded from version control**: it is now the single place where a password that also works in production appears in clear text, and unifying the credentials made the precaution more pressing, not less. In its place the repository carries `config-db.esempio.php`, with the same structure and placeholder values; after a `git clone` you copy it to `config-db.php` and fill it in.
+
+It is thirty seconds of nuisance the first time, and in exchange the password enters no commit. It is worth saying from direct experience: in this project the credentials did end up in a commit before the `.gitignore` existed, and once they are in git's history they never leave — they stay readable in every copy of the repository, and the only effective remedy is not removing them from the files but **changing the password**.
+
+Since `config-db.php` may now be absent, the scripts that read it check for it before requiring it: without that check a `require` on a missing file would halt execution and leave the user a blank page, whereas this way it falls back to the same generic message provided for an unreachable database.
 
 From PHP 8.1 onwards the `mysqli` extension reports errors by **throwing exceptions** rather than setting `connect_error`. A check written in the traditional `if ($conn->connect_error)` form would therefore never run, and an unreachable database would produce a stack trace containing host, user and file path. The connection is consequently wrapped in a `try/catch`: the user receives a generic message, while the technical detail goes to the server log through `error_log()`.
 
@@ -1004,7 +1013,7 @@ The notice in `privacy.php` documents the situation anyway, because the absence 
 1. Start the **Apache** and **MySQL/MariaDB** modules of your local environment (XAMPP, MAMP or WAMP).
 2. Copy the project folder into the directory served by the server (for example `C:\xampp\htdocs\algora_site` or `C:\wamp64\www\algora_site`).
 3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algorast_db` database and the `contatti` table.
-4. Check that the parameters in `config-db.php` match your installation. The project uses a dedicated MySQL user (`algorast_user`) with privileges limited to the `algorast_db` database, rather than the `root` user that XAMPP/MAMP/WAMP provide by default: if that user does not exist yet it must be created and associated with the database, otherwise inserting a contact fails with an access error. The credentials are deliberately the same as the hosting's, for the reason explained in §5.5: this way the file needs no editing at publication time.
+4. Copy `config-db.esempio.php` to `config-db.php` and fill it in: the real file is not in the repository (§5.5). The project uses a dedicated MySQL user (`algorast_user`) with privileges limited to the `algorast_db` database, rather than the `root` user that XAMPP/MAMP/WAMP provide by default: if that user does not exist yet it must be created and associated with the database, otherwise inserting a contact fails with an access error. The credentials are deliberately the same as the hosting's, for the reason explained in §5.5: this way the file needs no editing at publication time.
 5. Open `http://localhost/algora_site/index.php`.
 6. To test the server-side part, open `http://localhost/algora_site/contatti.php`, fill in the form and submit it. Check that the confirmation page appears and that the row is present in the `contatti` table.
 7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" link in the footer — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
@@ -1059,7 +1068,7 @@ The site is meant to be published on the domain `www.algorastudio.it`. On shared
 1. Upload the project files into the domain's public folder (typically `public_html` or `httpdocs`), `video/` included. There is no need to upload the source logos in `img/marchi/` that the `LEGGIMI` file marks as unused by the pages: they are 5.7 MB no page ever requests.
 2. Create the database from the hosting control panel and run `crea_db.sql` on it.
 3. Create the database user with the same credentials used locally (§5.5), so that `config-db.php` needs no editing, and grant it only the privileges the code actually uses: `SELECT`, `INSERT`, `UPDATE` and `DELETE` on the `contatti` table. The last two are for the reserved area (§5.7): with `INSERT` and `SELECT` alone the public form would work and the panel would not.
-4. Check that `config-db.php` is not reachable from outside and that it is not included in version control.
+4. Upload `config-db.php` by hand — it does not come from the repository, being excluded from it (§5.5) — and check that it is not reachable from outside.
 
 ---
 
@@ -1070,4 +1079,5 @@ For completeness, the points still open:
 * **Language of the multimedia content.** The five screenshots and the demo video (§3.5) show the interface in Italian, and the step-by-step description accompanying the video is written in Italian. Should the site gain an English version, that material will have to be re-recorded or accompanied by a note: a video is the one part of a site that translating the text does not reach.
 * **Controller details in the privacy notice.** The privacy notice is structurally complete, but the controller's identifying details (company name, VAT number, registered office), the retention period and the suppliers appointed as processors are placeholders, made graphically obvious on the page. They must be filled in before publication: a half-published notice is worse than no notice at all. The same VAT number placeholder appears in the footer.
 * **Protection of the public form.** The anti-CSRF token described in §5.7 protects the reserved area, but it has not been extended to the contact form, which also lacks an anti-spam measure. Both should be added for production use. For the latter a passive technique is preferable — a honeypot field plus a check on how long the form took to fill in — over a CAPTCHA: visual CAPTCHAs are an accessibility obstacle, and third-party services would reintroduce into the page the external dependency removed in §3.2.
+* **Credentials that already reached a commit.** The `.gitignore` and `config-db.esempio.php` described in §5.5 stop it happening again, but they do not remove from git's history what already entered it: the database password stays readable in earlier commits, and in a public repository that means readable by anyone. The only effective remedy is changing it on the hosting; until that happens it must be considered compromised.
 * **Authentication of the reserved area.** Access to `archivio.php` rests on a single shared password: enough to protect a demonstration panel, not an archive in production, which would require named accounts, mandatory HTTPS, rate limiting on login attempts and a log of the operations performed. There is also no scheduled erasure at the end of the retention period: today erasure is a manual act, however much it is now possible without opening phpMyAdmin.

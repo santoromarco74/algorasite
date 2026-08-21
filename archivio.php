@@ -75,6 +75,11 @@ function h(?string $s): string
 /** Connessione al database, con gli stessi parametri del modulo pubblico. */
 function apriConnessione(): mysqli
 {
+    // config-db.php non sta in repository (vedi .gitignore): dopo un clone
+    // va creato copiando config-db.esempio.php.
+    if (!is_file(__DIR__ . '/config-db.php')) {
+        throw new RuntimeException('config-db.php assente: copiare config-db.esempio.php');
+    }
     $cfg = require __DIR__ . '/config-db.php';
 
     // Con PHP 8.1+ mysqli solleva eccezioni invece di restituire false:
@@ -252,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->close();
                 rimanda('Operazione sconosciuta.', 'errore');
         }
-    } catch (mysqli_sql_exception $e) {
+    } catch (mysqli_sql_exception | RuntimeException $e) {
         // Il dettaglio tecnico va nel log del server: i messaggi del DBMS
         // descrivono la struttura del database a chiunque li legga.
         error_log('[algora] archivio, operazione "' . $azione . '" fallita: ' . $e->getMessage());
@@ -305,7 +310,7 @@ if ($autenticato) {
         }
 
         $conn->close();
-    } catch (mysqli_sql_exception $e) {
+    } catch (mysqli_sql_exception | RuntimeException $e) {
         error_log('[algora] archivio, lettura fallita: ' . $e->getMessage());
         $erroreDb = 'Archivio non raggiungibile: verifica che il server MySQL sia avviato '
                   . 'e che il database sia stato creato con crea_db.sql.';
