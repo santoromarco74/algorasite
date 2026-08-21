@@ -1,0 +1,15 @@
+{
+  "name": "Algora Studio",
+  "short_name": "Algora",
+  "description": "Software verticale per archivi ed enti culturali",
+  "lang": "it",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#F4EFE4",
+  "theme_color": "#F4EFE4",
+  "icons": [
+    { "src": "img/marchi/favicon-32.png",     "sizes": "32x32",   "type": "image/png" },
+    { "src": "img/marchi/apple-touch-icon.png","sizes": "180x180", "type": "image/png" },
+    { "src": "img/marchi/icona-512.png",      "sizes": "512x512", "type": "image/png" }
+  ]
+}

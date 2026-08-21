@@ -231,7 +231,16 @@ h3 { font-size: clamp(22px, 3vw, 32px); }
 
 #nav.scrolled { box-shadow: 0 4px 24px rgba(30,21,10,.08); }
 
-.nav-logo { display: flex; flex-direction: column; text-decoration: none; line-height: 1; gap: 3px; }
+/* Marchio e lettering affiancati. Il lettering resta testo: selezionabile,
+   ingrandibile e annunciato dai lettori di schermo. Il marchio e' invece
+   decorativo (aria-hidden nell'SVG) e non va annunciato una seconda volta. */
+/* Il colore va dichiarato qui, non solo sui due span del lettering: il
+   marchio eredita currentColor dall'ancora, che senza questa riga userebbe
+   il blu predefinito dei collegamenti. */
+.nav-logo { display: flex; align-items: center; text-decoration: none; line-height: 1; gap: 11px; color: var(--ink); }
+.nav-logo-testo { display: flex; flex-direction: column; gap: 3px; }
+.nav-logo-marchio { display: flex; }
+.nav-logo-marchio svg { height: 30px; width: auto; }
 .nav-logo .brand {
   font-family: var(--font-label);
   font-size: 17px; font-weight: 700;
@@ -538,6 +547,9 @@ footer {
   .footer-main { grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
 }
 
+.footer-brand-riga { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+.footer-brand-marchio { display: flex; color: var(--ivory); }
+.footer-brand-marchio svg { height: 36px; width: auto; }
 .footer-brand .brand {
   font-family: var(--font-label);
   font-size: 16px; font-weight: 700; letter-spacing: 5px; color: var(--ivory);
@@ -545,7 +557,7 @@ footer {
 .footer-brand .sub {
   font-family: var(--font-label);
   font-size: 8px; letter-spacing: 7px; color: var(--gold-on-dark);
-  text-transform: uppercase; display: block; margin: 4px 0 16px;
+  text-transform: uppercase; display: block; margin: 4px 0 0;
 }
 .footer-brand p { font-size: 14px; color: rgba(249,246,239,.62); line-height: 1.7; max-width: 260px; }
 

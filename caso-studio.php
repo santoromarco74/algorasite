@@ -6,6 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Caso Studio — Archivio di Stato di Savona | Algora Studio</title>
 <meta name="description" content="Come Foliarium ha digitalizzato 190 anni di storia catastale per l'Archivio di Stato di Savona. Il caso studio completo.">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="img/marchi/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/marchi/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#F4EFE4">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>

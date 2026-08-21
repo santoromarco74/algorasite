@@ -1,110 +1,74 @@
-# Marchi — cosa serve e in che formato
+# Marchi
 
-Questa cartella ospita i marchi di Algora Studio e di Foliarium. Finché i file
-non ci sono, il sito usa il lettering testuale attuale e non si rompe nulla.
+## Cosa c'è in questa cartella
 
-## Stato
-
-I marchi esistono in versione a colori (una "A" con taglio diagonale per Algora,
-un libro aperto con dissolvenza digitale per Foliarium) ma **non sono ancora
-utilizzabili sul sito**. Mancano tre requisiti, elencati qui sotto: assenza di
-filigrana, sfondo trasparente, e una variante cromatica compatibile con la
-palette del sito.
-
-## File attesi
-
-| Nome file | Cosa contiene |
+| File | Ruolo |
 | :--- | :--- |
-| `algora-marchio.svg` | Il solo simbolo, senza testo, in proporzione quadrata. Serve per la favicon e per gli usi piccoli. |
-| `algora-logo.svg` | Il blocco completo (simbolo + scritta), sviluppato in orizzontale. |
-| `foliarium-marchio.svg` | Il solo simbolo di Foliarium, in proporzione quadrata. |
-| `foliarium-logo.svg` | Il blocco completo di Foliarium, in orizzontale. |
+| `Logo_uff_Algora.jpg` | Marchio ufficiale Algora a colori, 2048×2048. Sorgente, non usato dalle pagine. |
+| `logo_foliarium1.png` | Marchio Foliarium a colori, 2816×1536. Sorgente, non ancora usato dalle pagine. |
+| `algora-marchio.svg` | **Variante monocromatica della "A"**, usata dal sito. |
+| `favicon-32.png`, `apple-touch-icon.png`, `icona-512.png` | Icone generate dalla variante monocromatica. |
 
-Se di uno dei due esiste solo il blocco completo e non il simbolo isolato, va
-bene lo stesso: si usa quello ovunque e per la favicon si ritaglia.
+La favicon vera e propria è `favicon.ico` nella radice del sito, dove i browser
+la cercano anche senza che sia dichiarata.
 
-## Requisito 1: nessuna filigrana
+## Come è stata ricavata la variante monocromatica
 
-Le esportazioni degli strumenti di grafica online includono spesso il nome del
-servizio in un angolo. Un file con filigrana non può essere pubblicato: serve
-l'esportazione pulita. La rimozione a posteriori non è un'opzione — su un
-raster lascia aloni visibili, e aggira comunque la licenza dell'esportazione.
+Il marchio ufficiale è blu navy e rame. Nessuno dei due colori appartiene alla
+palette del sito (pergamena, inchiostro, oro, verde archivio): inserito così
+com'è nella barra di navigazione, sembrerebbe il marchio di un'altra azienda
+appoggiato sopra questo sito. La strada consueta in questi casi non è cambiare
+il marchio, ma affiancargli una variante monocromatica per gli usi in cui il
+colore pieno non funziona.
 
-## Requisito 2: sfondo trasparente
+Il procedimento, riproducibile:
 
-I marchi devono comparire sia sulla pergamena chiara sia sull'inchiostro quasi
-nero del piè di pagina. Un file con il fondo chiaro incorporato mostra un
-rettangolo bianco su entrambi, evidentissimo sul secondo.
+1. **Ritaglio della sola "A"** dal blocco completo, escludendo il lettering.
+   Il lettering nel sito resta testo vero, non immagine.
+2. **Soglia sulla luminosità al 94%.** Il fondo del file originale è a 253/255,
+   mentre il punto più chiaro del rame sta più in basso: la soglia separa figura
+   e fondo senza bucare i riflessi. Sopra il 97% entrerebbe il rumore JPEG del
+   fondo, sotto il 90% si perderebbero i riflessi del rame.
+3. **Chiusura morfologica con raggio 6.** I riflessi speculari nel raccordo fra
+   gamba e piede della lettera restavano come piccoli morsi bianchi; un raggio
+   minore non li chiudeva, uno maggiore non serviva. Il canale bianco della
+   curva che attraversa la "A" e la controforma restano aperti.
+4. **Vettorializzazione con potrace**, quantizzando le coordinate a `-u 1`:
+   il file scende da 20 KB a 11 KB (3,6 KB compressi) con la stessa resa.
 
-## Requisito 3: variante cromatica compatibile
+## Perché `currentColor` e non due file
 
-La palette del sito è composta da quattro colori:
+Il marchio compare su fondo pergamena nella barra e su fondo inchiostro nel piè
+di pagina. Invece di tenere due file da mantenere allineati, l'SVG dichiara
+`fill="currentColor"`: eredita il colore del testo che lo circonda, esattamente
+come fa il lettering accanto.
 
-| Ruolo | Valore |
-| :--- | :--- |
-| Pergamena (fondo) | `#F4EFE4` |
-| Inchiostro (testo) | `#1E150A` |
-| Oro (accenti) | `#B8821A` |
-| Verde archivio | `#1A3A28` |
+Perché funzioni, l'elemento contenitore deve avere un colore dichiarato. Nella
+barra il marchio sta dentro un `<a>`, e senza una regola esplicita erediterebbe
+il **blu predefinito dei collegamenti** — proprio il colore che si voleva
+evitare. Per questo `.nav-logo` porta `color: var(--ink)`.
 
-Un marchio che introduce un colore estraneo — per esempio un blu — sembra
-appoggiato sopra il sito invece che parte di esso. La soluzione abituale è una
-**variante monocromatica** del marchio da usare sul web, tenendo quella a colori
-per carta intestata e documenti. Se nell'SVG i riempimenti sono impostati su
-`currentColor`, la variante monocromatica si ottiene da sola: il marchio prende
-il colore del testo circostante e si adatta a entrambi i fondi.
+Per la stessa ragione l'SVG viene **incorporato nella pagina** con `readfile()`
+invece che richiamato con `<img>`: un'immagine esterna non può ereditare il
+colore del contesto.
 
-## Formato: SVG, e perché conta
+## Accessibilità
 
-**SVG di gran lunga preferibile.** Il marchio compare a 28 px di altezza nella
-barra di navigazione e a 16 px nella scheda del browser: a quelle misure un PNG
-si impasta, un SVG resta nitido. In più pesa una frazione e non richiede la
-versione a doppia risoluzione per gli schermi ad alta densità.
+L'SVG porta `aria-hidden="true"`: il marchio è decorativo, il nome dello studio
+è già presente come testo accanto ed è quello che i lettori di schermo devono
+annunciare. Il collegamento alla home si annuncia come "ALGORA STUDIO", non
+come "logo".
 
-Se hai solo un raster, mandalo **PNG con sfondo trasparente, almeno 1024 px sul
-lato lungo**. Da lì ricavo io le misure che servono.
+## Marchio Foliarium: ancora da inserire
 
-Evita JPEG: non ha trasparenza, e su un marchio si vedono gli aloni.
+Il file a colori è in questa cartella ma non è usato dalle pagine. Verde scuro
+e oro sono compatibili con la palette, quindi qui non serve una variante
+monocromatica; il problema è un altro: il marchio è molto ricco (libro,
+rilegatura decorata, dissolvenza in quadretti, penna, mappa) e a misura ridotta
+diventa una macchia. Va usato **grande, nella testata della scheda prodotto**,
+dove ha spazio per leggersi, e va ritagliato il fondo chiaro incorporato.
 
-## Il colore: il punto a cui fare attenzione
-
-Il marchio deve comparire su **due fondi opposti**:
-
-- barra di navigazione e corpo pagina → pergamena chiara (`#F4EFE4`)
-- piè di pagina, fascia contatti, riquadri di chiusura → inchiostro (`#1E150A`)
-
-Se l'SVG ha i colori fissati dentro, servono **due versioni** (una chiara e una
-scura). Se invece nell'SVG i riempimenti sono impostati su `currentColor`, il
-marchio prende automaticamente il colore del testo circostante e ne basta uno
-solo: si adatta da sé a entrambi i fondi, come fa oggi il lettering.
-
-È la soluzione migliore. Se il file te lo ha preparato qualcun altro e non sai
-come è fatto dentro, mandalo comunque: guardo io se è convertibile.
-
-## Prova di leggibilità
-
-Prima di mandarlo, guarda il marchio rimpicciolito a 16 px. Se a quella misura
-diventa una macchia, serve una versione semplificata per la favicon: meno
-dettagli, tratti più spessi. È normale che un marchio ne abbia due varianti.
-
-## Simbolo isolato, non blocco completo
-
-Nella barra di navigazione va **solo il simbolo**, non il blocco con la scritta.
-Due motivi: il blocco completo duplicherebbe il lettering testuale già presente,
-e a 28 px di altezza una scritta incorporata in un'immagine diventa illeggibile.
-
-Vale anche per i sottotitoli incorporati nel marchio ("gestione digitale archivi
-catastali storici" e simili): ripetono quello che le pagine già dicono a parole,
-e in un'immagine quel testo non è né selezionabile né leggibile da un lettore di
-schermo. Meglio la versione con il solo nome.
-
-## Cosa faccio io una volta ricevuti
-
-- Inserimento nella barra di navigazione e nel piè di pagina, con il lettering
-  che resta come testo accanto al simbolo (non lo sostituisco con un'immagine:
-  il testo è selezionabile, ingrandibile e leggibile dai lettori di schermo).
-- Testo alternativo corretto: il collegamento alla home deve annunciarsi come
-  "Algora Studio — home", non come "logo".
-- Favicon completa: `.ico` per i browser datati, PNG a 32 e 180 px, più il
-  file `site.webmanifest`.
-- Dimensioni dichiarate nel markup, così la pagina non slitta al caricamento.
+Il suo sottotitolo "gestione digitale archivi catastali storici" ripete quello
+che la pagina già dice a parole: dentro un'immagine quel testo non è
+selezionabile né leggibile da un lettore di schermo, quindi va preferita la
+versione con il solo simbolo e nome, se disponibile.
