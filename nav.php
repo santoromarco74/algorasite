@@ -10,8 +10,14 @@ $navItems = [
 ?>
 <nav id="nav">
   <a href="index.php" class="nav-logo">
-    <span class="brand">ALGORA</span>
-    <span class="sub">STUDIO</span>
+    <?php /* Il marchio e' incorporato nella pagina invece che richiamato con
+             <img>: solo cosi' il suo fill="currentColor" puo' ereditare il
+             colore del testo circostante. Il file resta unico e condiviso. */ ?>
+    <span class="nav-logo-marchio"><?php readfile(__DIR__ . '/img/marchi/algora-marchio.svg'); ?></span>
+    <span class="nav-logo-testo">
+      <span class="brand">ALGORA</span>
+      <span class="sub">STUDIO</span>
+    </span>
   </a>
   <ul class="nav-links" id="navLinks">
     <?php foreach ($navItems as $key => $item): ?>

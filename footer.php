@@ -1,8 +1,13 @@
 <footer>
   <div class="footer-main">
     <div class="footer-brand">
-      <span class="brand">ALGORA</span>
-      <span class="sub">STUDIO</span>
+      <span class="footer-brand-riga">
+        <span class="footer-brand-marchio"><?php readfile(__DIR__ . '/img/marchi/algora-marchio.svg'); ?></span>
+        <span>
+          <span class="brand">ALGORA</span>
+          <span class="sub">STUDIO</span>
+        </span>
+      </span>
       <p>Software verticale per domini specifici. Strumenti precisi, duraturi, costruiti per la complessità reale di chi li usa.</p>
     </div>
     <div class="footer-col">
