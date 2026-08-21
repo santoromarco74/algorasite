@@ -45,7 +45,7 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 | `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
 | `config-admin.php` | Impronta della password dell'area riservata, isolata come i parametri del database. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
-| `style.css` | Foglio di stile unico dell'intero sito (1.503 righe, ~55 KB). |
+| `style.css` | Foglio di stile unico dell'intero sito (1.518 righe, ~60 KB). |
 | `main.js` | Comportamenti client-side (63 righe). |
 | `fonts/` | I due caratteri tipografici in formato WOFF2 (8 file, 300 KB). |
 | `img/` | Schermate del prodotto e fotogramma poster del filmato, con le istruzioni in `LEGGIMI.md`. |
@@ -53,7 +53,7 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 
 ### 2.1 Perché PHP anche sulle pagine di contenuto
 
-Le cinque pagine non contengono logica applicativa, ma hanno estensione `.php` per poter usare `include`:
+Le sei pagine di contenuto non contengono logica applicativa, ma hanno estensione `.php` per poter usare `include`:
 
 ```php
 <?php $active = 'home'; ?>
@@ -74,7 +74,7 @@ foreach ($navItems as $key => $item) {
 }
 ```
 
-Senza include, una modifica al menu andrebbe replicata a mano su sei file, con il rischio concreto di disallineamenti.
+Senza include, una modifica al menu andrebbe replicata a mano sugli otto file che lo mostrano — le sei pagine di contenuto, la pagina di esito e l'area riservata — con il rischio concreto di disallineamenti.
 
 ---
 
@@ -127,7 +127,7 @@ Il consolidamento ha reso visibile una dipendenza dalla specificità che i nomi 
 Il requisito di un layout non semplicemente lineare è soddisfatto da tre tecniche, tutte fuori dal flusso normale del documento:
 
 1. **Barra di navigazione ancorata:** `#nav` usa `position: fixed; top: 0; left: 0; right: 0; z-index: 200`, restando visibile durante lo scorrimento.
-2. **Griglie asimmetriche con CSS Grid:** la hero e il caso studio usano colonne di larghezza diversa (`grid-template-columns: 1fr 400px`) e griglie a `gap: 1px` su fondo colorato, che producono l'effetto di "caselle" archivistiche separate da un filetto. In tutto il foglio di stile sono presenti 18 contesti di griglia.
+2. **Griglie asimmetriche con CSS Grid:** la hero e il caso studio usano colonne di larghezza diversa (`grid-template-columns: 1fr 400px`) e griglie a `gap: 1px` su fondo colorato, che producono l'effetto di "caselle" archivistiche separate da un filetto. In tutto il foglio di stile sono presenti 13 contesti di griglia: erano 18 prima che il consolidamento descritto in §3.2 riducesse a una sola le undici griglie di card.
 3. **Confronto "prima e dopo":** in `caso-studio.php`, due colonne a contrasto invertito (pergamena contro inchiostro) affiancano il processo manuale e quello digitalizzato.
 
 A questi si aggiungono elementi in `position: absolute` usati come decorazione (la lettera "A" in filigrana nella hero, i punti della timeline).
@@ -164,7 +164,7 @@ Il passo orizzontale delle fasce a tutta larghezza è centralizzato in una varia
 }
 ```
 
-Undici regole (barra di navigazione, sezioni, fasce, piè di pagina, intestazioni di pagina) usano `var(--pad-x)`: il margine di pagina si modifica in un punto solo.
+Dodici regole (barra di navigazione, sezioni, fasce, piè di pagina, intestazioni di pagina, area riservata) usano `var(--pad-x)`: il margine di pagina si modifica in un punto solo.
 
 #### Perché non uno strato correttivo `max-width`
 
@@ -249,8 +249,9 @@ La codifica `utf8mb4` copre l'intero repertorio Unicode, inclusi i caratteri acc
 
 ```php
 $stmt = $conn->prepare(
-    'INSERT INTO contatti (nome, ente, email, tipo, messaggio)
-     VALUES (?, ?, ?, ?, ?)'
+    'INSERT INTO contatti (nome, ente, email, tipo, messaggio,
+                           consenso_privacy, data_consenso)
+     VALUES (?, ?, ?, ?, ?, 1, NOW())'
 );
 $stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
 $stmt->execute();
@@ -267,7 +268,11 @@ Applicare l'escaping anche in ingresso — errore frequente, perché sembra "pi�
 
 ### 5.5 Gestione degli errori e credenziali
 
-I parametri di connessione stanno in `config-db.php`, separati dalla logica: il passaggio da ambiente locale a hosting richiede di modificare un solo file, e in un deployment reale il file va escluso dal versionamento.
+I parametri di connessione stanno in `config-db.php`, separati dalla logica. L'ambiente locale è stato inoltre configurato con **lo stesso nome di database, lo stesso utente e la stessa password** dell'hosting: il file è quindi identico nei due ambienti, e la pubblicazione non richiede di modificarlo affatto.
+
+È una precauzione contro l'errore più banale del passaggio in produzione, che non è sbagliare le credenziali ma dimenticarsene: si carica il sito, si lascia il file con i valori locali e il modulo di contatto smette di scrivere: oppure, più insidioso, si aggiorna il file sull'hosting e alla successiva sincronizzazione lo si sovrascrive con la copia locale. Se il file non deve cambiare, nessuna delle due cose può accadere. Il prezzo è dover tenere anche in locale credenziali non banali, invece dell'utente `root` senza password che gli ambienti di sviluppo propongono come impostazione predefinita — il che, per inciso, è comunque una buona abitudine.
+
+Resta valido, e anzi diventa più stringente, che in un deployment reale il file vada **escluso dal versionamento**: ora è l'unico punto in cui compare in chiaro una password che vale anche in produzione.
 
 A partire da PHP 8.1 l'estensione `mysqli` segnala gli errori **sollevando eccezioni** anziché valorizzando `connect_error`. Un controllo scritto nella forma tradizionale `if ($conn->connect_error)` non verrebbe quindi mai eseguito, e un database irraggiungibile produrrebbe una traccia di stack contenente host, utente e percorso del file. La connessione è perciò racchiusa in un `try/catch`: all'utente arriva un messaggio generico, il dettaglio tecnico finisce nel log del server tramite `error_log()`.
 
@@ -438,7 +443,9 @@ Tutte le pagine, **incluse l'informativa privacy ed entrambe le varianti della p
 
 ### 6.6 Nessun cookie e nessun terzo
 
-Il sito non imposta cookie — né propri né di terze parti — non usa strumenti di analisi statistica e, una volta ospitati localmente i caratteri tipografici (§3.2), non effettua alcuna richiesta a domini esterni. Di conseguenza **non è necessario alcun banner di consenso ai cookie**: non c'è nulla da consentire.
+Le pagine pubbliche non impostano cookie — né propri né di terze parti — non usano strumenti di analisi statistica e, una volta ospitati localmente i caratteri tipografici (§3.2), non effettuano alcuna richiesta a domini esterni. Di conseguenza **non è necessario alcun banner di consenso ai cookie**: non c'è nulla da consentire.
+
+L'unica eccezione è l'area riservata (§5.7): l'accesso apre una sessione PHP, e con essa il cookie tecnico `PHPSESSID`, senza il quale il pannello non avrebbe modo di riconoscere chi ha effettuato l'accesso da una richiesta alla successiva. È un cookie di sessione strettamente necessario a un servizio richiesto dall'utente, e come tale esente dal consenso ai sensi dell'articolo 122 del Codice privacy; per di più riguarda soltanto chi gestisce il sito, non chi lo visita. Va comunque dichiarato: un'eccezione taciuta vale quanto un banner mancante, ed è la ragione per cui questa relazione afferma "le pagine pubbliche" e non "il sito".
 
 È una scelta che vale la pena rendere esplicita, perché il banner è oggi la principale fonte di attrito nella navigazione, e nella grande maggioranza dei siti serve a giustificare trattamenti che il sito potrebbe semplicemente non fare. Qui l'ordine è stato invertito: prima si è eliminato il trattamento, poi è venuto a mancare il motivo del banner.
 
@@ -451,7 +458,7 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 1. Avviare i moduli **Apache** e **MySQL/MariaDB** del proprio ambiente locale (XAMPP, MAMP o WAMP).
 2. Copiare la cartella del progetto nella directory servita dal server (per esempio `C:\xampp\htdocs\algora_site` oppure `C:\wamp64\www\algora_site`).
 3. Aprire **phpMyAdmin** (`http://localhost/phpmyadmin`) ed eseguire lo script `crea_db.sql`, che crea il database `algora_db` e la tabella `contatti`.
-4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione (i valori predefiniti sono quelli di XAMPP/MAMP: utente `root`, password vuota).
+4. Creare in locale database, utente e password con gli stessi valori previsti sull'hosting, e verificare che corrispondano a quelli in `config-db.php`. È la scelta descritta in §5.5: il file resta identico nei due ambienti e non va toccato al momento della pubblicazione.
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
 7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire il collegamento "Area riservata" nel piè di pagina — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
@@ -505,7 +512,7 @@ Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su h
 
 1. Caricare i file del progetto nella cartella pubblica del dominio (tipicamente `public_html` o `httpdocs`), `video/` compresa. Non serve invece caricare i marchi sorgente in `img/marchi/` che il `LEGGIMI` dichiara non usati dalle pagine: sono 5,7 MB che nessuna pagina richiede.
 2. Creare il database dal pannello dell'hosting ed eseguirvi `crea_db.sql`.
-3. Aggiornare `config-db.php` con host, nome del database, utente e password forniti dal gestore del dominio, assegnando all'utente i soli privilegi necessari (`INSERT` e `SELECT` sulla tabella `contatti`).
+3. Creare l'utente del database con le stesse credenziali usate in locale (§5.5), così che `config-db.php` non debba essere modificato, e assegnargli i soli privilegi che il codice usa davvero: `SELECT`, `INSERT`, `UPDATE` e `DELETE` sulla tabella `contatti`. Gli ultimi due servono all'area riservata (§5.7): con i soli `INSERT` e `SELECT` il modulo pubblico funzionerebbe e il pannello no.
 4. Verificare che `config-db.php` non sia raggiungibile dall'esterno e che non venga incluso nel versionamento.
 
 ---
@@ -568,7 +575,7 @@ The site is built on **6 content pages**, served by PHP, plus **1 server-side sc
 | `config-db.php` | Database connection parameters, kept apart from the application logic. |
 | `config-admin.php` | Hash of the reserved area password, isolated like the database parameters. |
 | `crea_db.sql` | DDL script creating the database and the table. |
-| `style.css` | Single stylesheet for the whole site (1,503 lines, ~55 KB). |
+| `style.css` | Single stylesheet for the whole site (1,518 lines, ~60 KB). |
 | `main.js` | Client-side behaviours (63 lines). |
 | `fonts/` | The two typefaces in WOFF2 format (8 files, 300 KB). |
 | `img/` | Product screenshots and the video poster frame, with instructions in `LEGGIMI.md`. |
@@ -576,7 +583,7 @@ The site is built on **6 content pages**, served by PHP, plus **1 server-side sc
 
 ### 2.1 Why PHP on the content pages too
 
-The five pages contain no application logic, but carry the `.php` extension so that they can use `include`:
+The six content pages contain no application logic, but carry the `.php` extension so that they can use `include`:
 
 ```php
 <?php $active = 'home'; ?>
@@ -597,7 +604,7 @@ foreach ($navItems as $key => $item) {
 }
 ```
 
-Without includes, a change to the menu would have to be replicated by hand across six files, with a real risk of them drifting apart.
+Without includes, a change to the menu would have to be replicated by hand across the eight files that display it — the six content pages, the outcome page and the reserved area — with a real risk of them drifting apart.
 
 ---
 
@@ -650,7 +657,7 @@ The consolidation made visible a dependency on specificity that the long names h
 The requirement for a layout that is not merely linear is met by three techniques, all of them outside the document's normal flow:
 
 1. **Pinned navigation bar:** `#nav` uses `position: fixed; top: 0; left: 0; right: 0; z-index: 200`, staying visible while scrolling.
-2. **Asymmetric CSS Grid layouts:** the hero and the case study use columns of different widths (`grid-template-columns: 1fr 400px`) and `gap: 1px` grids over a coloured background, producing the effect of archival "boxes" separated by a hairline. The stylesheet contains 18 grid contexts in all.
+2. **Asymmetric CSS Grid layouts:** the hero and the case study use columns of different widths (`grid-template-columns: 1fr 400px`) and `gap: 1px` grids over a coloured background, producing the effect of archival "boxes" separated by a hairline. The stylesheet contains 13 grid contexts in all: there were 18 before the consolidation described in §3.2 reduced eleven card grids to one.
 3. **"Before and after" comparison:** in `caso-studio.php`, two columns in inverted contrast (parchment against ink) set the manual process alongside the digitised one.
 
 To these are added `position: absolute` elements used as decoration (the watermark letter "A" in the hero, the timeline dots).
@@ -687,7 +694,7 @@ The horizontal padding of the full-width bands is centralised in a variable, red
 }
 ```
 
-Eleven rules (navigation bar, sections, bands, footer, page headers) use `var(--pad-x)`: the page margin is changed in a single place.
+Twelve rules (navigation bar, sections, bands, footer, page headers, reserved area) use `var(--pad-x)`: the page margin is changed in a single place.
 
 #### Why not a corrective `max-width` layer
 
@@ -772,8 +779,9 @@ The `utf8mb4` encoding covers the whole Unicode repertoire, including the accent
 
 ```php
 $stmt = $conn->prepare(
-    'INSERT INTO contatti (nome, ente, email, tipo, messaggio)
-     VALUES (?, ?, ?, ?, ?)'
+    'INSERT INTO contatti (nome, ente, email, tipo, messaggio,
+                           consenso_privacy, data_consenso)
+     VALUES (?, ?, ?, ?, ?, 1, NOW())'
 );
 $stmt->bind_param('sssss', $nome, $ente, $email, $tipo, $messaggio);
 $stmt->execute();
@@ -790,7 +798,11 @@ Escaping on the way in as well — a frequent mistake, because it feels "safer" 
 
 ### 5.5 Error handling and credentials
 
-The connection parameters live in `config-db.php`, separate from the logic: moving from a local environment to hosting means editing a single file, and in a real deployment that file must be excluded from version control.
+The connection parameters live in `config-db.php`, separate from the logic. The local environment has moreover been set up with **the same database name, the same user and the same password** as the hosting: the file is therefore identical in both environments, and publishing requires no edit to it at all.
+
+It is a precaution against the most banal mistake of going into production, which is not getting the credentials wrong but forgetting about them: you upload the site, leave the file with the local values, and the contact form quietly stops writing — or, more insidiously, you update the file on the host and then overwrite it with the local copy on the next sync. If the file never has to change, neither can happen. The price is having to keep non-trivial credentials locally too, instead of the passwordless `root` user that development environments offer by default — which, incidentally, is a good habit anyway.
+
+It remains true, and indeed becomes more pressing, that in a real deployment the file must be **excluded from version control**: it is now the single place where a password that also works in production appears in clear text.
 
 From PHP 8.1 onwards the `mysqli` extension reports errors by **throwing exceptions** rather than setting `connect_error`. A check written in the traditional `if ($conn->connect_error)` form would therefore never run, and an unreachable database would produce a stack trace containing host, user and file path. The connection is consequently wrapped in a `try/catch`: the user receives a generic message, while the technical detail goes to the server log through `error_log()`.
 
@@ -961,7 +973,9 @@ All pages, **including the privacy notice and both variants of the outcome page*
 
 ### 6.6 No cookies and no third parties
 
-The site sets no cookies — neither its own nor third-party ones — uses no analytics, and, once the typefaces were self-hosted (§3.2), makes no request to external domains. Consequently **no cookie consent banner is required**: there is nothing to consent to.
+The public pages set no cookies — neither their own nor third-party ones — use no analytics, and, once the typefaces were self-hosted (§3.2), make no request to external domains. Consequently **no cookie consent banner is required**: there is nothing to consent to.
+
+The one exception is the reserved area (§5.7): logging in opens a PHP session, and with it the technical `PHPSESSID` cookie, without which the panel would have no way of recognising who logged in from one request to the next. It is a session cookie strictly necessary to a service the user requested, and as such exempt from consent under Article 122 of the Italian privacy code; moreover it concerns only whoever runs the site, not whoever visits it. It must be declared all the same: an unstated exception is worth as much as a missing banner, and it is why this report says "the public pages" and not "the site".
 
 It is a choice worth stating explicitly, because the banner is today the main source of friction in browsing, and on the vast majority of sites it exists to justify processing that the site could simply not carry out. Here the order was reversed: the processing was removed first, and the reason for the banner then disappeared on its own.
 
@@ -974,7 +988,7 @@ The notice in `privacy.php` documents the situation anyway, because the absence 
 1. Start the **Apache** and **MySQL/MariaDB** modules of your local environment (XAMPP, MAMP or WAMP).
 2. Copy the project folder into the directory served by the server (for example `C:\xampp\htdocs\algora_site` or `C:\wamp64\www\algora_site`).
 3. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run the `crea_db.sql` script, which creates the `algora_db` database and the `contatti` table.
-4. Check that the parameters in `config-db.php` match your installation (the defaults are XAMPP/MAMP's: user `root`, empty password).
+4. Create the database, user and password locally with the same values used on the hosting, and check that they match those in `config-db.php`. This is the choice described in §5.5: the file stays identical in both environments and needs no editing at publication time.
 5. Open `http://localhost/algora_site/index.php`.
 6. To test the server-side part, open `http://localhost/algora_site/contatti.php`, fill in the form and submit it. Check that the confirmation page appears and that the row is present in the `contatti` table.
 7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" link in the footer — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
@@ -1028,7 +1042,7 @@ The site is meant to be published on the domain `www.algorastudio.it`. On shared
 
 1. Upload the project files into the domain's public folder (typically `public_html` or `httpdocs`), `video/` included. There is no need to upload the source logos in `img/marchi/` that the `LEGGIMI` file marks as unused by the pages: they are 5.7 MB no page ever requests.
 2. Create the database from the hosting control panel and run `crea_db.sql` on it.
-3. Update `config-db.php` with the host, database name, user and password supplied by the hosting provider, granting the user only the privileges actually needed (`INSERT` and `SELECT` on the `contatti` table).
+3. Create the database user with the same credentials used locally (§5.5), so that `config-db.php` needs no editing, and grant it only the privileges the code actually uses: `SELECT`, `INSERT`, `UPDATE` and `DELETE` on the `contatti` table. The last two are for the reserved area (§5.7): with `INSERT` and `SELECT` alone the public form would work and the panel would not.
 4. Check that `config-db.php` is not reachable from outside and that it is not included in version control.
 
 ---
