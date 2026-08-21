@@ -6,7 +6,7 @@ $navItems = [
   'chi-siamo'   => ['href' => 'chi-siamo.php',    'label' => 'Chi siamo'],
   'foliarium'   => ['href' => 'foliarium.php',    'label' => 'Foliarium'],
   'caso-studio' => ['href' => 'caso-studio.php',  'label' => 'Caso Studio'],
-  'contatti'    => ['href' => 'contatti.php',     'label' => 'Contatti'],
+  'archivio'    => ['href' => 'archivio.php',     'label' => 'Area riservata'],
 ];
 ?>
 <nav id="nav">
