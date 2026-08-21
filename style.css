@@ -1382,6 +1382,115 @@ footer {
 .msg-success { color: var(--green); }
 .msg-error { color: #A32015; }
 
+/* ═══════════════════════════════════════════════
+   PAGINA: archivio.php (area riservata)
+   Schermata di servizio: riusa i componenti gia' definiti (.label,
+   .form-group, .form-submit, .btn) e aggiunge solo cio' che qui non
+   esisteva — la tabella dell'archivio e i suoi contorni.
+═══════════════════════════════════════════════ */
+.area-riservata { padding-top: 130px; min-height: 80vh; background: var(--parchment); }
+
+/* Riquadro unico e centrato: accesso, modifica, conferma di eliminazione */
+.ar-accesso, .ar-scheda {
+  max-width: 640px; margin: 0 auto;
+  background: var(--cream); border: 1px solid var(--border); padding: 40px 32px;
+}
+.ar-accesso h1, .ar-scheda h1 { font-size: clamp(30px, 4vw, 42px); margin-bottom: 4px; }
+
+/* Avviso dell'esito dell'ultima operazione */
+.ar-avviso {
+  max-width: 1180px; margin: 0 auto 32px;
+  padding: 14px 18px; border-left: 3px solid var(--green);
+  background: var(--green-light); color: var(--ink); font-size: 15px;
+}
+.ar-avviso-errore { border-left-color: #A32015; background: #F6E4E1; }
+
+.ar-testata {
+  max-width: 1180px; margin: 0 auto 40px;
+  display: flex; flex-wrap: wrap; gap: 24px;
+  align-items: flex-end; justify-content: space-between;
+}
+.ar-testata h1 { font-size: clamp(30px, 4vw, 42px); margin-bottom: 4px; }
+
+.ar-vuoto {
+  max-width: 1180px; margin: 0 auto;
+  padding: 32px; background: var(--parchment-2); border: 1px dashed var(--border);
+  color: var(--mid); font-style: italic;
+}
+
+/* La tabella tiene la sua larghezza minima e scorre dentro al contenitore
+   invece di schiacciare le colonne: un archivio si legge per righe. */
+.ar-tabella-wrap {
+  max-width: 1180px; margin: 0 auto;
+  overflow-x: auto; border: 1px solid var(--border); background: var(--ivory);
+}
+.ar-tabella { width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; }
+.ar-tabella caption {
+  font-family: var(--font-label);
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold-text); text-align: left; padding: 16px 16px 12px;
+}
+.ar-tabella th, .ar-tabella td {
+  text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.ar-tabella th {
+  font-family: var(--font-label);
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink); font-weight: 400; background: var(--parchment-2);
+  white-space: nowrap;
+}
+.ar-tabella td { color: var(--mid); }
+.ar-tabella tbody tr:last-child td { border-bottom: none; }
+.ar-tabella tbody tr:hover { background: var(--gold-faint); }
+.ar-estratto { max-width: 320px; }
+.ar-quando { white-space: nowrap; }
+
+.ar-scorri {
+  max-width: 1180px; margin: 12px auto 0;
+  font-size: 13px; font-style: italic; color: var(--muted);
+}
+
+.ar-si, .ar-no {
+  font-family: var(--font-label); font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 3px 8px; white-space: nowrap;
+}
+.ar-si { background: var(--green-light); color: var(--green); }
+.ar-no { background: #F6E4E1; color: #A32015; }
+.ar-data { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.ar-azioni { white-space: nowrap; }
+.ar-azioni a {
+  font-family: var(--font-label); font-size: 11px;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--gold-text); text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.ar-azioni a:hover { border-bottom-color: currentColor; }
+.ar-azioni a + a { margin-left: 14px; }
+.ar-link-elimina { color: #A32015; }
+
+/* Testo integrale del messaggio nella conferma di eliminazione */
+.ar-messaggio {
+  background: var(--parchment-2); border-left: 3px solid var(--border);
+  padding: 16px 20px; font-size: 15px; color: var(--mid); line-height: 1.8;
+}
+
+.ar-elimina { background: #A32015; }
+.ar-elimina:hover { background: #7D170F; }
+
+.ar-nuovo {
+  max-width: 760px; margin: 56px auto 0;
+  background: var(--cream); border: 1px solid var(--border); padding: 40px 32px;
+}
+
+/* Disposizione desktop dell'area riservata */
+@media (min-width: 961px) {
+  .ar-accesso, .ar-scheda, .ar-nuovo { padding: 48px; }
+  .ar-scorri { display: none; }
+}
+
 /* ── ANIMAZIONI ──────────────────────────────── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
