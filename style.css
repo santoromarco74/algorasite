@@ -573,6 +573,15 @@ footer {
 }
 .footer-col a:hover { color: var(--gold-on-dark); }
 
+/* Distintivi di validazione W3C: nessuno stile inline, opacita' ridotta
+   perche' sono un dettaglio a fondo pagina, non un elemento da notare. */
+.footer-valid {
+  display: flex; gap: 12px; margin-bottom: 16px;
+  opacity: .5; transition: opacity .2s;
+}
+.footer-valid:hover { opacity: .85; }
+.footer-valid img { display: block; }
+
 .footer-bottom {
   display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
 }

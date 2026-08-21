@@ -35,22 +35,20 @@
       </ul>
     </div>
   </div>
-  <div >
-    <a href="https://validator.w3.org/check?uri=referer">
-      <img style="border:0;width:88px;height:31px"
-        src="https://www.w3.org/Icons/valid-html401"
-        alt="Valid HTML 4.01!" />
+  <?php /* Le due immagini sono ospitate sul sito, non richiamate da w3.org:
+           un'immagine remota comunicherebbe l'IP del visitatore a un
+           dominio terzo a ogni caricamento di pagina, dato che il pie' di
+           pagina e' incluso ovunque. Stessa ragione dei caratteri
+           tipografici in fonts/ (vedi img/badge/LEGGIMI.md). Il badge
+           dichiara HTML5, non HTML 4.01: e' quella la versione che il
+           sito usa e che la §6.5 della relazione dichiara validata. */ ?>
+  <div class="footer-valid">
+    <a href="https://validator.w3.org/nu/?doc=https%3A%2F%2Falgorastudio.it%2F">
+      <img src="img/badge/valid-html5.png" width="79" height="31" alt="HTML valido" loading="lazy">
     </a>
-  <a href="https://css-validator.org/check/referer">
-    <img style="border:0;width:88px;height:31px"
-      src="https://css-validator.org/validator/images/vcss.png"
-      alt="Valid CSS!" />
-  </a>
-  <a href="https://css-validator.org/check/referer">
-    <img style="border:0;width:88px;height:31px"
-      src="https://css-validator.org/validator/images/vcss-blue.png"
-      alt="Valid CSS!" />
-  </a>
+    <a href="https://jigsaw.w3.org/css-validator/check/referer">
+      <img src="img/badge/valid-css.png" width="88" height="31" alt="CSS valido" loading="lazy">
+    </a>
   </div>
   <div class="footer-bottom">
     <p>© 2025 Algora Studio — Marco Santoro — P.IVA [01925090092] — Savona, Liguria</p>
