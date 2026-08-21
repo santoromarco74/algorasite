@@ -26,7 +26,7 @@ La maggior parte dei siti per software house si appoggia a template generici o a
 
 ## 2. ARCHITETTURA DELL'INFORMAZIONE E MAPPATURA DEI FILE
 
-Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 script server-side** per la persistenza dei dati. Le parti comuni sono estratte in due **include PHP** riusati da tutte le pagine.
+Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 script server-side** per la persistenza dei dati e **1 schermata di servizio** riservata a chi gestisce il sito. Le parti comuni sono estratte in due **include PHP** riusati da tutte le pagine.
 
 | File | Ruolo |
 | :--- | :--- |
@@ -39,9 +39,11 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 | `nav.php` | Include: barra di navigazione, generata da un array PHP che marca automaticamente la voce attiva. |
 | `footer.php` | Include: piè di pagina comune a tutte le pagine. |
 | `invia-contatto.php` | **Backend.** Riceve il POST del modulo, valida, inserisce nel database con istruzione preparata, restituisce la pagina di esito. |
+| `archivio.php` | **Area riservata.** Schermata di servizio protetta da password: elenco delle richieste, inserimento manuale, modifica ed eliminazione (§5.7). |
 | `config-db.php` | Parametri di connessione al database, isolati dalla logica applicativa. |
+| `config-admin.php` | Impronta della password dell'area riservata, isolata come i parametri del database. |
 | `crea_db.sql` | Script DDL di creazione di database e tabella. |
-| `style.css` | Foglio di stile unico dell'intero sito (1.383 righe, ~51 KB). |
+| `style.css` | Foglio di stile unico dell'intero sito (1.513 righe, ~55 KB). |
 | `main.js` | Comportamenti client-side (63 righe). |
 | `fonts/` | I due caratteri tipografici in formato WOFF2 (8 file, 300 KB). |
 | `img/` | Cartella per le schermate del prodotto, con le istruzioni in `LEGGIMI.md`. |
@@ -191,13 +193,15 @@ CREATE DATABASE IF NOT EXISTS algora_db
 USE algora_db;
 
 CREATE TABLE IF NOT EXISTS contatti (
-    id        INT AUTO_INCREMENT PRIMARY KEY,
-    nome      VARCHAR(100) NOT NULL,
-    ente      VARCHAR(100),
-    email     VARCHAR(100) NOT NULL,
-    tipo      VARCHAR(50),
-    messaggio TEXT         NOT NULL,
-    data_invio DATETIME DEFAULT CURRENT_TIMESTAMP
+    id               INT AUTO_INCREMENT PRIMARY KEY,
+    nome             VARCHAR(100) NOT NULL,
+    ente             VARCHAR(100),
+    email            VARCHAR(100) NOT NULL,
+    tipo             VARCHAR(50),
+    messaggio        TEXT         NOT NULL,
+    consenso_privacy TINYINT(1)   NOT NULL DEFAULT 0,
+    data_consenso    DATETIME     DEFAULT NULL,
+    data_invio       DATETIME     DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 ```
 
@@ -253,6 +257,82 @@ $consenso = isset($_POST['consenso']) && $_POST['consenso'] === '1';
 ```
 
 Senza consenso lo script non esegue alcun inserimento e restituisce un messaggio di errore specifico. Quando invece il consenso c'è, non viene registrato soltanto il fatto che la casella fosse spuntata: l'articolo 7 del Regolamento richiede di poter **dimostrare** che il consenso è stato prestato, quindi la tabella conserva anche il momento in cui è avvenuto, nelle colonne `consenso_privacy` e `data_consenso`.
+
+### 5.7 Area riservata: le altre tre operazioni sull'archivio
+
+Il flusso descritto fin qui esegue **una sola** delle quattro operazioni fondamentali su una tabella: l'inserimento. Lettura, modifica ed eliminazione restavano possibili soltanto da phpMyAdmin, cioè dal pannello di amministrazione del DBMS. È un limite pratico e insieme giuridico: la sezione 4 dell'informativa promette che le richieste vengono cancellate al termine del periodo di conservazione, e gli articoli 16 e 17 del Regolamento riconoscono all'interessato il diritto di ottenere rettifica e cancellazione dei propri dati. Una promessa che si può mantenere solo aprendo il pannello del database è una promessa fragile.
+
+`archivio.php` completa il quadro con una schermata di servizio, protetta da password e raggiungibile da un collegamento discreto nel piè di pagina. Le quattro operazioni si distribuiscono così:
+
+| Operazione | Istruzione SQL | Come viene richiesta |
+| :--- | :--- | :--- |
+| Lettura (*Read*) | `SELECT` | `GET archivio.php` |
+| Inserimento (*Create*) | `INSERT` | `POST` con `azione=crea` |
+| Modifica (*Update*) | `UPDATE` | `POST` con `azione=aggiorna` |
+| Eliminazione (*Delete*) | `DELETE` | `POST` con `azione=elimina` |
+
+#### Un solo file, tre viste
+
+Elenco, modifica e conferma di eliminazione sono rami della stessa pagina, non file distinti: la sequenza **richiesta → azione → risposta** resta leggibile dall'alto in basso, come in `invia-contatto.php`. In testa allo script stanno le azioni che scrivono, subito sotto le interrogazioni di lettura, e solo in fondo il markup. Nessuna riga di HTML viene prodotta prima che si sappia come è andata l'operazione: è la condizione perché il redirect del punto successivo possa funzionare, dato che le intestazioni HTTP vanno inviate prima del corpo della risposta.
+
+#### Le scritture viaggiano solo in POST
+
+Un collegamento in `GET` viene seguito dai crawler dei motori di ricerca e ripetuto dal tasto "aggiorna" del browser: affidare a un `GET` la cancellazione di una riga significa consegnare l'archivio al primo indicizzatore che passa. Nella schermata i collegamenti "Modifica" ed "Elimina" sono effettivamente `GET`, ma non toccano nulla: aprono soltanto la vista corrispondente. Tutto ciò che scrive è un `POST`.
+
+#### Post/Redirect/Get
+
+Dopo ogni scrittura lo script non produce direttamente una pagina, ma risponde con un redirect `303 See Other` verso sé stesso. Ricaricare la pagina di esito ripete quindi una lettura, non l'inserimento o l'eliminazione appena eseguiti — il classico problema del modulo inviato due volte per un `F5` di troppo. Il messaggio di esito e, in caso di errore di validazione, i valori digitati vengono trasportati **in sessione** e non nella *querystring*: un messaggio ripreso dall'URL sarebbe testo di provenienza esterna stampato in pagina, cioè esattamente ciò che si evita in §5.4.
+
+#### Token anti-CSRF
+
+Il cookie di sessione viene allegato dal browser a **qualsiasi** richiesta diretta al sito, anche a quella partita da una pagina ostile aperta in un'altra scheda. Senza contromisure, un modulo nascosto su un sito di terzi potrebbe inviare a `archivio.php` un `POST` di eliminazione, e il server lo eseguirebbe come se fosse legittimo. La contromisura è un valore casuale noto soltanto alla sessione, ricopiato in ogni modulo della pagina e verificato a ogni scrittura:
+
+```php
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(32));
+}
+/* ... a ogni operazione che scrive ... */
+if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
+    /* richiesta respinta */
+}
+```
+
+Una pagina di terzi non può leggere quel valore, quindi non può costruire una richiesta valida. Il confronto usa `hash_equals()` e non l'operatore `===` perché il primo non si ferma al primo carattere diverso: il tempo di risposta non lascia intuire quanto ci si è avvicinati al token.
+
+#### Autenticazione
+
+Il file `config-admin.php` non contiene la password ma la sua **impronta** calcolata con `password_hash()`, isolata dalla logica applicativa come i parametri del database:
+
+```php
+if (password_verify($_POST['password'] ?? '', $cfgAdmin['password_hash'])) {
+    session_regenerate_id(true);
+    $_SESSION['archivio_admin'] = true;
+}
+```
+
+L'algoritmo bcrypt è lento per costruzione e applica un *sale* diverso a ogni chiamata: due impronte della stessa password sono diverse fra loro e non sono confrontabili con una tabella precalcolata. `session_regenerate_id(true)` sostituisce l'identificativo di sessione nel momento in cui cambiano i privilegi, così un identificativo eventualmente imposto prima dell'accesso non vale più nulla (*session fixation*). Il messaggio di errore è unico e generico: a un estraneo non si conferma mai quale metà della credenziale ha indovinato.
+
+I limiti dell'impostazione sono dichiarati nel commento in testa al file: una password unica condivisa è sufficiente per un pannello dimostrativo su una singola postazione, mentre un archivio in produzione richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei tentativi di accesso e registro degli accessi.
+
+#### La conferma di eliminazione è una pagina, non una finestra di dialogo
+
+Un `confirm()` JavaScript sparirebbe con lo script disattivato, lasciando un pulsante che cancella al primo clic. La conferma è quindi una vista a sé, raggiunta in `GET`, che mostra per esteso il dato in procinto di sparire — nome, indirizzo, data e testo integrale del messaggio — e contiene il solo modulo `POST` che esegue davvero l'eliminazione. Funziona senza JavaScript e dà modo di accorgersi di aver scelto la riga sbagliata.
+
+#### La data del consenso non si riscrive a ogni salvataggio
+
+Se la modifica sovrascrivesse `data_consenso` con `NOW()` a ogni salvataggio, la prova richiesta dall'articolo 7 del Regolamento (§5.6) diventerebbe la data dell'ultima correzione di un refuso, non il momento in cui il consenso è stato prestato. La colonna viene perciò valorizzata solo alla prima spunta e azzerata in caso di revoca:
+
+```sql
+UPDATE contatti
+   SET nome = ?, ente = ?, email = ?, tipo = ?, messaggio = ?,
+       consenso_privacy = ?,
+       data_consenso = IF(? = 1, COALESCE(data_consenso, NOW()), NULL)
+ WHERE id = ?
+```
+
+#### Continuità con il resto del progetto
+
+Ogni interrogazione passa da un'istruzione preparata e ogni dato stampato a video passa da `htmlspecialchars()`: le stesse due regole di §5.3 e §5.4, applicate qui a un numero molto maggiore di valori in uscita. La schermata riusa i componenti già definiti nel foglio di stile e, su schermo stretto, la tabella non si comprime ma scorre orizzontalmente dentro un contenitore dichiarato `role="region"` e focalizzabile da tastiera, che si può quindi scorrere anche senza mouse; il messaggio di esito è marcato `role="status"`, perché venga annunciato dai lettori di schermo senza sottrarre il focus. La pagina porta infine `<meta name="robots" content="noindex, nofollow">`: una schermata di servizio non ha ragione di comparire nei motori di ricerca.
 
 ---
 
@@ -340,6 +420,11 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione (i valori predefiniti sono quelli di XAMPP/MAMP: utente `root`, password vuota).
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
+7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire il collegamento "Area riservata" nel piè di pagina — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
+
+```
+php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
+```
 
 ### 7.1 Casi di prova eseguiti
 
@@ -354,6 +439,14 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 | Apertura diretta di `invia-contatto.php` via URL | Redirect `303` al modulo | Superato |
 | Stringa di SQL injection nel campo nome | Memorizzata come testo, tabella intatta | Superato |
 | Database irraggiungibile | Messaggio generico all'utente, dettaglio nel log, nessun dato tecnico esposto | Superato |
+| Area riservata: password errata | Messaggio generico, nessun accesso | Superato |
+| Area riservata: `POST` di eliminazione senza sessione valida | Richiesta respinta, riga intatta | Superato |
+| Area riservata: `POST` privo di token anti-CSRF | Richiesta respinta, riga intatta | Superato |
+| Modifica con email non valida | Errore specifico, valori digitati riproposti nel modulo, nessuna scrittura | Superato |
+| Doppio salvataggio con consenso già presente | `data_consenso` invariata | Superato |
+| Revoca del consenso in modifica | `consenso_privacy` a `0` e `data_consenso` azzerata | Superato |
+| Eliminazione di un numero inesistente | Messaggio specifico, nessuna riga toccata | Superato |
+| Nome contenente `<b>` e apostrofo, mostrato in elenco | Stampato come testo, non interpretato dal browser | Superato |
 
 ### 7.2 Verifica del passaggio a mobile-first
 
@@ -383,4 +476,5 @@ Per completezza si segnalano gli aspetti ancora aperti:
 
 * **Contenuti multimediali.** Il sito è tuttora interamente testuale. L'impianto per accogliere le schermate di Foliarium è predisposto nella scheda prodotto — struttura `<figure>`, didascalie, testi alternativi, dimensioni dichiarate per evitare lo slittamento del layout — ma resta disattivato in attesa delle immagini. Le istruzioni sono in `img/LEGGIMI.md`.
 * **Dati del titolare nell'informativa.** L'informativa privacy è completa nella struttura, ma i riferimenti anagrafici del titolare (ragione sociale, partita IVA, sede), il periodo di conservazione e i fornitori nominati responsabili esterni sono segnaposto, resi graficamente evidenti nella pagina. Vanno compilati prima della pubblicazione: un'informativa pubblicata a metà è peggio di nessuna informativa. Lo stesso segnaposto della partita IVA compare nel piè di pagina.
-* **Protezione del modulo.** Per un uso in produzione andrebbero aggiunti un token anti-CSRF e una misura anti-spam. Per quest'ultima è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
+* **Protezione del modulo pubblico.** Il token anti-CSRF descritto in §5.7 protegge l'area riservata, ma non è stato esteso al modulo di contatto, che resta privo anche di una misura anti-spam. Per un uso in produzione andrebbero aggiunti entrambi. Per la seconda è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
+* **Autenticazione dell'area riservata.** L'accesso a `archivio.php` poggia su un'unica password condivisa: basta a proteggere un pannello dimostrativo, non un archivio in produzione, che richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei tentativi di accesso e registro delle operazioni eseguite. Manca inoltre una cancellazione programmata al termine del periodo di conservazione: oggi la cancellazione è un gesto manuale, per quanto ora possibile senza aprire phpMyAdmin.

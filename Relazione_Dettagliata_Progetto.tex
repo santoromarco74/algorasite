@@ -187,9 +187,10 @@ e MySQL/MariaDB}) permette di ottenere:
 FILE}\label{architettura-dellinformazione-e-mappatura-dei-file}}
 
 Il sito si articola su \textbf{6 pagine di contenuto}, servite da PHP,
-più \textbf{1 script server-side} per la persistenza dei dati. Le parti
-comuni sono estratte in due \textbf{include PHP} riusati da tutte le
-pagine.
+più \textbf{1 script server-side} per la persistenza dei dati e
+\textbf{1 schermata di servizio} riservata a chi gestisce il sito. Le
+parti comuni sono estratte in due \textbf{include PHP} riusati da tutte
+le pagine.
 
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
@@ -229,12 +230,17 @@ pagine. \\
 \texttt{invia-contatto.php} & \textbf{Backend.} Riceve il POST del
 modulo, valida, inserisce nel database con istruzione preparata,
 restituisce la pagina di esito. \\
+\texttt{archivio.php} & \textbf{Area riservata.} Schermata di servizio
+protetta da password: elenco delle richieste, inserimento manuale,
+modifica ed eliminazione (§5.7). \\
 \texttt{config-db.php} & Parametri di connessione al database, isolati
 dalla logica applicativa. \\
+\texttt{config-admin.php} & Impronta della password dell'area riservata,
+isolata come i parametri del database. \\
 \texttt{crea\_db.sql} & Script DDL di creazione di database e
 tabella. \\
-\texttt{style.css} & Foglio di stile unico dell'intero sito (1.383
-righe, \textasciitilde51 KB). \\
+\texttt{style.css} & Foglio di stile unico dell'intero sito (1.513
+righe, \textasciitilde55 KB). \\
 \texttt{main.js} & Comportamenti client-side (63 righe). \\
 \texttt{fonts/} & I due caratteri tipografici in formato WOFF2 (8 file,
 300 KB). \\
@@ -533,13 +539,15 @@ adotta quindi l'architettura a tre livelli \textbf{Client (HTML/CSS/JS)
 \KeywordTok{USE}\NormalTok{ algora\_db;}
 
 \KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ contatti (}
-    \KeywordTok{id}        \DataTypeTok{INT}\NormalTok{ AUTO\_INCREMENT }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
-\NormalTok{    nome      }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{) }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
-\NormalTok{    ente      }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{),}
-\NormalTok{    email     }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{) }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
-\NormalTok{    tipo      }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{50}\NormalTok{),}
-\NormalTok{    messaggio TEXT         }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
-\NormalTok{    data\_invio DATETIME }\KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+    \KeywordTok{id}               \DataTypeTok{INT}\NormalTok{ AUTO\_INCREMENT }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    nome             }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{) }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    ente             }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{),}
+\NormalTok{    email            }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{100}\NormalTok{) }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    tipo             }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{50}\NormalTok{),}
+\NormalTok{    messaggio        TEXT         }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    consenso\_privacy TINYINT(}\DecValTok{1}\NormalTok{)   }\KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{DEFAULT} \DecValTok{0}\NormalTok{,}
+\NormalTok{    data\_consenso    DATETIME     }\KeywordTok{DEFAULT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    data\_invio       DATETIME     }\KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
 \NormalTok{) ENGINE}\OperatorTok{=}\NormalTok{InnoDB;}
 \end{Highlighting}
 \end{Shaded}
@@ -665,6 +673,190 @@ del Regolamento richiede di poter \textbf{dimostrare} che il consenso è
 stato prestato, quindi la tabella conserva anche il momento in cui è
 avvenuto, nelle colonne \texttt{consenso\_privacy} e
 \texttt{data\_consenso}.
+
+\hypertarget{area-riservata-le-altre-tre-operazioni-sullarchivio}{%
+\subsubsection{5.7 Area riservata: le altre tre operazioni
+sull'archivio}\label{area-riservata-le-altre-tre-operazioni-sullarchivio}}
+
+Il flusso descritto fin qui esegue \textbf{una sola} delle quattro
+operazioni fondamentali su una tabella: l'inserimento. Lettura, modifica
+ed eliminazione restavano possibili soltanto da phpMyAdmin, cioè dal
+pannello di amministrazione del DBMS. È un limite pratico e insieme
+giuridico: la sezione 4 dell'informativa promette che le richieste
+vengono cancellate al termine del periodo di conservazione, e gli
+articoli 16 e 17 del Regolamento riconoscono all'interessato il diritto
+di ottenere rettifica e cancellazione dei propri dati. Una promessa che
+si può mantenere solo aprendo il pannello del database è una promessa
+fragile.
+
+\texttt{archivio.php} completa il quadro con una schermata di servizio,
+protetta da password e raggiungibile da un collegamento discreto nel piè
+di pagina. Le quattro operazioni si distribuiscono così:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Operazione & Istruzione SQL & Come viene richiesta \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Lettura (\emph{Read}) & \texttt{SELECT} & \texttt{GET\ archivio.php} \\
+Inserimento (\emph{Create}) & \texttt{INSERT} & \texttt{POST} con
+\texttt{azione=crea} \\
+Modifica (\emph{Update}) & \texttt{UPDATE} & \texttt{POST} con
+\texttt{azione=aggiorna} \\
+Eliminazione (\emph{Delete}) & \texttt{DELETE} & \texttt{POST} con
+\texttt{azione=elimina} \\
+\end{longtable}
+
+\hypertarget{un-solo-file-tre-viste}{%
+\paragraph{Un solo file, tre viste}\label{un-solo-file-tre-viste}}
+
+Elenco, modifica e conferma di eliminazione sono rami della stessa
+pagina, non file distinti: la sequenza \textbf{richiesta → azione →
+risposta} resta leggibile dall'alto in basso, come in
+\texttt{invia-contatto.php}. In testa allo script stanno le azioni che
+scrivono, subito sotto le interrogazioni di lettura, e solo in fondo il
+markup. Nessuna riga di HTML viene prodotta prima che si sappia come è
+andata l'operazione: è la condizione perché il redirect del punto
+successivo possa funzionare, dato che le intestazioni HTTP vanno inviate
+prima del corpo della risposta.
+
+\hypertarget{le-scritture-viaggiano-solo-in-post}{%
+\paragraph{Le scritture viaggiano solo in
+POST}\label{le-scritture-viaggiano-solo-in-post}}
+
+Un collegamento in \texttt{GET} viene seguito dai crawler dei motori di
+ricerca e ripetuto dal tasto ``aggiorna'' del browser: affidare a un
+\texttt{GET} la cancellazione di una riga significa consegnare
+l'archivio al primo indicizzatore che passa. Nella schermata i
+collegamenti ``Modifica'' ed ``Elimina'' sono effettivamente
+\texttt{GET}, ma non toccano nulla: aprono soltanto la vista
+corrispondente. Tutto ciò che scrive è un \texttt{POST}.
+
+\hypertarget{postredirectget}{%
+\paragraph{Post/Redirect/Get}\label{postredirectget}}
+
+Dopo ogni scrittura lo script non produce direttamente una pagina, ma
+risponde con un redirect \texttt{303\ See\ Other} verso sé stesso.
+Ricaricare la pagina di esito ripete quindi una lettura, non
+l'inserimento o l'eliminazione appena eseguiti --- il classico problema
+del modulo inviato due volte per un \texttt{F5} di troppo. Il messaggio
+di esito e, in caso di errore di validazione, i valori digitati vengono
+trasportati \textbf{in sessione} e non nella \emph{querystring}: un
+messaggio ripreso dall'URL sarebbe testo di provenienza esterna stampato
+in pagina, cioè esattamente ciò che si evita in §5.4.
+
+\hypertarget{token-anti-csrf}{%
+\paragraph{Token anti-CSRF}\label{token-anti-csrf}}
+
+Il cookie di sessione viene allegato dal browser a \textbf{qualsiasi}
+richiesta diretta al sito, anche a quella partita da una pagina ostile
+aperta in un'altra scheda. Senza contromisure, un modulo nascosto su un
+sito di terzi potrebbe inviare a \texttt{archivio.php} un \texttt{POST}
+di eliminazione, e il server lo eseguirebbe come se fosse legittimo. La
+contromisura è un valore casuale noto soltanto alla sessione, ricopiato
+in ogni modulo della pagina e verificato a ogni scrittura:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\KeywordTok{empty}\NormalTok{(}\VariableTok{$\_SESSION}\NormalTok{[}\StringTok{\textquotesingle{}csrf\textquotesingle{}}\NormalTok{])) \{}
+    \VariableTok{$\_SESSION}\NormalTok{[}\StringTok{\textquotesingle{}csrf\textquotesingle{}}\NormalTok{] }\OperatorTok{=} \FunctionTok{bin2hex}\NormalTok{(}\FunctionTok{random\_bytes}\NormalTok{(}\DecValTok{32}\NormalTok{))}\OtherTok{;}
+\NormalTok{\}}
+\CommentTok{/* ... a ogni operazione che scrive ... */}
+\ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\FunctionTok{hash\_equals}\NormalTok{(}\VariableTok{$\_SESSION}\NormalTok{[}\StringTok{\textquotesingle{}csrf\textquotesingle{}}\NormalTok{]}\OtherTok{,} \VariableTok{$\_POST}\NormalTok{[}\StringTok{\textquotesingle{}csrf\textquotesingle{}}\NormalTok{] }\OperatorTok{??} \StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{)) \{}
+    \CommentTok{/* richiesta respinta */}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Una pagina di terzi non può leggere quel valore, quindi non può
+costruire una richiesta valida. Il confronto usa \texttt{hash\_equals()}
+e non l'operatore \texttt{===} perché il primo non si ferma al primo
+carattere diverso: il tempo di risposta non lascia intuire quanto ci si
+è avvicinati al token.
+
+\hypertarget{autenticazione}{%
+\paragraph{Autenticazione}\label{autenticazione}}
+
+Il file \texttt{config-admin.php} non contiene la password ma la sua
+\textbf{impronta} calcolata con \texttt{password\_hash()}, isolata dalla
+logica applicativa come i parametri del database:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{password\_verify}\NormalTok{(}\VariableTok{$\_POST}\NormalTok{[}\StringTok{\textquotesingle{}password\textquotesingle{}}\NormalTok{] }\OperatorTok{??} \StringTok{\textquotesingle{}\textquotesingle{}}\OtherTok{,} \VariableTok{$cfgAdmin}\NormalTok{[}\StringTok{\textquotesingle{}password\_hash\textquotesingle{}}\NormalTok{])) \{}
+    \FunctionTok{session\_regenerate\_id}\NormalTok{(}\KeywordTok{true}\NormalTok{)}\OtherTok{;}
+    \VariableTok{$\_SESSION}\NormalTok{[}\StringTok{\textquotesingle{}archivio\_admin\textquotesingle{}}\NormalTok{] }\OperatorTok{=} \KeywordTok{true}\OtherTok{;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+L'algoritmo bcrypt è lento per costruzione e applica un \emph{sale}
+diverso a ogni chiamata: due impronte della stessa password sono diverse
+fra loro e non sono confrontabili con una tabella precalcolata.
+\texttt{session\_regenerate\_id(true)} sostituisce l'identificativo di
+sessione nel momento in cui cambiano i privilegi, così un identificativo
+eventualmente imposto prima dell'accesso non vale più nulla
+(\emph{session fixation}). Il messaggio di errore è unico e generico: a
+un estraneo non si conferma mai quale metà della credenziale ha
+indovinato.
+
+I limiti dell'impostazione sono dichiarati nel commento in testa al
+file: una password unica condivisa è sufficiente per un pannello
+dimostrativo su una singola postazione, mentre un archivio in produzione
+richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei
+tentativi di accesso e registro degli accessi.
+
+\hypertarget{la-conferma-di-eliminazione-uxe8-una-pagina-non-una-finestra-di-dialogo}{%
+\paragraph{La conferma di eliminazione è una pagina, non una finestra di
+dialogo}\label{la-conferma-di-eliminazione-uxe8-una-pagina-non-una-finestra-di-dialogo}}
+
+Un \texttt{confirm()} JavaScript sparirebbe con lo script disattivato,
+lasciando un pulsante che cancella al primo clic. La conferma è quindi
+una vista a sé, raggiunta in \texttt{GET}, che mostra per esteso il dato
+in procinto di sparire --- nome, indirizzo, data e testo integrale del
+messaggio --- e contiene il solo modulo \texttt{POST} che esegue davvero
+l'eliminazione. Funziona senza JavaScript e dà modo di accorgersi di
+aver scelto la riga sbagliata.
+
+\hypertarget{la-data-del-consenso-non-si-riscrive-a-ogni-salvataggio}{%
+\paragraph{La data del consenso non si riscrive a ogni
+salvataggio}\label{la-data-del-consenso-non-si-riscrive-a-ogni-salvataggio}}
+
+Se la modifica sovrascrivesse \texttt{data\_consenso} con \texttt{NOW()}
+a ogni salvataggio, la prova richiesta dall'articolo 7 del Regolamento
+(§5.6) diventerebbe la data dell'ultima correzione di un refuso, non il
+momento in cui il consenso è stato prestato. La colonna viene perciò
+valorizzata solo alla prima spunta e azzerata in caso di revoca:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{UPDATE}\NormalTok{ contatti}
+   \KeywordTok{SET}\NormalTok{ nome }\OperatorTok{=}\NormalTok{ ?, ente }\OperatorTok{=}\NormalTok{ ?, email }\OperatorTok{=}\NormalTok{ ?, tipo }\OperatorTok{=}\NormalTok{ ?, messaggio }\OperatorTok{=}\NormalTok{ ?,}
+\NormalTok{       consenso\_privacy }\OperatorTok{=}\NormalTok{ ?,}
+\NormalTok{       data\_consenso }\OperatorTok{=} \ControlFlowTok{IF}\NormalTok{(? }\OperatorTok{=} \DecValTok{1}\NormalTok{, }\FunctionTok{COALESCE}\NormalTok{(data\_consenso, NOW()), }\KeywordTok{NULL}\NormalTok{)}
+ \KeywordTok{WHERE} \KeywordTok{id} \OperatorTok{=}\NormalTok{ ?}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{continuituxe0-con-il-resto-del-progetto}{%
+\paragraph{Continuità con il resto del
+progetto}\label{continuituxe0-con-il-resto-del-progetto}}
+
+Ogni interrogazione passa da un'istruzione preparata e ogni dato
+stampato a video passa da \texttt{htmlspecialchars()}: le stesse due
+regole di §5.3 e §5.4, applicate qui a un numero molto maggiore di
+valori in uscita. La schermata riusa i componenti già definiti nel
+foglio di stile e, su schermo stretto, la tabella non si comprime ma
+scorre orizzontalmente dentro un contenitore dichiarato
+\texttt{role="region"} e focalizzabile da tastiera, che si può quindi
+scorrere anche senza mouse; il messaggio di esito è marcato
+\texttt{role="status"}, perché venga annunciato dai lettori di schermo
+senza sottrarre il focus. La pagina porta infine
+\texttt{\textless{}meta\ name="robots"\ content="noindex,\ nofollow"\textgreater{}}:
+una schermata di servizio non ha ragione di comparire nei motori di
+ricerca.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -926,7 +1118,18 @@ LOCALE}\label{installazione-e-collaudo-in-locale}}
   \texttt{http://localhost/algora\_site/contatti.php}, compilare il
   modulo e inviarlo. Va verificato che compaia la pagina di conferma e
   che la riga sia presente nella tabella \texttt{contatti}.
+\item
+  Per collaudare l'area riservata (§5.7), aprire
+  \texttt{http://localhost/algora\_site/archivio.php} --- o seguire il
+  collegamento ``Area riservata'' nel piè di pagina --- ed entrare con
+  la password dimostrativa \texttt{algora2025}. Per sostituirla si
+  rigenera l'impronta da riga di comando e si aggiorna
+  \texttt{config-admin.php}:
 \end{enumerate}
+
+\begin{verbatim}
+php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
+\end{verbatim}
 
 \hypertarget{casi-di-prova-eseguiti}{%
 \subsubsection{7.1 Casi di prova
@@ -967,6 +1170,23 @@ Stringa di SQL injection nel campo nome & Memorizzata come testo,
 tabella intatta & Superato \\
 Database irraggiungibile & Messaggio generico all'utente, dettaglio nel
 log, nessun dato tecnico esposto & Superato \\
+Area riservata: password errata & Messaggio generico, nessun accesso &
+Superato \\
+Area riservata: \texttt{POST} di eliminazione senza sessione valida &
+Richiesta respinta, riga intatta & Superato \\
+Area riservata: \texttt{POST} privo di token anti-CSRF & Richiesta
+respinta, riga intatta & Superato \\
+Modifica con email non valida & Errore specifico, valori digitati
+riproposti nel modulo, nessuna scrittura & Superato \\
+Doppio salvataggio con consenso già presente & \texttt{data\_consenso}
+invariata & Superato \\
+Revoca del consenso in modifica & \texttt{consenso\_privacy} a
+\texttt{0} e \texttt{data\_consenso} azzerata & Superato \\
+Eliminazione di un numero inesistente & Messaggio specifico, nessuna
+riga toccata & Superato \\
+Nome contenente \texttt{\textless{}b\textgreater{}} e apostrofo,
+mostrato in elenco & Stampato come testo, non interpretato dal browser &
+Superato \\
 \end{longtable}
 
 \hypertarget{verifica-del-passaggio-a-mobile-first}{%
@@ -1051,12 +1271,23 @@ Per completezza si segnalano gli aspetti ancora aperti:
   informativa. Lo stesso segnaposto della partita IVA compare nel piè di
   pagina.
 \item
-  \textbf{Protezione del modulo.} Per un uso in produzione andrebbero
-  aggiunti un token anti-CSRF e una misura anti-spam. Per quest'ultima è
-  preferibile una tecnica passiva --- campo esca più controllo sul tempo
-  di compilazione --- rispetto a un CAPTCHA: quelli visuali sono un
+  \textbf{Protezione del modulo pubblico.} Il token anti-CSRF descritto
+  in §5.7 protegge l'area riservata, ma non è stato esteso al modulo di
+  contatto, che resta privo anche di una misura anti-spam. Per un uso in
+  produzione andrebbero aggiunti entrambi. Per la seconda è preferibile
+  una tecnica passiva --- campo esca più controllo sul tempo di
+  compilazione --- rispetto a un CAPTCHA: quelli visuali sono un
   ostacolo di accessibilità, e i servizi di terze parti
   reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
+\item
+  \textbf{Autenticazione dell'area riservata.} L'accesso a
+  \texttt{archivio.php} poggia su un'unica password condivisa: basta a
+  proteggere un pannello dimostrativo, non un archivio in produzione,
+  che richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei
+  tentativi di accesso e registro delle operazioni eseguite. Manca
+  inoltre una cancellazione programmata al termine del periodo di
+  conservazione: oggi la cancellazione è un gesto manuale, per quanto
+  ora possibile senza aprire phpMyAdmin.
 \end{itemize}
 
 \end{document}
