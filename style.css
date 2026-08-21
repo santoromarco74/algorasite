@@ -1035,16 +1035,31 @@ footer {
 }
 
 .shot { margin: 0; }
-.shot img {
+.shot img,
+.shot video {
   display: block; width: 100%; height: auto;
   border: 1px solid var(--border);
   background: var(--parchment);
 }
+/* Il fondo scuro sotto al filmato evita il lampo chiaro fra il fotogramma
+   poster e il primo fotogramma riprodotto. */
+.shot video { background: var(--ink); }
 .shot figcaption {
   font-size: 14px; line-height: 1.7; color: var(--mid);
   margin-top: 14px; padding-left: 16px;
   border-left: 2px solid var(--gold);
 }
+
+/* Alternativa testuale al filmato: chiusa di suo, ma raggiungibile da
+   tastiera e apribile senza JavaScript, perche' <details> se ne occupa da se'. */
+.shot-alt { margin-top: 12px; }
+.shot-alt summary {
+  font-family: var(--font-label);
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold-text); cursor: pointer;
+}
+.shot-alt ol { margin: 14px 0 0; padding-left: 20px; }
+.shot-alt li { margin-bottom: 10px; }
 
 @media (min-width: 961px) {
   /* La prima schermata a piena larghezza, le altre due affiancate */

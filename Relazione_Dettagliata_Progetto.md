@@ -48,7 +48,8 @@ Il sito si articola su **6 pagine di contenuto**, servite da PHP, più **1 scrip
 | `style.css` | Foglio di stile unico dell'intero sito (1.503 righe, ~55 KB). |
 | `main.js` | Comportamenti client-side (63 righe). |
 | `fonts/` | I due caratteri tipografici in formato WOFF2 (8 file, 300 KB). |
-| `img/` | Cartella per le schermate del prodotto, con le istruzioni in `LEGGIMI.md`. |
+| `img/` | Schermate del prodotto e fotogramma poster del filmato, con le istruzioni in `LEGGIMI.md`. |
+| `video/` | Il filmato dimostrativo nelle due codifiche (§3.5). |
 
 ### 2.1 Perché PHP anche sulle pagine di contenuto
 
@@ -172,6 +173,31 @@ L'impostazione precedente definiva il layout desktop nelle regole di base e lo c
 Il caso concreto emerso in questo progetto: i titoli di colonna del piè di pagina sono governati da `.footer-col h2 { font-size: 10px }`, ma lo strato correttivo conteneva `h2 { font-size: clamp(28px, 6vw, 36px) !important }`. Su schermo stretto vinceva quest'ultima, e le etichette "Studio", "Prodotti", "Contatti" venivano rese a 28px anziché a 10px — visibile solo sotto i 960px. Rimosso lo strato, la regola specifica torna a valere e il difetto sparisce senza alcun intervento mirato.
 
 Nel foglio di stile non resta oggi nessun `!important` di layout: gli unici tre superstiti sono quelli, idiomatici, del blocco `prefers-reduced-motion`, dove servono proprio a scavalcare qualunque animazione dichiarata altrove.
+
+### 3.5 Contenuti multimediali: il filmato dimostrativo
+
+La scheda prodotto ospita un filmato di un minuto e diciotto che mostra Foliarium in funzione: la schermata iniziale, l'elenco dei comuni, la scheda di una partita, l'albero delle variazioni, la ricerca, l'esportazione in CSV, Excel e PDF, e infine reportistica e statistiche. È l'unico contenuto temporale del sito, e le scelte che lo riguardano seguono lo stesso criterio del resto del progetto.
+
+**Ospitato in proprio, non incorporato.** Un `<iframe>` di YouTube o Vimeo avrebbe risolto il problema in una riga, al prezzo di reintrodurre in pagina un dominio terzo che riceve l'indirizzo IP di ogni visitatore e imposta cookie — esattamente ciò che §3.2 ha eliminato con i caratteri tipografici e su cui poggia §6.6. Il filmato sta quindi in `video/`, servito dallo stesso dominio del resto del sito, e nulla cambia nell'informativa privacy.
+
+**Due codifiche, per una ragione misurata.** Il file è servito in H.264 (1,6 MB) e in VP9 (1,5 MB). La differenza di peso è trascurabile e da sola non giustificherebbe due file; la ragione è un'altra, emersa provando: il browser usato per le verifiche automatiche è una build di Chromium **senza codec proprietari**, e dell'H.264 non sa che farsene. È esattamente la situazione che il secondo formato esiste per coprire. L'ordine dei `<source>` mette il WebM per primo, perché il browser prende il primo che sa riprodurre.
+
+**Il preload: `none`, non `metadata`.** La scelta di partenza era `preload="metadata"`, che in teoria fa scaricare la sola intestazione del file. Il registro degli accessi di Apache dice altro:
+
+| Attributo | Richieste al filmato al caricamento | Byte inviati dal server |
+| :--- | :--- | :--- |
+| `preload="metadata"` | 1 | 1.518.502 (il file intero) |
+| `preload="none"` | 0 | 0 |
+
+Per leggere la durata il browser chiede `Range: bytes=0-`, e il server gli spedisce tutto. Un megabyte e mezzo scaricato da chi il filmato non lo guarda è un megabyte e mezzo sprecato, e su hosting condiviso è banda che si paga. Con `preload="none"` si carica il solo fotogramma poster (67 KB) e il file arriva al primo clic su *Riproduci*. Il prezzo è che la durata totale compare solo dopo l'avvio: per questo è scritta nella didascalia.
+
+La scheda prodotto pesa così **352 KB** al caricamento, contro i 183 KB di una pagina senza immagini: il filmato non incide finché non lo si chiede.
+
+**Accessibilità.** I controlli sono quelli nativi di `<video controls>`, per la stessa ragione per cui il menu e le FAQ sono `<button>` e non `<div>` (§6.1): sono già nell'ordine di tabulazione, rispondono a `Barra spaziatrice` e alle frecce, e vengono annunciati correttamente senza una riga di JavaScript. Il filmato è muto, quindi il criterio sui sottotitoli (WCAG 1.2.2) non si applica; si applica però quello sull'alternativa al contenuto temporale (1.2.1), risolto con una descrizione passo per passo dentro un elemento `<details>` nella didascalia — apribile da tastiera e senza JavaScript, e utile anche a chi la pagina la legge soltanto. Non c'è autoplay né loop, `width` e `height` sono dichiarati contro lo slittamento del layout, e il poster evita il rettangolo nero.
+
+**Il taglio.** La registrazione originale durava 84 secondi e nei suoi ultimi istanti passava dalla schermata delle statistiche a quella di gestione degli utenti, dove è leggibile un indirizzo email personale. Il filmato pubblicato si ferma a 78,2 secondi: chiude sui grafici, che è anche un finale migliore, e non pubblica un recapito privato su una pagina indicizzabile.
+
+**Nel foglio di stile** il filmato non ha introdotto un componente nuovo: la regola che vestiva le schermate è diventata `.shot img, .shot video`, perché è la stessa figura con un media diverso. È la disciplina descritta in §3.2.
 
 ---
 
@@ -455,6 +481,10 @@ php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
 | Revoca del consenso in modifica | `consenso_privacy` a `0` e `data_consenso` azzerata | Superato |
 | Eliminazione di un numero inesistente | Messaggio specifico, nessuna riga toccata | Superato |
 | Nome contenente `<b>` e apostrofo, mostrato in elenco | Stampato come testo, non interpretato dal browser | Superato |
+| Caricamento della scheda prodotto con `preload="none"` | Nessuna richiesta al filmato nel registro del server | Superato |
+| Riproduzione dopo il clic | Il filmato parte, durata 78,2 s letta correttamente, nessun errore | Superato |
+| Richiesta del filmato con intestazione `Range` | `206 Partial Content`, quindi barra di avanzamento funzionante | Superato |
+| Browser privo di codec proprietari | Ricade sul WebM e riproduce | Superato |
 
 ### 7.2 Verifica del passaggio a mobile-first
 
@@ -473,7 +503,7 @@ Lo stesso metodo è stato applicato al consolidamento dei nomi di classe descrit
 
 Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su hosting condiviso la procedura è la seguente:
 
-1. Caricare i file del progetto nella cartella pubblica del dominio (tipicamente `public_html` o `httpdocs`).
+1. Caricare i file del progetto nella cartella pubblica del dominio (tipicamente `public_html` o `httpdocs`), `video/` compresa. Non serve invece caricare i marchi sorgente in `img/marchi/` che il `LEGGIMI` dichiara non usati dalle pagine: sono 5,7 MB che nessuna pagina richiede.
 2. Creare il database dal pannello dell'hosting ed eseguirvi `crea_db.sql`.
 3. Aggiornare `config-db.php` con host, nome del database, utente e password forniti dal gestore del dominio, assegnando all'utente i soli privilegi necessari (`INSERT` e `SELECT` sulla tabella `contatti`).
 4. Verificare che `config-db.php` non sia raggiungibile dall'esterno e che non venga incluso nel versionamento.
@@ -484,7 +514,7 @@ Il sito è pensato per essere pubblicato sul dominio `www.algorastudio.it`. Su h
 
 Per completezza si segnalano gli aspetti ancora aperti:
 
-* **Contenuti multimediali.** Il sito è tuttora interamente testuale. L'impianto per accogliere le schermate di Foliarium è predisposto nella scheda prodotto — struttura `<figure>`, didascalie, testi alternativi, dimensioni dichiarate per evitare lo slittamento del layout — ma resta disattivato in attesa delle immagini. Le istruzioni sono in `img/LEGGIMI.md`.
+* **Lingua dei contenuti multimediali.** Le cinque schermate e il filmato dimostrativo (§3.5) mostrano l'interfaccia in italiano, e la descrizione passo per passo che accompagna il filmato è scritta in italiano. Se il sito avrà una versione inglese, quei contenuti andranno rigirati oppure accompagnati da una nota: un filmato è l'unica parte del sito che una traduzione del testo non raggiunge.
 * **Dati del titolare nell'informativa.** L'informativa privacy è completa nella struttura, ma i riferimenti anagrafici del titolare (ragione sociale, partita IVA, sede), il periodo di conservazione e i fornitori nominati responsabili esterni sono segnaposto, resi graficamente evidenti nella pagina. Vanno compilati prima della pubblicazione: un'informativa pubblicata a metà è peggio di nessuna informativa. Lo stesso segnaposto della partita IVA compare nel piè di pagina.
 * **Protezione del modulo pubblico.** Il token anti-CSRF descritto in §5.7 protegge l'area riservata, ma non è stato esteso al modulo di contatto, che resta privo anche di una misura anti-spam. Per un uso in produzione andrebbero aggiunti entrambi. Per la seconda è preferibile una tecnica passiva — campo esca più controllo sul tempo di compilazione — rispetto a un CAPTCHA: quelli visuali sono un ostacolo di accessibilità, e i servizi di terze parti reintrodurrebbero in pagina la dipendenza esterna eliminata in §3.2.
 * **Autenticazione dell'area riservata.** L'accesso a `archivio.php` poggia su un'unica password condivisa: basta a proteggere un pannello dimostrativo, non un archivio in produzione, che richiederebbe utenze nominali, HTTPS obbligatorio, limitazione dei tentativi di accesso e registro delle operazioni eseguite. Manca inoltre una cancellazione programmata al termine del periodo di conservazione: oggi la cancellazione è un gesto manuale, per quanto ora possibile senza aprire phpMyAdmin.
@@ -541,7 +571,8 @@ The site is built on **6 content pages**, served by PHP, plus **1 server-side sc
 | `style.css` | Single stylesheet for the whole site (1,503 lines, ~55 KB). |
 | `main.js` | Client-side behaviours (63 lines). |
 | `fonts/` | The two typefaces in WOFF2 format (8 files, 300 KB). |
-| `img/` | Folder for the product screenshots, with instructions in `LEGGIMI.md`. |
+| `img/` | Product screenshots and the video poster frame, with instructions in `LEGGIMI.md`. |
+| `video/` | The demo video in its two encodings (§3.5). |
 
 ### 2.1 Why PHP on the content pages too
 
@@ -665,6 +696,31 @@ The previous arrangement defined the desktop layout in the base rules and correc
 The concrete case that surfaced in this project: the footer column headings are governed by `.footer-col h2 { font-size: 10px }`, but the corrective layer contained `h2 { font-size: clamp(28px, 6vw, 36px) !important }`. On narrow screens the latter won, and the labels "Studio", "Prodotti", "Contatti" were rendered at 28px instead of 10px — visible only below 960px. With the layer removed, the specific rule applies again and the defect disappears with no targeted fix.
 
 No layout `!important` remains in the stylesheet today: the only three survivors are the idiomatic ones inside the `prefers-reduced-motion` block, where their whole purpose is to override any animation declared elsewhere.
+
+### 3.5 Multimedia content: the demo video
+
+The product page hosts a one-minute-eighteen video showing Foliarium at work: the opening screen, the list of municipalities, a land registry entry, the tree of its variations, the search, the export to CSV, Excel and PDF, and finally reporting and statistics. It is the site's only time-based content, and the decisions around it follow the same criterion as the rest of the project.
+
+**Self-hosted, not embedded.** A YouTube or Vimeo `<iframe>` would have solved the problem in one line, at the price of putting back into the page a third-party domain that receives every visitor's IP address and sets cookies — exactly what §3.2 removed with the typefaces, and what §6.6 rests on. The video therefore lives in `video/`, served from the same domain as everything else, and the privacy notice needs no change.
+
+**Two encodings, for a measured reason.** The file is served in H.264 (1.6 MB) and in VP9 (1.5 MB). The size difference is negligible and would not on its own justify two files; the real reason emerged while testing: the browser used for the automated checks is a Chromium build **without proprietary codecs**, and has no use for H.264. That is precisely the situation the second format exists to cover. The `<source>` order puts WebM first, because the browser takes the first one it can play.
+
+**Preload: `none`, not `metadata`.** The starting choice was `preload="metadata"`, which in theory fetches only the file header. Apache's access log says otherwise:
+
+| Attribute | Requests for the video on page load | Bytes sent by the server |
+| :--- | :--- | :--- |
+| `preload="metadata"` | 1 | 1,518,502 (the whole file) |
+| `preload="none"` | 0 | 0 |
+
+To read the duration the browser asks for `Range: bytes=0-`, and the server sends everything. A megabyte and a half downloaded by someone who never watches the video is a megabyte and a half wasted, and on shared hosting it is bandwidth that costs money. With `preload="none"` only the poster frame loads (67 KB) and the file arrives on the first click of *Play*. The price is that the total duration appears only after playback starts: hence it is stated in the caption.
+
+The product page therefore weighs **352 KB** on load, against the 183 KB of a page with no images: the video costs nothing until it is asked for.
+
+**Accessibility.** The controls are the native ones of `<video controls>`, for the same reason the menu and the FAQ are `<button>` rather than `<div>` (§6.1): they are already in the tab order, they respond to `Space` and to the arrow keys, and they are announced correctly without a line of JavaScript. The video is silent, so the captions criterion (WCAG 1.2.2) does not apply; the one on an alternative for time-based media (1.2.1) does, and it is met with a step-by-step description inside a `<details>` element in the caption — operable from the keyboard and without JavaScript, and useful to anyone who merely reads the page. There is no autoplay and no loop, `width` and `height` are declared against layout shift, and the poster avoids a black rectangle.
+
+**The trim.** The original recording ran 84 seconds and in its final moments moved from the statistics screen to user management, where a personal email address is legible. The published video stops at 78.2 seconds: it closes on the charts, which is also a better ending, and it does not publish a private contact detail on an indexable page.
+
+**In the stylesheet** the video introduced no new component: the rule that dressed the screenshots became `.shot img, .shot video`, because it is the same figure with a different medium. It is the discipline described in §3.2.
 
 ---
 
@@ -948,6 +1004,10 @@ php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
 | Withdrawing consent while editing | `consenso_privacy` set to `0` and `data_consenso` cleared | Passed |
 | Deleting a non-existent number | Specific message, no row touched | Passed |
 | Name containing `<b>` and an apostrophe, shown in the list | Printed as text, not interpreted by the browser | Passed |
+| Loading the product page with `preload="none"` | No request for the video in the server log | Passed |
+| Playback after the click | The video starts, duration 78.2 s read correctly, no errors | Passed |
+| Video request with a `Range` header | `206 Partial Content`, so the progress bar works | Passed |
+| Browser without proprietary codecs | Falls back to WebM and plays | Passed |
 
 ### 7.2 Verifying the move to mobile-first
 
@@ -966,7 +1026,7 @@ The same method was applied to the class-name consolidation described in §3.2, 
 
 The site is meant to be published on the domain `www.algorastudio.it`. On shared hosting the procedure is as follows:
 
-1. Upload the project files into the domain's public folder (typically `public_html` or `httpdocs`).
+1. Upload the project files into the domain's public folder (typically `public_html` or `httpdocs`), `video/` included. There is no need to upload the source logos in `img/marchi/` that the `LEGGIMI` file marks as unused by the pages: they are 5.7 MB no page ever requests.
 2. Create the database from the hosting control panel and run `crea_db.sql` on it.
 3. Update `config-db.php` with the host, database name, user and password supplied by the hosting provider, granting the user only the privileges actually needed (`INSERT` and `SELECT` on the `contatti` table).
 4. Check that `config-db.php` is not reachable from outside and that it is not included in version control.
@@ -977,7 +1037,7 @@ The site is meant to be published on the domain `www.algorastudio.it`. On shared
 
 For completeness, the points still open:
 
-* **Multimedia content.** The site is still entirely textual. The scaffolding for hosting the Foliarium screenshots is in place on the product page — `<figure>` structure, captions, alternative text, declared dimensions to prevent layout shift — but stays disabled while the images are pending. Instructions are in `img/LEGGIMI.md`.
+* **Language of the multimedia content.** The five screenshots and the demo video (§3.5) show the interface in Italian, and the step-by-step description accompanying the video is written in Italian. Should the site gain an English version, that material will have to be re-recorded or accompanied by a note: a video is the one part of a site that translating the text does not reach.
 * **Controller details in the privacy notice.** The privacy notice is structurally complete, but the controller's identifying details (company name, VAT number, registered office), the retention period and the suppliers appointed as processors are placeholders, made graphically obvious on the page. They must be filled in before publication: a half-published notice is worse than no notice at all. The same VAT number placeholder appears in the footer.
 * **Protection of the public form.** The anti-CSRF token described in §5.7 protects the reserved area, but it has not been extended to the contact form, which also lacks an anti-spam measure. Both should be added for production use. For the latter a passive technique is preferable — a honeypot field plus a check on how long the form took to fill in — over a CAPTCHA: visual CAPTCHAs are an accessibility obstacle, and third-party services would reintroduce into the page the external dependency removed in §3.2.
 * **Authentication of the reserved area.** Access to `archivio.php` rests on a single shared password: enough to protect a demonstration panel, not an archive in production, which would require named accounts, mandatory HTTPS, rate limiting on login attempts and a log of the operations performed. There is also no scheduled erasure at the end of the retention period: today erasure is a manual act, however much it is now possible without opening phpMyAdmin.

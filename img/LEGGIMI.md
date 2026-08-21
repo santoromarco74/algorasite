@@ -52,3 +52,15 @@ E riscrivi il testo alternativo. L'attributo `alt` non descrive l'aspetto
 della schermata ma dice a chi non la vede **che cosa dimostra**: "schermata
 del software" non serve a nessuno. Gli `alt` attuali citano numeri e nomi
 visibili nelle immagini, quindi diventano falsi se le immagini cambiano.
+
+## Fotogramma poster del filmato
+
+| File | Cosa mostra |
+| :--- | :--- |
+| `foliarium-demo-poster.jpg` | Fotogramma tratto dal terzo secondo del filmato dimostrativo (§3.5 della relazione): la schermata iniziale del gestionale. Serve come immagine di anteprima dell'elemento `<video>`, che con `preload="none"` non scarica nulla finché non si preme Riproduci. |
+
+Va rigenerato insieme al filmato, dallo stesso sorgente:
+
+```
+ffmpeg -i video/foliarium-demo.mp4 -ss 3 -frames:v 1 -q:v 3 img/foliarium-demo-poster.jpg
+```

@@ -150,10 +150,65 @@
   <div class="feat-intro">
     <p class="label mb-16">Schermate</p>
     <h2>Foliarium<br><em>in funzione.</em></h2>
-    <p>Le immagini che seguono sono riprese dall'archivio dimostrativo che usiamo durante le demo: contiene dati storici reali della provincia di Savona, in quantità ridotta rispetto all'archivio in produzione.</p>
+    <p>Il filmato e le immagini che seguono sono ripresi dall'archivio dimostrativo che usiamo durante le demo: contiene dati storici reali della provincia di Savona, in quantità ridotta rispetto all'archivio in produzione.</p>
   </div>
 
   <div class="shot-grid">
+    <?php /* Il filmato sta in prima posizione perche' .shot-grid assegna al
+             primo figlio la larghezza piena: prende lo slot che finora era
+             della schermata iniziale, senza una regola di layout in piu'.
+
+             Nessun autoplay e nessun loop: parte solo se lo si chiede.
+
+             preload="none" e non "metadata": misurando sul log di Apache si
+             vede che per leggere la durata il browser chiede l'intero file
+             (Range: bytes=0- , a cui il server risponde spedendo tutto), e
+             1,5 MB scaricati da chi il filmato non lo guarda sono 1,5 MB
+             sprecati. Cosi' invece parte l'immagine del poster e nient'altro;
+             il file si scarica al primo clic su Riproduci. Il prezzo e' che
+             la durata totale compare solo dopo l'avvio: per questo e' scritta
+             nella didascalia.
+
+             I controlli sono quelli nativi, per la stessa ragione per cui il
+             menu e le FAQ sono <button> e non <div>: sono gia' raggiungibili
+             da tastiera e annunciati correttamente. */ ?>
+    <figure class="shot">
+      <video controls preload="none" playsinline
+             poster="img/foliarium-demo-poster.jpg"
+             width="1280" height="686">
+        <?php /* Due codifiche dello stesso filmato. Il browser prende la prima
+                 che sa riprodurre, quindi il WebM va per primo: pesa poco meno,
+                 ma soprattutto copre i browser costruiti senza i codec
+                 proprietari, che dell'H.264 non sanno che farsene. L'MP4 resta
+                 come rete di sicurezza universale. */ ?>
+        <source src="video/foliarium-demo.webm" type="video/webm">
+        <source src="video/foliarium-demo.mp4"  type="video/mp4">
+        <p>Il browser non riesce a riprodurre il filmato:
+           <a href="video/foliarium-demo.mp4">scaricalo per vederlo</a> (1,6 MB).</p>
+      </video>
+      <figcaption>
+        Un minuto e diciotto di Foliarium in funzione, senza commento sonoro:
+        dalla ricerca di una partita alla sua storia completa, fino
+        all'esportazione dei dati.
+        <?php /* Il filmato non ha parlato, quindi i sottotitoli non si
+                 applicano; serve pero' un'alternativa al contenuto temporale
+                 (WCAG 1.2.1), ed e' questa. Utile anche a chi la pagina la
+                 legge e basta. */ ?>
+        <details class="shot-alt">
+          <summary>Che cosa mostra, passaggio per passaggio</summary>
+          <ol>
+            <li>La schermata iniziale: ricerca rapida su tutto il catasto, i quattro contatori dell'archivio dimostrativo (69 comuni, 330 partite, 120 possessori, 660 immobili), gli ultimi inserimenti e il registro delle attività.</li>
+            <li>L'elenco dei comuni registrati; da Carcare si aprono le partite del comune.</li>
+            <li>La scheda della partita 3003 bis, con le linguette per dati generali, possessori, immobili, variazioni e documenti allegati.</li>
+            <li>L'albero genealogico della partita: predecessori e successori ricostruiti all'indietro nel tempo, con il report testuale che se ne ricava.</li>
+            <li>La ricerca delle partite, filtrabile per comune, numero, possessore e natura dell'immobile.</li>
+            <li>L'esportazione in CSV, Excel e PDF, con il file salvato e riaperto nel foglio di calcolo.</li>
+            <li>Reportistica e statistiche: partite per comune, stato delle partite, variazioni per anno.</li>
+          </ol>
+        </details>
+      </figcaption>
+    </figure>
+
     <figure class="shot">
       <img src="img/foliarium-cruscotto.png"
            alt="Schermata iniziale di Foliarium: una barra di ricerca rapida sull'intero catasto e quattro contatori — 69 comuni, 330 partite, 120 possessori, 660 immobili — seguiti dagli ultimi inserimenti e dal registro delle attività degli utenti."
