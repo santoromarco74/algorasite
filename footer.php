@@ -35,6 +35,23 @@
       </ul>
     </div>
   </div>
+  <div class="footer-valid">
+    <a href="https://validator.w3.org/check?uri=referer">
+      <img style="border:0;width:88px;height:31px"
+        src="https://www.w3.org/Icons/valid-html401"
+        alt="Valid HTML 4.01!" />
+    </a>
+  <a href="https://css-validator.org/check/referer">
+    <img style="border:0;width:88px;height:31px"
+      src="https://css-validator.org/validator/images/vcss.png"
+      alt="Valid CSS!" />
+  </a>
+  <a href="https://css-validator.org/check/referer">
+    <img style="border:0;width:88px;height:31px"
+      src="https://css-validator.org/validator/images/vcss-blue.png"
+      alt="Valid CSS!" />
+  </a>
+  </div>
   <div class="footer-bottom">
     <p>© 2025 Algora Studio — Marco Santoro — P.IVA [01925090092] — Savona, Liguria</p>
     <p><a href="privacy.php">Privacy</a> · <a href="privacy.php#cookie">Cookie</a> · <a href="archivio.php">Area riservata</a></p>
