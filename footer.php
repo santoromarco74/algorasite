@@ -35,7 +35,7 @@
       </ul>
     </div>
   </div>
-  <div class="footer-valid">
+  <div >
     <a href="https://validator.w3.org/check?uri=referer">
       <img style="border:0;width:88px;height:31px"
         src="https://www.w3.org/Icons/valid-html401"
