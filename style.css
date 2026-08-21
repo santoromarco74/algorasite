@@ -855,6 +855,14 @@ footer {
 
 .ph-left { padding: 0 0 80px; }
 
+/* Il marchio Foliarium e' verde scuro e oro su fondo trasparente: regge
+   sulla pergamena, non su fondo scuro, dove verde e oro scomparirebbero.
+   Per questo compare solo qui, nella testata chiara della scheda prodotto. */
+.ph-marchio {
+  display: block; width: 100%; max-width: 340px; height: auto;
+  margin-bottom: 28px;
+}
+
 .ph-badge {
   display: inline-flex; align-items: center; gap: 8px;
   background: var(--gold-faint); border: 1px solid var(--gold-light);
@@ -1024,6 +1032,7 @@ footer {
    Le regole restano attive anche senza immagini: il markup che le usa e'
    commentato in foliarium.php e basta scommentarlo (vedi img/LEGGIMI.md). */
 .schermate { background: var(--cream); }
+.schermate .feat-intro p { font-size: 17px; color: var(--mid); margin-top: 16px; line-height: 1.8; max-width: 640px; }
 
 .shot-grid {
   display: grid; grid-template-columns: 1fr; gap: 40px;

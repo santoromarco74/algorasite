@@ -1,42 +1,54 @@
-# Schermate di Foliarium
+# Immagini
 
-Questa cartella ospita le immagini della scheda prodotto (`foliarium.php`).
+## Schermate di Foliarium
 
-## Cosa serve
+Cinque schermate del gestionale, usate nella sezione "Schermate" di
+`foliarium.php`.
 
-Il blocco che le mostra è già presente in `foliarium.php`, commentato, subito
-dopo la sezione delle funzionalità. Cerca il commento `SCHERMATE DEL PRODOTTO`.
-
-Per attivarlo servono tre file:
-
-| File | Cosa mostrare |
+| File | Cosa mostra |
 | :--- | :--- |
-| `foliarium-ricerca.png` | La ricerca fuzzy con un risultato che mostra una corrispondenza approssimata |
-| `foliarium-albero.png` | L'albero delle proprietà di un possessore |
-| `foliarium-report.png` | Un report esportato, o la schermata da cui si esporta |
+| `foliarium-cruscotto.png` | Schermata iniziale: ricerca rapida, contatori dell'archivio, ultimi inserimenti, registro attività |
+| `foliarium-ricerca-partite.png` | Elenco delle partite con la scheda di dettaglio aperta |
+| `foliarium-albero-genealogico.png` | Albero delle variazioni di una partita e report testuale |
+| `foliarium-statistiche.png` | Grafici per comune, stato delle partite, variazioni per anno |
+| `foliarium-esportazione.png` | Esportazione e file risultante aperto nel foglio di calcolo |
 
-## Requisiti tecnici
+### Provenienza dei dati
 
-- **Formato:** PNG per le schermate di interfaccia (il testo resta nitido).
-- **Larghezza:** 1600 px. Il layout le rimpicciolisce, ma su schermi ad alta
-  densità la definizione doppia si vede.
-- **Dimensioni dichiarate:** dopo aver messo i file, aggiorna gli attributi
-  `width` e `height` nel markup con le dimensioni reali in pixel. Servono a
-  riservare lo spazio prima che l'immagine arrivi, evitando che il testo
-  sottostante salti durante il caricamento.
+Le schermate vengono dall'**archivio dimostrativo**, non da quello in
+produzione presso l'Archivio di Stato di Savona. I contatori visibili
+(330 partite, 120 possessori) sono quindi molto inferiori alle cifre citate
+nel caso studio (12.000+ partite, 8.500+ possessori). L'introduzione della
+sezione lo dichiara esplicitamente: senza quella riga il divario fra le due
+cifre risulterebbe una contraddizione.
 
-## Testi alternativi
+Per lo stesso motivo queste immagini stanno solo sulla scheda prodotto e non
+sulla pagina del caso studio, dove le cifre grandi sono l'argomento portante.
 
-L'attributo `alt` non deve descrivere l'aspetto della schermata, ma dire a chi
-non la vede *che cosa dimostra*. "Schermata del software" non serve a nessuno.
-Nel markup commentato trovi tre `alt` già scritti in questo modo: adattali a
-quello che le tue immagini mostrano davvero.
+### Nomi di persona
 
-La didascalia (`<figcaption>`) è visibile a tutti e completa l'immagine: può
-ripetere il concetto con parole diverse, non deve duplicare l'`alt`.
+Le schermate contengono nomi di possessori tratti da registri catastali fra
+il 1870 e il 1951 (per esempio "Gaggero Antonio di Marco", "Bolla Teresa fu
+Luigi"). Sono dati d'archivio storico riferiti a persone da tempo decedute.
+Se in futuro si aggiungessero schermate con partite più recenti, va
+verificato che non compaiano persone identificabili ancora in vita.
 
-## Dati personali
+### Ottimizzazione
 
-Le schermate provengono da un archivio reale. Prima di pubblicarle verifica che
-non compaiano nomi di persone identificabili: usa il database dimostrativo,
-oppure oscura i dati sensibili.
+I file originali sono stati ridotti a 256 colori: le schermate di interfaccia
+hanno poche tinte piatte e si comprimono molto bene. Il peso è sceso di circa
+il 55% con uno scarto misurato fra lo 0,2 e lo 0,5%, invisibile a occhio.
+
+Sono caricate con `loading="lazy"`: sulla scheda prodotto valgono circa
+280 KB, che il visitatore scarica solo se scorre fino alla sezione.
+
+### Se le sostituisci
+
+Aggiorna anche gli attributi `width` e `height` nel markup con le dimensioni
+reali dei nuovi file: servono a riservare lo spazio prima che l'immagine
+arrivi, evitando che il testo sottostante slitti durante il caricamento.
+
+E riscrivi il testo alternativo. L'attributo `alt` non descrive l'aspetto
+della schermata ma dice a chi non la vede **che cosa dimostra**: "schermata
+del software" non serve a nessuno. Gli `alt` attuali citano numeri e nomi
+visibili nelle immagini, quindi diventano falsi se le immagini cambiano.

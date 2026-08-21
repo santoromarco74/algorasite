@@ -26,6 +26,12 @@
   <p class="label mb-20">Un prodotto Algora Studio</p>
   <div class="prod-hero-inner">
     <div class="ph-left fade-up">
+      <?php /* alt vuoto: il marchio ripete il nome del prodotto e la sua
+               descrizione, entrambi presenti come testo qui sotto. Con un alt
+               descrittivo un lettore di schermo annuncerebbe "Foliarium" due
+               volte di seguito. */ ?>
+      <img class="ph-marchio" src="img/marchi/foliarium-logo.png" alt=""
+           width="800" height="308" fetchpriority="high" decoding="async">
       <div class="ph-badge"><span>Versione 1.5 — Attivo</span></div>
       <h1>Foliarium</h1>
       <p class="ph-tagline">dove il tempo incontra i dati</p>
@@ -139,50 +145,51 @@
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════════
-     SCHERMATE DEL PRODOTTO
-
-     Blocco pronto all'uso, disattivato finche' non ci sono le immagini.
-     Per attivarlo: metti i tre PNG in img/ (vedi img/LEGGIMI.md), togli
-     le due righe di commento qui sotto e sopra </section>, e aggiorna
-     width/height con le dimensioni reali dei file.
-
-     Gli attributi width e height servono a riservare lo spazio prima che
-     l'immagine arrivi: senza, il testo sotto slitta a caricamento finito.
-     loading="lazy" rimanda il caricamento a quando l'immagine si avvicina
-     allo schermo; decoding="async" evita che blocchi il disegno di pagina.
-
+<!-- SCHERMATE -->
 <section class="schermate">
   <div class="feat-intro">
     <p class="label mb-16">Schermate</p>
     <h2>Foliarium<br><em>in funzione.</em></h2>
+    <p>Le immagini che seguono sono riprese dall'archivio dimostrativo che usiamo durante le demo: contiene dati storici reali della provincia di Savona, in quantità ridotta rispetto all'archivio in produzione.</p>
   </div>
 
   <div class="shot-grid">
     <figure class="shot">
-      <img src="img/foliarium-ricerca.png"
-           alt="Ricerca del possessore Ferrari: il sistema propone anche Ferrero e Ferraro, con l'indicazione di quanto ciascun risultato si discosta dal testo cercato."
-           width="1600" height="1000" loading="lazy" decoding="async">
-      <figcaption>La ricerca fuzzy tollera le varianti di grafia con cui lo stesso cognome compare nei registri di epoche diverse.</figcaption>
+      <img src="img/foliarium-cruscotto.png"
+           alt="Schermata iniziale di Foliarium: una barra di ricerca rapida sull'intero catasto e quattro contatori — 69 comuni, 330 partite, 120 possessori, 660 immobili — seguiti dagli ultimi inserimenti e dal registro delle attività degli utenti."
+           width="1915" height="1031" loading="lazy" decoding="async">
+      <figcaption>Il quadro d'insieme all'apertura: quanto contiene l'archivio, che cosa è stato inserito di recente e chi vi ha lavorato.</figcaption>
     </figure>
 
     <figure class="shot">
-      <img src="img/foliarium-albero.png"
-           alt="Albero delle proprieta' di un possessore: dalla partita catastale si diramano i singoli terreni, ognuno con foglio, mappale e destinazione d'uso."
-           width="1600" height="1000" loading="lazy" decoding="async">
-      <figcaption>L'albero delle proprieta' ricostruisce in una sola vista che cosa apparteneva a un possessore e in quale comune.</figcaption>
+      <img src="img/foliarium-ricerca-partite.png"
+           alt="Elenco delle partite catastali, filtrabile per comune, numero e possessore. In primo piano la scheda della partita 3003 bis di Carcare, impiantata nel 1951, con il nome del possessore e le linguette per immobili, variazioni e documenti allegati."
+           width="1917" height="1032" loading="lazy" decoding="async">
+      <figcaption>Dalla ricerca alla scheda della singola partita, con possessori, immobili e variazioni raccolti in un'unica vista.</figcaption>
     </figure>
 
     <figure class="shot">
-      <img src="img/foliarium-report.png"
-           alt="Anteprima di un report in PDF con l'intestazione dell'Archivio di Stato, l'elenco delle partite selezionate e la data di estrazione."
-           width="1600" height="1000" loading="lazy" decoding="async">
-      <figcaption>Ogni ricerca puo' diventare un report firmato e datato, utile per le richieste di consultazione.</figcaption>
+      <img src="img/foliarium-albero-genealogico.png"
+           alt="Ricostruzione della storia di una proprietà: l'albero della partita 1001 di Savona mostra la partita che l'ha preceduta, estinta da una vendita del 1891. Accanto, il report testuale con intestatari, predecessori e successori."
+           width="1908" height="996" loading="lazy" decoding="async">
+      <figcaption>La catena delle variazioni ricostruita all'indietro nel tempo: è la ricerca che sui registri cartacei costava giorni di lavoro.</figcaption>
+    </figure>
+
+    <figure class="shot">
+      <img src="img/foliarium-statistiche.png"
+           alt="Tre grafici: le partite per comune nei primi dieci comuni, la quota di partite attive e inattive — 84,8 per cento contro 15,2 — e il numero di variazioni registrate anno per anno dal 1876 al 1984."
+           width="1908" height="978" loading="lazy" decoding="async">
+      <figcaption>Una lettura d'insieme del fondo archivistico, difficile da ricavare quando i dati stanno solo sui volumi.</figcaption>
+    </figure>
+
+    <figure class="shot">
+      <img src="img/foliarium-esportazione.png"
+           alt="La stessa selezione esportata in un foglio di calcolo: il registro dell'operazione riporta 33 partite, 12 possessori, 66 immobili e 9 variazioni, e il file aperto mostra la scheda delle partite con numero, stato e data di impianto."
+           width="1910" height="999" loading="lazy" decoding="async">
+      <figcaption>Ogni selezione può uscire dall'archivio in CSV, Excel o PDF, pronta per essere allegata a una risposta.</figcaption>
     </figure>
   </div>
 </section>
-
-═══════════════════════════════════════════════════════════════════ -->
 
 <!-- LICENZE -->
 <section class="licenze">
