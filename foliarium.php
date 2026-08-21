@@ -32,7 +32,7 @@
                volte di seguito. */ ?>
       <img class="ph-marchio" src="img/marchi/foliarium-logo.png" alt=""
            width="800" height="308" fetchpriority="high" decoding="async">
-      <div class="ph-badge"><span>Versione 1.5 — Attivo</span></div>
+      <div class="ph-badge"><span>Versione 1.0 — Attivo</span></div>
       <h1>Foliarium</h1>
       <p class="ph-tagline">dove il tempo incontra i dati</p>
       <p class="desc">Sistema completo per la digitalizzazione, gestione e consultazione degli archivi catastali storici italiani. Sviluppato da Algora Studio su commissione dell'Archivio di Stato di Savona, dove è in uso dalla versione 1.0.</p>

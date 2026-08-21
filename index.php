@@ -42,7 +42,7 @@
       <div class="hero-meta">
         <div class="meta-item"><strong>1</strong><span>Prodotto attivo</span></div>
         <div class="meta-item"><strong>Savona</strong><span>Cliente di riferimento</span></div>
-        <div class="meta-item"><strong>v 1.5</strong><span>Release corrente</span></div>
+        <div class="meta-item"><strong>v 1.0</strong><span>Release corrente</span></div>
         <div class="meta-item"><strong>2025</strong><span>Anno di lancio</span></div>
       </div>
     </div>
@@ -69,7 +69,7 @@
       <p class="label-sm">01 — Attivo</p>
       <h3>Foliarium</h3>
       <p>Sistema completo per la gestione e consultazione degli archivi catastali storici italiani. In uso presso l'Archivio di Stato di Savona dalla versione 1.0.</p>
-      <span class="ph-tag">Disponibile · v1.5</span><br>
+      <span class="ph-tag">Disponibile · v1.0</span><br>
       <a href="foliarium.php" class="link-arrow">Scopri il prodotto →</a>
     </div>
     <div class="ph-card">
