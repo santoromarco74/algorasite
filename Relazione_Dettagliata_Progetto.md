@@ -303,7 +303,13 @@ Senza consenso lo script non esegue alcun inserimento e restituisce un messaggio
 
 Il flusso descritto fin qui esegue **una sola** delle quattro operazioni fondamentali su una tabella: l'inserimento. Lettura, modifica ed eliminazione restavano possibili soltanto da phpMyAdmin, cioè dal pannello di amministrazione del DBMS. È un limite pratico e insieme giuridico: la sezione 4 dell'informativa promette che le richieste vengono cancellate al termine del periodo di conservazione, e gli articoli 16 e 17 del Regolamento riconoscono all'interessato il diritto di ottenere rettifica e cancellazione dei propri dati. Una promessa che si può mantenere solo aprendo il pannello del database è una promessa fragile.
 
-`archivio.php` completa il quadro con una schermata di servizio protetta da password, raggiungibile dalla voce "Area riservata" della barra di navigazione e dal collegamento omonimo nel piè di pagina. Le quattro operazioni si distribuiscono così:
+`archivio.php` completa il quadro con una schermata di servizio protetta da password, raggiungibile da un collegamento nel piè di pagina, accanto a quelli dell'informativa privacy e della sezione cookie.
+
+Il collegamento è stato per un certo tempo anche una voce della barra di navigazione, ed è stato tolto. La ragione principale non è di sicurezza ma di architettura dell'informazione: il menu è rivolto a chi visita il sito, mentre l'area riservata ha un utente solo, che sa già dove si trova. Una voce di menu per una persona sola è rumore per tutte le altre, e sottrae spazio alle quattro voci che i visitatori cercano davvero.
+
+Va detto con chiarezza che **non annunciarla non è una misura di sicurezza**: la protezione è la password confrontata con la sua impronta, il token anti-CSRF e la sessione descritti in questa sezione, e resterebbe identica se l'indirizzo comparisse in prima pagina. Confondere la discrezione con la protezione — la cosiddetta *sicurezza per segretezza* — è un errore concettuale, non una scelta di progetto.
+
+Ridurre la visibilità ha però un effetto reale e misurabile su un archivio esposto in rete: meno indirizzi noti significano meno tentativi automatici da parte dei programmi che scandagliano i siti alla ricerca di pannelli di amministrazione. È la stessa considerazione che porta al `<meta name="robots" content="noindex, nofollow">` citato più avanti: le due decisioni sono la stessa decisione presa due volte, in due punti diversi. Le quattro operazioni si distribuiscono così:
 
 | Operazione | Istruzione SQL | Come viene richiesta |
 | :--- | :--- | :--- |
@@ -463,7 +469,7 @@ L'informativa in `privacy.php` documenta comunque la situazione, perché l'assen
 4. Verificare che i parametri in `config-db.php` corrispondano alla propria installazione. Il progetto usa un utente MySQL dedicato (`algorast_user`) con privilegi limitati al database `algorast_db`, invece dell'utente `root` predefinito di XAMPP/MAMP/WAMP: se l'utente non esiste ancora va creato e associato al database, altrimenti l'inserimento dei contatti fallisce con un errore di accesso. Le credenziali sono deliberatamente le stesse dell'hosting, per la ragione spiegata in §5.5: così il file non va toccato al momento della pubblicazione.
 5. Aprire `http://localhost/algora_site/index.php`.
 6. Per collaudare la parte server-side, aprire `http://localhost/algora_site/contatti.php`, compilare il modulo e inviarlo. Va verificato che compaia la pagina di conferma e che la riga sia presente nella tabella `contatti`.
-7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire la voce "Area riservata" nella barra di navigazione — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
+7. Per collaudare l'area riservata (§5.7), aprire `http://localhost/algora_site/archivio.php` — o seguire il collegamento "Area riservata" nel piè di pagina — ed entrare con la password dimostrativa `algora2025`. Per sostituirla si rigenera l'impronta da riga di comando e si aggiorna `config-admin.php`:
 
 ```
 php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
@@ -835,7 +841,13 @@ Without consent the script performs no insertion and returns a specific error me
 
 The flow described so far performs **one only** of the four fundamental operations on a table: insertion. Reading, editing and deletion remained possible only through phpMyAdmin, that is, through the DBMS administration panel. This is a limitation at once practical and legal: section 4 of the privacy notice promises that requests are erased at the end of the retention period, and Articles 16 and 17 of the Regulation grant the data subject the right to obtain rectification and erasure of their data. A promise that can be kept only by opening the database panel is a fragile promise.
 
-`archivio.php` completes the picture with a password-protected service screen, reachable from the "Area riservata" item in the navigation bar and from the matching link in the footer. The four operations are distributed as follows:
+`archivio.php` completes the picture with a password-protected service screen, reachable from a link in the footer, next to those for the privacy notice and the cookie section.
+
+For a while the link was also an item in the navigation bar, and it was removed. The main reason is not security but information architecture: the menu addresses the people who visit the site, whereas the reserved area has a single user, who already knows where it is. A menu item for one person is noise for everybody else, and it takes space away from the four items visitors actually look for.
+
+It must be said plainly that **not advertising it is not a security measure**: the protection is the password checked against its hash, the anti-CSRF token and the session described in this section, and it would be exactly the same if the address appeared on the home page. Confusing discretion with protection — so-called *security through obscurity* — is a conceptual mistake, not a design decision.
+
+Reducing visibility does however have a real and measurable effect on an archive exposed to the internet: fewer known addresses mean fewer automated attempts by the programs that trawl sites looking for administration panels. It is the same consideration that leads to the `<meta name="robots" content="noindex, nofollow">` mentioned further down: the two decisions are the same decision taken twice, in two different places. The four operations are distributed as follows:
 
 | Operation | SQL statement | How it is requested |
 | :--- | :--- | :--- |
@@ -995,7 +1007,7 @@ The notice in `privacy.php` documents the situation anyway, because the absence 
 4. Check that the parameters in `config-db.php` match your installation. The project uses a dedicated MySQL user (`algorast_user`) with privileges limited to the `algorast_db` database, rather than the `root` user that XAMPP/MAMP/WAMP provide by default: if that user does not exist yet it must be created and associated with the database, otherwise inserting a contact fails with an access error. The credentials are deliberately the same as the hosting's, for the reason explained in §5.5: this way the file needs no editing at publication time.
 5. Open `http://localhost/algora_site/index.php`.
 6. To test the server-side part, open `http://localhost/algora_site/contatti.php`, fill in the form and submit it. Check that the confirmation page appears and that the row is present in the `contatti` table.
-7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" item in the navigation bar — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
+7. To test the reserved area (§5.7), open `http://localhost/algora_site/archivio.php` — or follow the "Area riservata" link in the footer — and log in with the demonstration password `algora2025`. To replace it, regenerate the hash from the command line and update `config-admin.php`:
 
 ```
 php -r 'echo password_hash("nuova-password", PASSWORD_DEFAULT), "\n";'
