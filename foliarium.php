@@ -175,7 +175,7 @@
     <figure class="shot">
       <video controls preload="none" playsinline
              poster="img/foliarium-demo-poster.jpg"
-             width="1280" height="686">
+             width="640" height="686">
         <?php /* Due codifiche dello stesso filmato. Il browser prende la prima
                  che sa riprodurre, quindi il WebM va per primo: pesa poco meno,
                  ma soprattutto copre i browser costruiti senza i codec
