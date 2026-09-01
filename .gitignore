@@ -2,3 +2,10 @@
 # il file vero resta fuori dal repository, il modello lo accompagna.
 # Vedi config-db.esempio.php e la sezione 5.5 della relazione.
 config-db.php
+
+# Archivio di consegna: si rigenera dai file del progetto, non va versionato
+# (7,8 MB che diventerebbero obsoleti al primo commit successivo).
+santoro.marco.zip
+
+# File di lock creati da Word mentre un documento e' aperto.
+~$*
