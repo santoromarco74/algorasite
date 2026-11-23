@@ -6,6 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Algora Studio — Software per il Patrimonio Culturale</title>
 <meta name="description" content="Algora Studio sviluppa software specializzato per archivi, enti culturali e professionisti del patrimonio documentale italiano.">
+<link rel="canonical" href="https://algorastudio.it/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Algora Studio">
+<meta property="og:locale" content="it_IT">
+<meta property="og:title" content="Algora Studio — Software per il Patrimonio Culturale">
+<meta property="og:description" content="Algora Studio sviluppa software specializzato per archivi, enti culturali e professionisti del patrimonio documentale italiano.">
+<meta property="og:url" content="https://algorastudio.it/">
+<meta property="og:image" content="https://algorastudio.it/img/marchi/icona-512.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Algora Studio","url":"https://algorastudio.it/","logo":"https://algorastudio.it/img/marchi/icona-512.png"}
+</script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="img/marchi/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="img/marchi/apple-touch-icon.png">

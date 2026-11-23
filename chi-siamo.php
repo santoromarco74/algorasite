@@ -5,6 +5,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chi Siamo — Algora Studio</title>
+<meta name="description" content="Algora Studio è uno studio di sviluppo software che progetta applicazioni verticali per archivi, enti culturali e professionisti con esigenze specifiche.">
+<link rel="canonical" href="https://algorastudio.it/chi-siamo.php">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Algora Studio">
+<meta property="og:locale" content="it_IT">
+<meta property="og:title" content="Chi Siamo — Algora Studio">
+<meta property="og:description" content="Algora Studio è uno studio di sviluppo software che progetta applicazioni verticali per archivi, enti culturali e professionisti con esigenze specifiche.">
+<meta property="og:url" content="https://algorastudio.it/chi-siamo.php">
+<meta property="og:image" content="https://algorastudio.it/img/marchi/icona-512.png">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="img/marchi/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="img/marchi/apple-touch-icon.png">
